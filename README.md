@@ -2,7 +2,7 @@
 
 **Team Member:** Siying Xu, Yuming Liu, Shaopeng Lin
 
-### Description of this application:
+## Description of this application:
 We are going to implement a web application called xx, in which users can find workers for home maintenance projects and skilled trade workers. At the same time, workers can find employment opportunities through help wanted advertisements posted by homeowners.
 
 ## Description of the key features that will be completed by the Beta version
