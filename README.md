@@ -23,13 +23,13 @@ We are going to implement a web application called xx, in which users can find w
 - Can ask for work with a post
 - Can accept posts that ask for help
 - Workers have a scheduled calendar.
-**Post:**
+## Post:
 - Posts will include the description of the posts and have 2 types: recruitment and employment
 - Authenticated user can see their own posting history
 - Authenticated user can delete their own posts
 - Non authenticated users can only view posts
 
-**Search:**
+## Search:
 - Select Type of Posts: 
 - Looking for Help
 - Looking for Work
