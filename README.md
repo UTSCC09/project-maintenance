@@ -5,7 +5,7 @@
 ### Description of this application:
 We are going to implement a web application called xx, in which users can find workers for home maintenance projects and skilled trade workers. At the same time, workers can find employment opportunities through help wanted advertisements posted by homeowners.
 
-### Description of the key features that will be completed by the Beta version
+## Description of the key features that will be completed by the Beta version
 ## User
 **Non authenticated Users**
 - Can search for workers and other people’s postings
@@ -35,7 +35,7 @@ We are going to implement a web application called xx, in which users can find w
 - Looking for Work
 - Search for wanted Workers
 
-### Description of the additional features that will be complete by the Final version
+## Description of the additional features that will be complete by the Final version
 - Distance Filter for searching
 - Administrator user in charge of content regulation. 
 - Workers are authenticated by the Administrator.
@@ -48,7 +48,7 @@ We are going to implement a web application called xx, in which users can find w
 - Non Authenticated now can cancel appointments using email and appointment number
 - Non Authenticated now can view history using email
 
-### a description of the technology stack that you will use to build and deploy it：
-Frontend: HTML, CSS, and Javascript with React
-Backend: node.js, express.js with GraphQL + mongoDB
+## a description of the technology stack that you will use to build and deploy it：
+- Frontend: HTML, CSS, and Javascript with React
+- Backend: node.js, express.js with GraphQL + mongoDB
 
