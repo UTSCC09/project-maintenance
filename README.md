@@ -6,7 +6,7 @@
 We are going to implement a web application called xx, in which users can find workers for home maintenance projects and skilled trade workers. At the same time, workers can find employment opportunities through help wanted advertisements posted by homeowners.
 
 ## Description of the key features that will be completed by the Beta version
-## User
+### User
 **Non authenticated Users**
 - Can search for workers and other people’s postings
 - Can login or sign up to be a client or worker
@@ -23,13 +23,13 @@ We are going to implement a web application called xx, in which users can find w
 - Can ask for work with a post
 - Can accept posts that ask for help
 - Workers have a scheduled calendar.
-## Post
+### Post
 - Posts will include the description of the posts and have 2 types: recruitment and employment
 - Authenticated user can see their own posting history
 - Authenticated user can delete their own posts
 - Non authenticated users can only view posts
 
-## Search
+### Search
 - Select Type of Posts: 
 - Looking for Help
 - Looking for Work
@@ -48,7 +48,7 @@ We are going to implement a web application called xx, in which users can find w
 - Non Authenticated now can cancel appointments using email and appointment number
 - Non Authenticated now can view history using email
 
-## a description of the technology stack that you will use to build and deploy it：
+## Description of the technology stack that you will use to build and deploy it：
 - Frontend: HTML, CSS, and Javascript with React
 - Backend: node.js, express.js with GraphQL + mongoDB
 
