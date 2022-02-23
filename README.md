@@ -52,3 +52,9 @@ We are going to implement a web application called xx, in which users can find w
 - Frontend: HTML, CSS, and Javascript with React
 - Backend: node.js, express.js with GraphQL + mongoDB
 
+## The top 5 technical challenges:
+- Managing complex user relationships such as comments, posts or chatting.
+- Managing Bad user behaviour. For example, not showing up to appointments, fraud worker documents, etc.
+- Learning Curve of new frameworks. (eg. react, map functionalities, graphql/grpc)
+- Little time for market research given the circumstances. 
+- Managing Security and User Privacy
