@@ -1,4 +1,4 @@
-# Image Editor
+# Dr. Handyman 
 
 **Team Member:** Siying Xu, Yuming Liu, Shaopeng Lin
 
