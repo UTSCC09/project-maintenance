@@ -3,13 +3,13 @@
 **Team Member:** Siying Xu, Yuming Liu, Shaopeng Lin
 
 ## Description of this application:
-We are going to implement a web application called Dr.Handyman, in which users can find workers for home maintenance projects and skilled trade workers. At the same time, workers can find employment opportunities through help wanted advertisements posted by homeowners.
+We are going to implement a web application called Dr.Handyman, in which users can find workers for home maintenance projects and skilled trade workers. At the same time, workers can find employment opportunities through help-wanted advertisements posted by homeowners.
 
 ## Description of the key features that will be completed by the Beta version
 ### User
 **Non authenticated Users**
 - Can search for workers and other people’s postings
-- Can login or sign up to be a client or worker
+- Can log in or sign up to be a client or worker
 
 
 **Client**
@@ -30,8 +30,8 @@ We are going to implement a web application called Dr.Handyman, in which users c
 
 ### Post
 - Posts will include the description of the posts and have 2 types: recruitment and employment
-- Authenticated user can see their own posting history
-- Authenticated user can delete their own posts
+- Authenticated user can see their posting history
+- Authenticated user can delete their posts
 - Non authenticated users can only view posts
 
 ### Search
@@ -48,18 +48,18 @@ We are going to implement a web application called Dr.Handyman, in which users c
 - Users can post comments to workers about previous uncancelled appointments.
 - Users can apply to be a worker.
 - Workers have a scheduled calendar.
-- Non Authenticated now can message workers as anonymous users, but have no history after leaving the page
-- Non Authenticated now can book appointment using emails
-- Non Authenticated now can cancel appointments using email and appointment number
-- Non Authenticated now can view history using email
+- Non-Authenticated now can message workers as anonymous users but have no history after leaving the page
+- Non-Authenticated now can book an appointment using emails
+- Non-Authenticated now can cancel appointments using email and appointment number
+- Non-Authenticated now can view history using email
 
 ## Description of the technology stack that you will use to build and deploy it：
 - Frontend: HTML, CSS, and Javascript with React
-- Backend: node.js, express.js with GraphQL + mongoDB
+- Backend: node.js, express.js with GraphQL + MongoDB
 
 ## The top 5 technical challenges:
-- Managing complex user relationships such as comments, posts or chatting.
-- Managing Bad user behaviour. For example, not showing up to appointments, fraud worker documents, etc.
-- Learning Curve of new frameworks. (eg. react, map functionalities, graphql/grpc)
+- Managing complex user relationships such as comments, posts, or chatting.
+- Managing Bad user behavior. For example, not showing up to appointments, fraud worker documents, etc.
+- Learning Curve of new frameworks. (eg. react, map functionalities, GraphQl/gRPC)
 - Little time for market research given the circumstances. 
 - Managing Security and User Privacy
