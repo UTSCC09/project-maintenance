@@ -41,7 +41,7 @@ We are going to implement a web application called Dr.Handyman, in which users c
 - Looking for Workers
 
 ## Description of the additional features that will be complete by the Final version
-- Distance Filter for searching
+- Distance Filter for searching and potential map distance showcase
 - Administrator user in charge of content regulation. 
 - Workers are authenticated by the Administrator.
 - Workers can post comments to users about previous uncancelled appointments.
