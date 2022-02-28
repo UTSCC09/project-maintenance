@@ -53,7 +53,7 @@ We are going to implement a web application called Dr.Handyman, in which users c
 - Non-Authenticated now can cancel appointments using email and appointment number
 - Non-Authenticated now can view history using email
 
-## Description of the technology stack that you will use to build and deploy it
+## Description of the technology stack that will be used to build
 - Frontend: HTML, CSS, and Javascript with React
 - Backend: node.js, express.js with GraphQL + MongoDB
 
