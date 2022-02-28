@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Dr.Handyman</title>
+    <link href="style/main.css" rel="stylesheet" type="text/css" />
+    <link href="style/filter.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="top">
+        <div id="header">
+            <div class="logo_icon"></div>
+            <a href='/index.html' class="title_icon">
+            </a>
+        </div>
+        <div class="search_bar">
+            <input type="text" class="bar" name=" search to find the posts and the maintainers " placeholder="Find the maintainers or maintainning work near you! " />
+            <button class="clear"></button>
+
+            <div class="filter">
+                <select>
+                <option value="all types">All types</option>
+                <option value="maintainers">Maintainers</option>
+                <option value="job posted">Job posted</option>
+                </select>
+            </div>
+            <div class="location_bar">
+                <input type="text" class="loc_bar" name="change the location" placeholder="Change location" />
+                <div class="location_icon"></div>
+            </div>
+            <button type="submit" id="search" class="search_icon"></button>
+        </div>
+
+        <a href="/post/" id="post_button" class="btn header_btn hidden">Start A New Post</a>
+        <div id="login">
+            <div class="user_icon"></div>
+            <a href="/login.html" id="signin" class="btn header_btn">Sign in</a>
+            <div class="text">or</div>
+            <a href="/signup.html" id="signup" class="btn header_btn">Sign up</a>
+            <a href="/userprofile.html/" id="userprofile" class="btn header_btn hidden">Username</a>
+
+
+        </div>
+    </div>
+
+    <footer>
+        <a href='/credits.html'> credits
+            </a>
+    </footer>
+    <script src="js/header.js"></script>
+</body>
+
+</html>
