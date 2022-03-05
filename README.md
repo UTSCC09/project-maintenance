@@ -65,7 +65,7 @@ We are going to implement a web application called Dr.Handyman, in which users c
 - Managing Security and User Privacy
 
 ## new features:
-- Video Chat
-- Tips
-- 360o Image Display
-- audio messages/chat
+- Video Chat Peerjs
+- Tips Paypal Payment button, credit card button
+- 360o Image Display PANOLENS JS
+- audio messages/chat https://howlerjs.com/
