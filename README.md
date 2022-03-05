@@ -63,3 +63,9 @@ We are going to implement a web application called Dr.Handyman, in which users c
 - Learning Curve of new frameworks. (eg. react, map functionalities, GraphQl/gRPC)
 - Little time for market research given the circumstances. 
 - Managing Security and User Privacy
+
+## new features:
+- Video Chat
+- Tips
+- 360o Image Display
+- audio messages/chat
