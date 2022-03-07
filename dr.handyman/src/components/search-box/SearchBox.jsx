@@ -80,7 +80,8 @@ const SearchBox = () => {
           <Box mr={0.5}>{category}</Box>
           <KeyboardArrowDownOutlined fontSize="small" color="inherit" />
         </DropDownHandler>}>
-      {categories.map(item => <MenuItem key={item} onClick={handleCategoryChange(item) } >
+      {categories.map(item => <MenuItem key={item} onClick={handleCategoryChange(item) } 
+             >
           {item}
         </MenuItem >)}
     </Menu>;
@@ -104,21 +105,13 @@ const SearchBox = () => {
 
       {!!resultList.length && <SearchResultCard elevation={2}>
           {resultList.map(item => <Link href={`/product/search/${item}`} key={item}>
-              <MenuItem key={item} InputProps={{
-      sx: {
-       
-        "&:hover ": {
-          bgcolor: "#FFDBCF",
-          
-        }
-      }
-     
-    }}>{item}</MenuItem>
+              <MenuItem key={item} >{item}</MenuItem>
             </Link>)}
         </SearchResultCard>}
     </Box>;
 };
 
 const categories = ["All Categories", "Mantainers","Posts"];
+
 
 export default SearchBox;;
