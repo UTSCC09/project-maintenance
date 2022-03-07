@@ -3,7 +3,7 @@ import React, {
   useState,
 } from 'react';
 
-import Button from 'components/AppButton';
+
 import TextField from 'components/AppTextField';
 import FlexBox from 'components/FlexBox';
 import {
@@ -23,51 +23,28 @@ import {
   Card,
   Divider,
   IconButton,
+  Button
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const fbStyle = {
-  background: "#3B5998",
-  color: "white"
-};
-const googleStyle = {
-  background: "#4285F4",
-  color: "white"
-};
+
 const StyledCard = styled(({
   children,
   passwordVisibility,
   ...rest
 }) => <Card {...rest}>{children}</Card>)(({
-  theme,
+  
   passwordVisibility
 }) => ({
   width: 500,
-  [theme.breakpoints.down("sm")]: {
-    width: "100%"
-  },
+  
   ".content": {
     textAlign: "center",
     padding: "3rem 3.75rem 0px",
-    [theme.breakpoints.down("xs")]: {
-      padding: "1.5rem 1rem 0px"
-    }
+    
   },
   ".passwordEye": {
-    color: passwordVisibility ? theme.palette.grey[600] : theme.palette.grey[400]
-  },
-  ".facebookButton": {
-    marginBottom: 10,
-    "&:hover": fbStyle,
-    ...fbStyle
-  },
-  ".googleButton": {
-    "&:hover": googleStyle,
-    ...googleStyle
-  },
-  ".agreement": {
-    marginTop: 12,
-    marginBottom: 24
+    color: passwordVisibility ? "#AEB4BE" : "#DAE1E7"
   }
 }));
 
@@ -98,17 +75,21 @@ const Login = () => {
           Log in with email & password
         </Small>
 
-        <TextField mb={1.5} name="email" label="Email or Phone Number" placeholder="exmple@mail.com" variant="outlined" size="small" type="email" fullWidth onBlur={handleBlur} onChange={handleChange} value={values.email || ""} error={!!touched.email && !!errors.email} helperText={touched.email && errors.email} />
+        <TextField mb={1.5} name="email" label="Email" placeholder="Enter your email" variant="outlined" size="small" type="email" fullWidth onBlur={handleBlur} onChange={handleChange} value={values.email || ""} error={!!touched.email && !!errors.email} helperText={touched.email && errors.email} />
 
-        <TextField mb={2} name="password" label="Password" placeholder="*********" autoComplete="on" type={passwordVisibility ? "text" : "password"} variant="outlined" size="small" fullWidth InputProps={{
+        <TextField mb={2} name="password" label="Password" placeholder="Enter your password" autoComplete="on" type={passwordVisibility ? "text" : "password"} variant="outlined" size="small" fullWidth InputProps={{
         endAdornment: <IconButton size="small" type="button" onClick={togglePasswordVisibility}>
                 {passwordVisibility ? <Visibility className="passwordEye" fontSize="small" /> : <VisibilityOff className="passwordEye" fontSize="small" />}
               </IconButton>
       }} onBlur={handleBlur} onChange={handleChange} value={values.password || ""} error={!!touched.password && !!errors.password} helperText={touched.password && errors.password} />
 
-        <Button variant="contained" color="primary" type="submit" fullWidth sx={{
+        <Button variant="contained"  type="submit" fullWidth sx={{
         mb: "1.65rem",
-        height: 44
+        height: 44,
+        bgcolor:"#F7B9A6",
+        "&:hover": {   
+          bgcolor:"#FCB19A"
+        }
       }}>
           Login
         </Button>
@@ -119,8 +100,8 @@ const Login = () => {
           </Box>
 
           <FlexBox justifyContent="center" mt={-1.625}>
-            <Box color="grey.600" bgcolor="background.paper" px={2}>
-              on
+            <Box color="#AEB4BE" bgcolor="#F6F9FC" px={2}>
+             
             </Box>
           </FlexBox>
         </Box>

@@ -1,7 +1,7 @@
 import Menu from '@mui/material/Menu';
 import React, { Children, cloneElement, Fragment } from 'react';
 
-const BazarMenu = ({
+const AppMenu = ({
   open,
   handler,
   direction,
@@ -42,8 +42,8 @@ const BazarMenu = ({
     </Fragment>;
 };
 
-BazarMenu.defaultProps = {
+AppMenu.defaultProps = {
   direction: 'left',
   shouldCloseOnItemClick: true
 };
-export default BazarMenu;
+export default AppMenu;

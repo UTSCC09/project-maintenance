@@ -1,7 +1,7 @@
 import { Box, TextField } from '@mui/material';
 import { Small } from './Typography';
 
-const BazarTextField = ({
+const AppTextField = ({
   label,
   InputProps,
   ...props
@@ -28,4 +28,4 @@ const BazarTextField = ({
 };
 
 const spacePropList = ['m', 'mt', 'mr', 'mb', 'ml', 'mx', 'my', 'p', 'pt', 'pr', 'pb', 'pl', 'px', 'py', 'margin', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'marginX', 'marginY', 'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'paddingX', 'paddingY'];
-export default BazarTextField;
+export default AppTextField;

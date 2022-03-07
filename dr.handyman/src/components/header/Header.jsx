@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import clsx from 'clsx';
-import Image from 'components/AppImage';
+
 import FlexBox from 'components/FlexBox';
 import Login from 'components/sessions/Login';
 import Link from 'next/link';
@@ -66,7 +66,7 @@ const Header = ({
       }}>
           <Link href="/">
             <a>           
-              <Image height={50} mb={0.5} src="/assets/title3.png" alt="logo" />
+              <img height={50} mb={0.5} src="/assets/title3.png" alt="logo"/>
             </a>
           </Link>
 
