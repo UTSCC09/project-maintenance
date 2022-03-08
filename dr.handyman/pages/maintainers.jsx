@@ -7,7 +7,7 @@ import React from 'react';
 
 const MaintainerList = () => {
   return <NavbarLayout>
-      <H3 color="#2C2C2C" mb={2}>All Mantainers</H3>
+      <H3 color="#2C2C2C" mb={2}>See Top Rated Mantainers</H3>
 
       <Grid container spacing={3}>
         {maintainerList.map((item, ind) => <Grid item lg={4} sm={6} xs={12} key={ind}>
@@ -16,8 +16,8 @@ const MaintainerList = () => {
       </Grid>
 
       <FlexBox flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={4}>
-        <Span color="grey.600">Showing 1-9 of 300 Maintaners</Span>
-        <Pagination count={maintainerList.length} variant="outlined" color="primary" />
+        <Span color="grey.600">Showing 1-6 of 300 Maintaners</Span>
+        <Pagination count={Math.ceil(maintainerList.length / 6)} variant="outlined" color="primary" />
       </FlexBox>
     </NavbarLayout>;
 };
