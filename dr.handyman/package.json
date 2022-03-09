@@ -18,8 +18,12 @@
   "homepage": "https://github.com/UTSCC09/project-maintenance#readme",
   "dependencies": {
     "apollo-server": "^3.6.3",
+    "apollo-server-express": "^3.6.3",
     "express": "^4.17.3",
+    "express-session": "^1.17.2",
     "graphql": "^16.3.0",
-    "mongoose": "^6.2.4"
+    "mongoose": "^6.2.4",
+    "passport": "^0.5.2",
+    "uuid": "^8.3.2"
   }
 }
