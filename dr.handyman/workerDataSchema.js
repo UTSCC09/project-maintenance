@@ -1,15 +1,15 @@
 const mongoose  = require('mongoose');
 const { Schema } = mongoose;
-const workerDefs = `
-    type Worker {
+const workerDataDefs = `
+    type WorkerData {
     title: String
     author: String
   }`
-const workerMutDef = `
-addWorker(title: String, author: String): Worker
+const workerDataMutDef = `
+addWorker(title: String, author: String): WorkerData
     `
 
-const WorkerSchema = new Schema({
+const WorkerDataSchema = new Schema({
     title: {
         type: String,
         required: true
@@ -20,12 +20,12 @@ const WorkerSchema = new Schema({
     }
 })
 
-const Worker = mongoose.model('Worker', WorkerSchema);
+const WorkerData = mongoose.model('WorkerData', WorkerDataSchema);
 
-const workerMut = {
+const workerDataMut = {
     addWorker (parent, args, context, info) {
         const { title, author } = args
-        const workerObj = new Worker({
+        const workerObj = new WorkerData({
             title, author
         });
         return workerObj.save()
@@ -39,9 +39,9 @@ const workerMut = {
 }
 
 module.exports = {
-    workerDefs,
-    workerMutDef,
-    Worker,
-    workerMut,
+    workerDataDefs,
+    workerDataMutDef,
+    WorkerData,
+    workerDataMut,
 }
 
