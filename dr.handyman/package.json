@@ -1,0 +1,25 @@
+{
+  "name": "project-maintenance",
+  "version": "1.0.0",
+  "description": "**Team Member:** Siying Xu, Yuming Liu, Shaopeng Lin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UTSCC09/project-maintenance.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UTSCC09/project-maintenance/issues"
+  },
+  "homepage": "https://github.com/UTSCC09/project-maintenance#readme",
+  "dependencies": {
+    "apollo-server": "^3.6.3",
+    "express": "^4.17.3",
+    "graphql": "^16.3.0",
+    "mongoose": "^6.2.4"
+  }
+}
