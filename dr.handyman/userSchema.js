@@ -1,4 +1,5 @@
 const mongoose  = require('mongoose');
+const { permissions } = require('./permissions');
 const { Schema } = mongoose;
 
 const userDefs = `
@@ -9,6 +10,7 @@ type User {
     type: String
     phone: Int
     rating: Int
+    permissions: [String]
 }`
 
 const userMutDef = `
@@ -40,6 +42,10 @@ const UserSchema = new Schema({
         type: Number,
         required: true
     },
+    permissions: {
+        type: [String],
+        required: true
+    }
 })
 
 const User = mongoose.model('User', UserSchema);
@@ -51,7 +57,8 @@ const userMut = {
             email, password, username,
             type: "user",
             phone: 123456789,
-            rating: 0
+            rating: 0,
+            permissions: []
         });
         return userObj.save()
             .then (result => {
