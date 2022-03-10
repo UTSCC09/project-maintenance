@@ -29,10 +29,14 @@ app.use(session({
 
 passport.use(
   new GraphQLLocalStrategy(async (email, password, done) => {
-    const users = await User.find();
-    const matchingUser = users.find(user => email === user.email && password === user.password);
-    const error = matchingUser ? null : new Error('no matching user');
-    done(error, matchingUser);
+    const oneuser = await User.findOne({
+      $and: [
+          { email: email},
+          { password: password }
+      ]
+    });
+    const error = oneuser ? null : new Error('no matching user');
+    done(error, oneuser);
   }),
 );
 
@@ -62,11 +66,14 @@ const typeDefs = gql(`
   type Query {
     WorkerData: [WorkerData]
     User: [User]
+    currentUser: User
   }
 
   # Mutation Types
   type Mutation {
     login(email: String!, password: String!): AuthPayload
+    signup(username: String!, email: String!, password: String!): AuthPayload
+    logout: Boolean
     `+ workerDataMutDef
      + userMutDef
      +`
@@ -85,6 +92,17 @@ const resolvers = {
         await context.login(user);
         return { user }
       },
+      logout: (parent, args, context) => context.logout(),
+      signup: async (parent, { username, email, password }, context) => {
+        const existUser = await User.findOne({ email: email});
+        if (existUser) {
+          throw new Error('User with email already exists');
+        }
+
+        const newUser = await userMut.addUser(null, {email, username, password}, null, null);
+        await context.login(newUser);
+        return { user: newUser };
+      },
     },
 
     Query: {
@@ -92,6 +110,7 @@ const resolvers = {
           return await User.find();
         },
         WorkerData: () => WorkerData,
+        currentUser: (parent, args, context) => context.getUser(),
     },
 }
 
