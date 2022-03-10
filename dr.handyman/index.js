@@ -4,6 +4,7 @@ const session = require('express-session');
 const passport = require('passport');
 const { GraphQLLocalStrategy, buildContext }= require('graphql-passport');
 const uuid = require('uuid').v4;
+const bcrypt = require('bcrypt');
 
 const {workerDataMutDef, workerDataDefs, WorkerData, workerDataMut} = require('./workerDataSchema');
 const {userMutDef, userDefs, User, userMut} = require('./userSchema');
@@ -29,24 +30,31 @@ app.use(session({
 
 passport.use(
   new GraphQLLocalStrategy(async (email, password, done) => {
-    const oneuser = await User.findOne({
-      $and: [
-          { email: email},
-          { password: password }
-      ]
-    });
+    const oneuser = await User.findOne({ email: email});
     const error = oneuser ? null : new Error('no matching user');
-    done(error, oneuser);
+    if (error) return done(error, oneuser);
+    const doCheck = () => new Promise((resolve, reject) => {
+      bcrypt.compare(password, oneuser.password, function (err, same){
+        if (error) return done(new Error('hash compare incorrect'), oneuser);
+        if (same)
+          done(error, oneuser);
+        else{
+          error = new Error('password incorrect');
+          done(error, oneuser);
+        }
+        resolve();
+      });
+    });
+    return await doCheck();
+    
   }),
 );
-
 
 passport.serializeUser((user, done) => {
   done(null, user.email);
 });
 passport.deserializeUser(async (email, done) => {
-  const users = await User.find();
-  const matchingUser = users.find(user => user.email === email);
+  const matchingUser = await User.findOne({ email: email});
   done(null, matchingUser);
 });
 
@@ -98,10 +106,18 @@ const resolvers = {
         if (existUser) {
           throw new Error('User with email already exists');
         }
-
-        const newUser = await userMut.addUser(null, {email, username, password}, null, null);
-        await context.login(newUser);
-        return { user: newUser };
+        const doSignup = () => new Promise((resolve, reject) => {
+          bcrypt.genSalt(10, function(err, salt) {
+            if (err) throw new Error('salt gen failed');
+            bcrypt.hash(password, salt, async (err, hash) => {
+              if (err) throw new Error('hash failed');
+              const newUser = await userMut.addUser(null, {email, username, password: hash}, null, null);
+              await context.login(newUser);
+              resolve({ user: newUser });
+            });
+          });
+        });
+        return await doSignup();
       },
     },
 
