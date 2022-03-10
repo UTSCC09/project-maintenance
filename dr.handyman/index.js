@@ -33,19 +33,15 @@ passport.use(
     const oneuser = await User.findOne({ email: email});
     const error = oneuser ? null : new Error('no matching user');
     if (error) return done(error, oneuser);
-    const doCheck = () => new Promise((resolve, reject) => {
-      bcrypt.compare(password, oneuser.password, function (err, same){
-        if (error) return done(new Error('hash compare incorrect'), oneuser);
+    return await bcrypt.compare(password, oneuser.password, function (err, same){
+        if (err) return done(new Error('hash compare incorrect'), oneuser);
         if (same)
           done(error, oneuser);
         else{
           error = new Error('password incorrect');
           done(error, oneuser);
         }
-        resolve();
-      });
     });
-    return await doCheck();
     
   }),
 );
@@ -106,11 +102,12 @@ const resolvers = {
         if (existUser) {
           throw new Error('User with email already exists');
         }
+        
         const doSignup = () => new Promise((resolve, reject) => {
           bcrypt.genSalt(10, function(err, salt) {
-            if (err) throw new Error('salt gen failed');
+            if (err) reject(Error('salt gen failed'));
             bcrypt.hash(password, salt, async (err, hash) => {
-              if (err) throw new Error('hash failed');
+              if (err) reject(Error('hash failed'));
               const newUser = await userMut.addUser(null, {email, username, password: hash}, null, null);
               await context.login(newUser);
               resolve({ user: newUser });
