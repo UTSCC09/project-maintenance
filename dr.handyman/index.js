@@ -7,9 +7,10 @@ const passport = require('passport');
 const { GraphQLLocalStrategy, buildContext }= require('graphql-passport');
 const uuid = require('uuid').v4;
 const bcrypt = require('bcrypt');
-
+const fs = require('fs');
 const {workerDataMutDef, workerDataDefs, WorkerData, workerDataMut} = require('./workerDataSchema');
 const {userMutDef, userDefs, User, userMut} = require('./userSchema');
+const { postMutDef, postDefs, Post, postMut} = require('./postSchema');
 const { permissions } = require('./permissions');
 const mongoose = require('mongoose');
 const { graphql } = require('graphql');
@@ -28,7 +29,9 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     maxAge: 360000,
-    secure: false // this should be true only when you don't want to show it for security reason
+    secure: true,
+    httpOnly: true,
+    sameSite: true,
   }
 }));
 
@@ -68,6 +71,7 @@ const typeDefs = gql(`
   }
   ` + workerDataDefs 
     + userDefs
+    + postDefs
     +`
 
   # Query types
@@ -84,6 +88,7 @@ const typeDefs = gql(`
     logout: Boolean
     `+ workerDataMutDef
      + userMutDef
+     + postMutDef
      +`
   }
 `);
@@ -91,6 +96,7 @@ const typeDefs = gql(`
 module.exports = {
     WorkerData,
     User,
+    Post,
 }
 
 const resolvers = {
@@ -133,6 +139,7 @@ const resolvers = {
 
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut);
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut);
+resolvers.Mutation = Object.assign({}, resolvers.Mutation, postMut);
 const schema = applyMiddleware(
   makeExecutableSchema({
     typeDefs,
@@ -160,7 +167,17 @@ async function startServer() {
 startServer();
 
 // The `listen` method launches a web server.
-app.listen(3000, function () {
-  console.log(`server running on port 3000`);
-  console.log(`gql path is localhost:3000${server.graphqlPath}`);
+const https = require('https');
+const PORT = 3000;
+
+var privateKey = fs.readFileSync( 'server.key' );
+var certificate = fs.readFileSync( 'server.crt' );
+var config = {
+        key: privateKey,
+        cert: certificate
+};
+
+https.createServer(config, app).listen(PORT, function (err) {
+    if (err) console.log(err);
+    else console.log("HTTPS server on https://localhost:%s", PORT);
 });

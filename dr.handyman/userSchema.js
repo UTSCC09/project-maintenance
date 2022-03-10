@@ -1,5 +1,4 @@
 const mongoose  = require('mongoose');
-const { permissions } = require('./permissions');
 const { Schema } = mongoose;
 
 const userDefs = `
@@ -11,10 +10,15 @@ type User {
     phone: Int
     rating: Int
     permissions: [String]
+    createdAt: String
+}
+type Del {
+    count: Int
 }`
 
 const userMutDef = `
 addUser(email: String, password: String, username: String): User
+deleteUser(email: String): Del
     `
 
 const UserSchema = new Schema({
@@ -45,8 +49,12 @@ const UserSchema = new Schema({
     permissions: {
         type: [String],
         required: true
+    },
+    createdAt: {
+        type: String,
+        required: true
     }
-})
+}, { timestamps: true })
 
 const User = mongoose.model('User', UserSchema);
 
@@ -68,6 +76,15 @@ const userMut = {
                 console.error(err)
             })
     },
+    deleteUser (parent, args, context, info){
+        const { email } = args
+        return User.deleteOne({email: email}).then (result => {
+                                    return { count: result.deletedCount }
+                                })
+                                .catch (err => {
+                                    console.error(err)
+                                });
+    }
 }
 
 module.exports = {
