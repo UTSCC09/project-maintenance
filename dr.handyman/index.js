@@ -1,6 +1,8 @@
-const { ApolloServer, gql } = require('apollo-server-express');
+const { ApolloServer, gql} = require('apollo-server-express');
 const express = require('express');
 const session = require('express-session');
+const { makeExecutableSchema } = require('graphql-tools');
+const { applyMiddleware } = require('graphql-middleware');
 const passport = require('passport');
 const { GraphQLLocalStrategy, buildContext }= require('graphql-passport');
 const uuid = require('uuid').v4;
@@ -8,7 +10,9 @@ const bcrypt = require('bcrypt');
 
 const {workerDataMutDef, workerDataDefs, WorkerData, workerDataMut} = require('./workerDataSchema');
 const {userMutDef, userDefs, User, userMut} = require('./userSchema');
+const { permissions } = require('./permissions');
 const mongoose = require('mongoose');
+const { graphql } = require('graphql');
 const { Schema } = mongoose;
 const connection = "mongodb+srv://Chris:chris@dr-handyman.7i3hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 mongoose.connect(connection);
@@ -129,11 +133,17 @@ const resolvers = {
 
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut);
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut);
-
-let server = null;
+const schema = applyMiddleware(
+  makeExecutableSchema({
+    typeDefs,
+    resolvers
+  }),
+  permissions
+);
 async function startServer() {
     server = new ApolloServer({
-        typeDefs,
+        schema,
+        typeDefs, 
         resolvers,
         introspection: true,
         playground: {
