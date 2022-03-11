@@ -1,7 +1,13 @@
+const { createServer } = require('http');
+const { ApolloServerPluginDrainHttpServer } = require("apollo-server-core");
+const { makeExecutableSchema }  = require('@graphql-tools/schema');
+const { WebSocketServer } = require('ws');
+const { useServer } = require('graphql-ws/lib/use/ws');
+
+
 const { ApolloServer, gql} = require('apollo-server-express');
 const express = require('express');
 const session = require('express-session');
-const { makeExecutableSchema } = require('graphql-tools');
 const { applyMiddleware } = require('graphql-middleware');
 const passport = require('passport');
 const { GraphQLLocalStrategy, buildContext }= require('graphql-passport');
@@ -11,16 +17,27 @@ const fs = require('fs');
 const {workerDataMutDef, workerDataDefs, WorkerData, workerDataMut} = require('./workerDataSchema');
 const {userMutDef, userDefs, User, userMut} = require('./userSchema');
 const { postMutDef, postDefs, Post, postMut} = require('./postSchema');
+const { chatMutDef, chatDefs, Conversation, Message, chatMut } = require('./chatSchema');
 const { permissions } = require('./permissions');
 const mongoose = require('mongoose');
 const { graphql } = require('graphql');
 const { Schema } = mongoose;
+
+const https = require('https');
+const PORT = 3000;
+
+var privateKey = fs.readFileSync( 'server.key' );
+var certificate = fs.readFileSync( 'server.crt' );
+var config = {
+        key: privateKey,
+        cert: certificate
+};
 const connection = "mongodb+srv://Chris:chris@dr-handyman.7i3hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-mongoose.connect(connection);
+mongoose.connect(connection, { ssl: true });
 
 const SESSION_SECRET = 'some secret';
-
 const app = express();
+const httpServer = https.createServer(config, app);
 
 app.use(session({
   genid: (req) => uuid(),
@@ -72,6 +89,7 @@ const typeDefs = gql(`
   ` + workerDataDefs 
     + userDefs
     + postDefs
+    + chatDefs
     +`
 
   # Query types
@@ -89,6 +107,7 @@ const typeDefs = gql(`
     `+ workerDataMutDef
      + userMutDef
      + postMutDef
+     + chatMutDef
      +`
   }
 `);
@@ -97,6 +116,8 @@ module.exports = {
     WorkerData,
     User,
     Post,
+    Conversation,
+    Message,
 }
 
 const resolvers = {
@@ -140,6 +161,8 @@ const resolvers = {
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut);
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut);
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, postMut);
+resolvers.Mutation = Object.assign({}, resolvers.Mutation, chatMut);
+
 const schema = applyMiddleware(
   makeExecutableSchema({
     typeDefs,
@@ -147,6 +170,20 @@ const schema = applyMiddleware(
   }),
   permissions
 );
+// Creating the WebSocket server
+const wsServer = new WebSocketServer({
+  // This is the `httpServer` we created in a previous step.
+  server: httpServer,
+  // Pass a different path here if your ApolloServer serves at
+  // a different path.
+  path: '/graphql',
+});
+
+// Hand in the schema we just created and have the
+// WebSocketServer start listening.
+const serverCleanup = useServer({ schema }, wsServer);
+
+let server;
 async function startServer() {
     server = new ApolloServer({
         schema,
@@ -158,6 +195,21 @@ async function startServer() {
             "request.credentials": "include"
           }
         },
+        plugins: [
+          // Proper shutdown for the HTTP server.
+          ApolloServerPluginDrainHttpServer({ httpServer }),
+    
+          // Proper shutdown for the WebSocket server.
+          {
+            async serverWillStart() {
+              return {
+                async drainServer() {
+                  await serverCleanup.dispose();
+                },
+              };
+            },
+          },
+        ],
         
         context: ({ req, res }) => buildContext({ req, res }),
     });
@@ -167,17 +219,8 @@ async function startServer() {
 startServer();
 
 // The `listen` method launches a web server.
-const https = require('https');
-const PORT = 3000;
 
-var privateKey = fs.readFileSync( 'server.key' );
-var certificate = fs.readFileSync( 'server.crt' );
-var config = {
-        key: privateKey,
-        cert: certificate
-};
-
-https.createServer(config, app).listen(PORT, function (err) {
+httpServer.listen(PORT, function (err) {
     if (err) console.log(err);
     else console.log("HTTPS server on https://localhost:%s", PORT);
 });

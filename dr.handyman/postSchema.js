@@ -3,8 +3,11 @@ const { Schema } = mongoose;
 
 const postDefs = `
 type Post {
+    _id: String
     posterEmail: String
+    posterUsername: String
     acceptorEmail: String
+    acceptorUsername: String
     title: String
     content: String
     region: String
@@ -23,7 +26,15 @@ const PostSchema = new Schema({
         type: String,
         required: true
     },
+    posterUsername: {
+        type: String,
+        required: true
+    },
     acceptorEmail: {
+        type: String,
+        required: false
+    },
+    acceptorUsername: {
         type: String,
         required: false
     },
@@ -47,14 +58,6 @@ const PostSchema = new Schema({
         type: Boolean,
         required: true
     },
-    createdAt: {
-        type: String,
-        required: false
-    },
-    updatedAt: {
-        type: String,
-        required: false
-    }
 }, { timestamps: true })
 
 const Post = mongoose.model('Post', PostSchema);
@@ -64,7 +67,7 @@ const postMut = {
         const { title, content, region, type} = args
         const postObj = new Post({
             posterEmail: context.getUser().email,
-            acceptorEmail: "",
+            posterUsername: context.getUser().username,
             title, 
             content,
             region,
