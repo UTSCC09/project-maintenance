@@ -1,7 +1,7 @@
 import AppLayout from 'components/layout/AppLayout';
 
-import MaintainerList from './maintainers';
-import Posts from './posts';
+import MaintainerList from 'components/homepage/maintainers';
+import Posts from 'components/homepage/posts';
 import { Box } from "@mui/system";
 
 import { ApolloClient, gql } from "@apollo/client";
