@@ -1,3 +1,7 @@
+/*
+from https://mui.com/store/items/bazar-pro-react-ecommerce-template
+*/
+
 import { Box, styled } from '@mui/material';
 import clsx from 'clsx';
 import React from 'react';

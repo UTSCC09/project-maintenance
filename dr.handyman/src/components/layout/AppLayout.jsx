@@ -13,8 +13,10 @@ const AppLayout = ({
   navbar,
   title = "Dr.Handyman"
 }) => {
-  
- 
+  const [isFixed, setIsFixed] = useState(false);
+  const toggleIsFixed = useCallback(fixed => {
+    setIsFixed(fixed);
+  }, []);
   return <Fragment>
       <Head>
         <title>{title}</title>

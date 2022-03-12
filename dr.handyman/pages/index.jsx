@@ -1,14 +1,12 @@
 import AppLayout from 'components/layout/AppLayout';
-import MaintainerList from './maintainers';
-import Posts from './posts';
-import { Box } from "@mui/system";
+import MaintainerList from 'components/homepage/maintainers';
+import Posts from 'components/homepage/posts';
 const IndexPage = props => {
   
   return <AppLayout>
-     <MaintainerList />
+     <MaintainerList />   
   <Posts />
     </AppLayout>;
+
 };
-
-
 export default IndexPage;

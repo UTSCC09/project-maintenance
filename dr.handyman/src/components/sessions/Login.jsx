@@ -86,9 +86,9 @@ const Login = () => {
         <Button variant="contained"  type="submit" fullWidth sx={{
         mb: "1.65rem",
         height: 44,
-        bgcolor:"#F7B9A6",
+        bgcolor:"#4D88AF",
         "&:hover": {   
-          bgcolor:"#FCB19A"
+          bgcolor:"#4D88AF"
         }
       }}>
           Login

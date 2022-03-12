@@ -1,3 +1,7 @@
+/*
+from https://mui.com/store/items/bazar-pro-react-ecommerce-template
+*/
+
 import { styled } from "@mui/material";
 import clsx from "clsx";
 import Link from "next/link";
@@ -31,7 +35,7 @@ const NavLink = ({
   const checkRouteMatch = () => {
     if (href === "/") return pathname === href;
     return pathname.includes(href);
-  }; // active route
+  };
 
 
   const currentRoute = checkRouteMatch();

@@ -7,7 +7,8 @@ const NavbarLayout = ({
   children
 }) => {
   return <Container sx={{
-      my: '2rem'
+      marginTop: '2rem',
+      marginBottom:'3rem'
     }}>{children}</Container>
    ;
 };

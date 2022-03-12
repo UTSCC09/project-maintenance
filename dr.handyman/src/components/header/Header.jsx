@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-import SearchBox from '../search-box/SearchBox'; // component props interface
+import SearchBox from '../homepage/SearchBox'; // component props interface
 
 // styled component
 export const HeaderWrapper = styled(Box)(({
@@ -66,7 +66,7 @@ const Header = ({
       }}>
           <Link href="/">
             <a>           
-              <img height={50} mb={0.5} src="/assets/title3.png" alt="logo"/>
+              <img height={50} mb={0.5} src="/assets/title.jpg" alt="logo"/>
             </a>
           </Link>
 
@@ -83,7 +83,7 @@ const Header = ({
           md: 'flex'
         }
       }}>
-          <Box component={IconButton} ml={2} p={1.25} bgcolor="#FCBEAF" onClick={toggleDialog}>
+          <Box component={IconButton} ml={2} p={1.25} bgcolor="#92B6CE" onClick={toggleDialog}>
             <PersonOutline />
           </Box>
          

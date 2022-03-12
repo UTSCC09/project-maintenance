@@ -20,8 +20,10 @@ const Maintainer = ({
       <Box sx={{
       color: '#373737',
       p: '17px 30px 56px',   
-      bgcolor: '#FFF3EC',
-      
+      bgcolor: '#BDDDEA',
+      "&:hover": {   
+        bgcolor:"#AEC5F2"
+      }
     }}>
         <H3 fontWeight="600" mb={1}>
           {name}

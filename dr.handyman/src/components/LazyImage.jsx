@@ -1,3 +1,7 @@
+/*
+from https://mui.com/store/items/bazar-pro-react-ecommerce-template
+*/
+
 import { bgcolor, borderRadius, compose, spacing, styled } from '@mui/system';
 import NextImage from 'next/image';
 import React from 'react';

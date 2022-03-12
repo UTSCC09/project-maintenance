@@ -1,6 +1,10 @@
+/*
+from https://mui.com/store/items/bazar-pro-react-ecommerce-template
+*/
+
 import { Small } from 'components/Typography';
 import Link from 'next/link';
-import React from 'react'; // component props interface
+import React from 'react'; 
 
 const NavLink2 = ({
   url,

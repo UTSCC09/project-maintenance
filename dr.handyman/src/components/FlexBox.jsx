@@ -1,3 +1,7 @@
+/*
+from https://mui.com/store/items/bazar-pro-react-ecommerce-template
+*/
+
 import { Box } from "@mui/system";
 
 const FlexBox = ({
