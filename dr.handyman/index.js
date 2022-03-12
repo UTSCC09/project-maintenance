@@ -3,7 +3,8 @@ const { ApolloServerPluginDrainHttpServer } = require("apollo-server-core");
 const { makeExecutableSchema }  = require('@graphql-tools/schema');
 const { WebSocketServer } = require('ws');
 const { useServer } = require('graphql-ws/lib/use/ws');
-
+const { execute, subscribe } = require('graphql');
+const { SubscriptionServer } = require('subscriptions-transport-ws');
 
 const { ApolloServer, gql} = require('apollo-server-express');
 const express = require('express');
@@ -14,15 +15,21 @@ const { GraphQLLocalStrategy, buildContext }= require('graphql-passport');
 const uuid = require('uuid').v4;
 const bcrypt = require('bcrypt');
 const fs = require('fs');
+
 const {workerDataMutDef, workerDataDefs, WorkerData, workerDataMut} = require('./workerDataSchema');
 const {userMutDef, userDefs, User, userMut} = require('./userSchema');
 const { postMutDef, postDefs, Post, postMut} = require('./postSchema');
 const { chatMutDef, chatDefs, Conversation, Message, chatMut } = require('./chatSchema');
 const { permissions } = require('./permissions');
+
 const mongoose = require('mongoose');
 const { graphql } = require('graphql');
 const { Schema } = mongoose;
+const connection = "mongodb+srv://Chris:chris@dr-handyman.7i3hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+mongoose.connect(connection, { ssl: true });
+const { PubSub } = require('graphql-subscriptions');
 
+const pubsub = new PubSub();
 const https = require('https');
 const PORT = 3000;
 
@@ -32,8 +39,7 @@ var config = {
         key: privateKey,
         cert: certificate
 };
-const connection = "mongodb+srv://Chris:chris@dr-handyman.7i3hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-mongoose.connect(connection, { ssl: true });
+
 
 const SESSION_SECRET = 'some secret';
 const app = express();
@@ -110,6 +116,10 @@ const typeDefs = gql(`
      + chatMutDef
      +`
   }
+
+  type Subscription {
+    newUser: User
+  }
 `);
 
 module.exports = {
@@ -121,10 +131,18 @@ module.exports = {
 }
 
 const resolvers = {
+    Subscription: {
+      newUser: {
+        subscribe: (parent, args, {pubsub}) => pubsub.asyncIterator("NEW_USER")
+      }
+    },
     Mutation: {
       login: async (parent, { email, password }, context) => {
         const { user } = await context.authenticate('graphql-local', { email, password });
         await context.login(user);
+        context.pubsub.publish("NEW_USER", {
+          newUser: user
+        })
         return { user }
       },
       logout: (parent, args, context) => context.logout(),
@@ -170,49 +188,81 @@ const schema = applyMiddleware(
   }),
   permissions
 );
-// Creating the WebSocket server
-const wsServer = new WebSocketServer({
-  // This is the `httpServer` we created in a previous step.
-  server: httpServer,
-  // Pass a different path here if your ApolloServer serves at
-  // a different path.
-  path: '/graphql',
-});
-
-// Hand in the schema we just created and have the
-// WebSocketServer start listening.
-const serverCleanup = useServer({ schema }, wsServer);
 
 let server;
 async function startServer() {
-    server = new ApolloServer({
-        schema,
-        typeDefs, 
-        resolvers,
-        introspection: true,
-        playground: {
-          settings: {
-            "request.credentials": "include"
-          }
-        },
-        plugins: [
-          // Proper shutdown for the HTTP server.
-          ApolloServerPluginDrainHttpServer({ httpServer }),
-    
-          // Proper shutdown for the WebSocket server.
-          {
-            async serverWillStart() {
-              return {
-                async drainServer() {
-                  await serverCleanup.dispose();
-                },
-              };
+    // Creating the WebSocket server
+  // const wsServer = new WebSocketServer({
+  //   // This is the `httpServer` we created in a previous step.
+  //   server: httpServer,
+  //   // Pass a different path here if your ApolloServer serves at
+  //   // a different path.
+  //   path: '/graphql',
+  // });
+
+  // Hand in the schema we just created and have the
+  // WebSocketServer start listening.
+  const temp = makeExecutableSchema({
+    typeDefs,
+    resolvers
+  });
+  // const serverCleanup = useServer({ temp }, wsServer);
+  const server = new ApolloServer({
+    schema,
+    introspection: true,
+    playground: {
+      settings: {
+        "request.credentials": "include"
+      }
+    },
+    plugins: [
+      // Proper shutdown for the HTTP server.
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+  
+      // Proper shutdown for the WebSocket server.
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
             },
-          },
-        ],
-        
-        context: ({ req, res }) => buildContext({ req, res }),
-    });
+          };
+        },
+      },
+    ],
+    
+    context: ({ req, res }) => buildContext({ req, res, pubsub }),
+  });
+  const subscriptionServer = SubscriptionServer.create({
+      // This is the `schema` we just created.
+      schema,
+      // These are imported from `graphql`.
+      execute,
+      subscribe,
+      // Providing `onConnect` is the `SubscriptionServer` equivalent to the
+      // `context` function in `ApolloServer`. Please [see the docs](https://github.com/apollographql/subscriptions-transport-ws#constructoroptions-socketoptions--socketserver)
+      // for more information on this hook.
+      async onConnect(
+          connectionParams,
+          webSocket,
+          context
+      ) {
+          console.log('Connected!');
+          // If an object is returned here, it will be passed as the `context`
+          // argument to your subscription resolvers.
+          return {
+              pubsub
+          }
+      },
+      onDisconnect(webSocket, context) {
+          console.log('Disconnected!')
+      },
+  }, {
+      // This is the `httpServer` we created in a previous step.
+      server: httpServer,
+      // This `server` is the instance returned from `new ApolloServer`.
+      path: server.graphqlPath,
+  });
     await server.start();
     server.applyMiddleware({ app });
 }

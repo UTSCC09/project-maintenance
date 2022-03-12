@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/UTSCC09/project-maintenance#readme",
   "dependencies": {
+    "@axelspringer/graphql-google-pubsub": "^2.1.0",
     "@graphql-tools/schema": "^8.3.2",
     "apollo-server": "^3.6.3",
     "apollo-server-core": "^3.6.4",
@@ -28,12 +29,15 @@
     "graphql-middleware": "^6.1.15",
     "graphql-passport": "^0.6.4",
     "graphql-shield": "^7.5.0",
+    "graphql-subscriptions": "^2.0.0",
     "graphql-tools": "^8.2.0",
     "graphql-ws": "^5.6.2",
     "mongoose": "^6.2.4",
     "passport": "^0.5.2",
     "passport-local": "^1.0.0",
+    "subscriptions-transport-ws": "^0.11.0",
     "uuid": "^8.3.2",
-    "ws": "^8.5.0"
+    "ws": "^8.5.0",
+    "wss": "^3.3.4"
   }
 }
