@@ -8,7 +8,7 @@ type Conversation {
     userEmails: [String]
 }
 
-type Messages {
+type Message {
     _id: String
     conversationId: String
     email: String
@@ -20,8 +20,11 @@ type Messages {
 `
 
 const chatMutDef = `
-
-    `
+    createConvo(email1: String, email2: String): Conversation
+`
+const chatQueryDef = `
+    getConvo(_id: String): Conversation
+`
 
 const ConversationSchema = new Schema({
     userEmails: {

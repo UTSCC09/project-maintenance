@@ -5,8 +5,7 @@ const { WebSocketServer } = require('ws');
 const { useServer } = require('graphql-ws/lib/use/ws');
 const { execute, subscribe } = require('graphql');
 const { SubscriptionServer } = require('subscriptions-transport-ws');
-
-const { ApolloServer, gql} = require('apollo-server-express');
+const { ApolloServer, gql, AuthenticationError} = require('apollo-server-express');
 const express = require('express');
 const session = require('express-session');
 const { applyMiddleware } = require('graphql-middleware');
@@ -15,6 +14,7 @@ const { GraphQLLocalStrategy, buildContext }= require('graphql-passport');
 const uuid = require('uuid').v4;
 const bcrypt = require('bcrypt');
 const fs = require('fs');
+const cookie = require('cookie');
 
 const {workerDataMutDef, workerDataDefs, WorkerData, workerDataMut} = require('./workerDataSchema');
 const {userMutDef, userDefs, User, userMut} = require('./userSchema');
@@ -23,13 +23,27 @@ const { chatMutDef, chatDefs, Conversation, Message, chatMut } = require('./chat
 const { permissions } = require('./permissions');
 
 const mongoose = require('mongoose');
-const { graphql } = require('graphql');
 const { Schema } = mongoose;
 const connection = "mongodb+srv://Chris:chris@dr-handyman.7i3hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 mongoose.connect(connection, { ssl: true });
-const { PubSub } = require('graphql-subscriptions');
+const { RedisPubSub } = require('graphql-redis-subscriptions');
+const Redis = require('ioredis');
 
-const pubsub = new PubSub();
+const options = {
+  host: "redis-19500.c239.us-east-1-2.ec2.cloud.redislabs.com",
+  port: 19500,
+  password: "XnWsIUd2TZ4PFZBApx603S1WGBSCZK9R",
+  retryStrategy: times => {
+    // reconnect after
+    return Math.min(times * 50, 2000);
+  }
+};
+
+const pubsub = new RedisPubSub({
+  publisher: new Redis(options),
+  subscriber: new Redis(options)
+});
+
 const https = require('https');
 const PORT = 3000;
 
@@ -43,9 +57,13 @@ var config = {
 
 const SESSION_SECRET = 'some secret';
 const app = express();
+var parseCookie = require('cookie-parser');
+const cookieParser = require('cookie-parser');
+const e = require('express');
+var expressWs = require('express-ws')(app);
 const httpServer = https.createServer(config, app);
 
-app.use(session({
+const sessionMid = session({
   genid: (req) => uuid(),
   secret: SESSION_SECRET,
   resave: false,
@@ -54,9 +72,10 @@ app.use(session({
     maxAge: 360000,
     secure: true,
     httpOnly: true,
-    sameSite: true,
+    sameSite: "none",
   }
-}));
+})
+app.use(sessionMid);
 
 passport.use(
   new GraphQLLocalStrategy(async (email, password, done) => {
@@ -77,7 +96,7 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user.email);
+  done(null, user);
 });
 passport.deserializeUser(async (email, done) => {
   const matchingUser = await User.findOne({ email: email});
@@ -119,6 +138,7 @@ const typeDefs = gql(`
 
   type Subscription {
     newUser: User
+    getChat(conversationId: String): [Message]
   }
 `);
 
@@ -133,7 +153,22 @@ module.exports = {
 const resolvers = {
     Subscription: {
       newUser: {
-        subscribe: (parent, args, {pubsub}) => pubsub.asyncIterator("NEW_USER")
+        subscribe: (parent, args, context) => {
+          if (context.email == null)
+            throw new Error("");
+          else
+            return context.pubsub.asyncIterator("NEW_USER")
+        }
+      },
+      getChat: {
+        subscribe: (parent, args, context) => {  
+          if (context.email == null)
+            throw new Error("");
+          else{
+            const sub_id = args.conversationId + context.email
+            return context.pubsub.asyncIterator(sub_id);
+          }
+        }
       }
     },
     Mutation: {
@@ -176,10 +211,10 @@ const resolvers = {
     },
 }
 
-resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut);
-resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut);
-resolvers.Mutation = Object.assign({}, resolvers.Mutation, postMut);
-resolvers.Mutation = Object.assign({}, resolvers.Mutation, chatMut);
+resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut, userMut, postMut, chatMut);
+// resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut);
+// resolvers.Mutation = Object.assign({}, resolvers.Mutation, postMut);
+// resolvers.Mutation = Object.assign({}, resolvers.Mutation, chatMut);
 
 const schema = applyMiddleware(
   makeExecutableSchema({
@@ -202,10 +237,10 @@ async function startServer() {
 
   // Hand in the schema we just created and have the
   // WebSocketServer start listening.
-  const temp = makeExecutableSchema({
-    typeDefs,
-    resolvers
-  });
+  // const temp = makeExecutableSchema({
+  //   typeDefs,
+  //   resolvers
+  // });
   // const serverCleanup = useServer({ temp }, wsServer);
   const server = new ApolloServer({
     schema,
@@ -247,15 +282,19 @@ async function startServer() {
           webSocket,
           context
       ) {
-          console.log('Connected!');
-          // If an object is returned here, it will be passed as the `context`
-          // argument to your subscription resolvers.
-          return {
-              pubsub
-          }
+        const authSub = () => new Promise((resolve, reject) => {
+          sessionMid(webSocket.upgradeReq, {}, () => {
+            if (webSocket.upgradeReq.session.passport == undefined)
+            {
+              resolve({email: null, pubsub});
+            }
+              
+            else resolve ({ email: webSocket.upgradeReq.session.passport.user, pubsub });
+          })
+        });
+        return await authSub();
       },
       onDisconnect(webSocket, context) {
-          console.log('Disconnected!')
       },
   }, {
       // This is the `httpServer` we created in a previous step.
@@ -264,7 +303,11 @@ async function startServer() {
       path: server.graphqlPath,
   });
     await server.start();
-    server.applyMiddleware({ app });
+    const cors = {
+      credentials: true,
+      origin: 'https://studio.apollographql.com'
+  }
+    server.applyMiddleware({ app, cors });
 }
 startServer();
 
@@ -273,4 +316,5 @@ startServer();
 httpServer.listen(PORT, function (err) {
     if (err) console.log(err);
     else console.log("HTTPS server on https://localhost:%s", PORT);
+    
 });

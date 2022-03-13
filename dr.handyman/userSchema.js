@@ -52,7 +52,7 @@ const UserSchema = new Schema({
     },
     createdAt: {
         type: String,
-        required: true
+        required: false
     }
 }, { timestamps: true })
 

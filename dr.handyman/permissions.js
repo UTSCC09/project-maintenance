@@ -13,8 +13,8 @@ const isAuthenticated = rule()((parent, args, context) => {
 
 const permissions = shield({
     Query: {
-        currentUser: isAuthenticated
-    }
+        currentUser: isAuthenticated,
+    },
 });
 module.exports = {
     permissions
