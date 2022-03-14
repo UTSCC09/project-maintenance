@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const { gql } = require('apollo-server-express');
 const { applyMiddleware } = require('graphql-middleware');
 const { makeExecutableSchema }  = require('@graphql-tools/schema');
@@ -7,6 +8,23 @@ const { postMutDef, postDefs, Post, postMut } = require('./postSchema');
 const { workerDataMutDef, workerDataDefs, WorkerData, workerDataMut } = require('./workerDataSchema');
 const { chatMutDef, chatQueryDef, chatDefs, Conversation, Message, chatMut, chatQuery } = require('./chatSchema');
 
+async function addUser (parent, args, context, info) {
+    const { email, password, username } = args
+    const userObj = new User({
+        email, password, username,
+        type: "user",
+        phone: 123456789,
+        rating: 0,
+        permissions: []
+    });
+    return userObj.save()
+        .then (result => {
+            return { ...result._doc }
+        })
+        .catch (err => {
+            console.error(err)
+        });
+};
 
 const typeDefs = gql(`
     # Type Defs
@@ -67,10 +85,10 @@ const resolvers = {
     },
     Mutation: {
         login: async (parent, { email, password }, context) => {
-            const { user } = await context.authenticate('graphql-local', { email, password });
-            await context.login(user);
-            context.pubsub.publish("NEW_USER", {
-            newUser: user
+                const { user } = await context.authenticate('graphql-local', { email, password });
+                await context.login(user);
+                context.pubsub.publish("NEW_USER", {
+                newUser: user
             });
             return { user };
         },
@@ -78,19 +96,18 @@ const resolvers = {
         signup: async (parent, { username, email, password }, context) => {
             const existUser = await User.findOne({ email: email});
             if (existUser) {
-            throw new Error('User with email already exists');
+                throw new Error('User with email already exists');
             }
-            
             const doSignup = () => new Promise((resolve, reject) => {
-            bcrypt.genSalt(10, function(err, salt) {
-                if (err) reject(Error('salt gen failed'));
-                bcrypt.hash(password, salt, async (err, hash) => {
-                if (err) reject(Error('hash failed'));
-                const newUser = await userMut.addUser(null, {email, username, password: hash}, null, null);
-                await context.login(newUser);
-                resolve({ user: newUser });
+                bcrypt.genSalt(10, function(err, salt) {
+                    if (err) reject(Error('salt gen failed'));
+                    bcrypt.hash(password, salt, async (err, hash) => {
+                        if (err) reject(Error('hash failed'));
+                        const newUser = await addUser(null, {email, username, password: hash}, null, null);
+                        await context.login(newUser);
+                        resolve({ user: newUser });
+                    });
                 });
-            });
             });
             return await doSignup();
         },

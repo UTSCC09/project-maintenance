@@ -17,9 +17,12 @@ type Del {
 }`
 
 const userMutDef = `
-addUser(email: String, password: String, username: String): User
-deleteUser(email: String): Del
-    `
+    deleteUser(email: String): Del
+`
+
+const chatQueryDef = `
+    getConvo(_id: String): Conversation
+`
 
 const UserSchema = new Schema({
     email: {
@@ -59,24 +62,7 @@ const UserSchema = new Schema({
 const User = mongoose.model('User', UserSchema);
 
 const userMut = {
-    addUser (parent, args, context, info) {
-        const { email, password, username } = args
-        const userObj = new User({
-            email, password, username,
-            type: "user",
-            phone: 123456789,
-            rating: 0,
-            permissions: []
-        });
-        return userObj.save()
-            .then (result => {
-                return { ...result._doc }
-            })
-            .catch (err => {
-                console.error(err)
-            })
-    },
-    deleteUser (parent, args, context, info){
+    async deleteUser (parent, args, context, info){
         const { email } = args
         return User.deleteOne({email: email}).then (result => {
                                     return { count: result.deletedCount }

@@ -14,11 +14,13 @@ const isAuthenticated = rule()((parent, args, context) => {
 const permissions = shield({
     Query: {
         currentUser: isAuthenticated,
+        getConvo: isAuthenticated,
     },
     Mutation: {
         createConvo: isAuthenticated,
-    }
-});
+        createMessage: isAuthenticated,
+    },
+}, {allowExternalErrors: true});
 module.exports = {
     permissions
 }
