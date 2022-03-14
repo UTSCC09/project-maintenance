@@ -1,3 +1,5 @@
+/*jshint esversion: 9 */
+
 const bcrypt = require('bcrypt');
 const { gql } = require('apollo-server-express');
 const { applyMiddleware } = require('graphql-middleware');
@@ -9,7 +11,7 @@ const { workerDataMutDef, workerDataDefs, WorkerData, workerDataMut } = require(
 const { chatMutDef, chatQueryDef, chatDefs, Conversation, Message, chatMut, chatQuery } = require('./chatSchema');
 
 async function addUser (parent, args, context, info) {
-    const { email, password, username } = args
+    const { email, password, username } = args;
     const userObj = new User({
         email, password, username,
         type: "user",
@@ -19,12 +21,12 @@ async function addUser (parent, args, context, info) {
     });
     return userObj.save()
         .then (result => {
-            return { ...result._doc }
+            return { ...result._doc };
         })
         .catch (err => {
-            console.error(err)
+            console.error(err);
         });
-};
+}
 
 const typeDefs = gql(`
     # Type Defs
@@ -143,4 +145,4 @@ module.exports = {
     Post,
     Conversation,
     Message,
-}
+};

@@ -1,25 +1,35 @@
+/*jshint esversion: 9 */
+
 const mongoose  = require('mongoose');
 const { Schema } = mongoose;
 
 const postDefs = `
-type Post {
-    _id: String
-    posterEmail: String
-    posterUsername: String
-    acceptorEmail: String
-    acceptorUsername: String
-    title: String
-    content: String
-    region: String
-    type: Int
-    state: Boolean
-    createdAt: String
-    updatedAt: String
-}`
+    type Post {
+        _id: String
+        posterEmail: String
+        posterUsername: String
+        acceptorEmail: String
+        acceptorUsername: String
+        title: String
+        content: String
+        region: String
+        type: Int
+        state: Boolean
+        createdAt: String
+        updatedAt: String
+    }
+`;
 
+/**
+ * add post
+ * delete post
+ * acquire post
+ * unacquire post
+ * edit post
+ */
 const postMutDef = `
-addPost(title: String, content: String, region: String, type: Int): Post
-    `
+    addPost(title: String!, content: String!, region: String!, type: Int!): Post
+`;
 
 const PostSchema = new Schema({
     posterEmail: {
@@ -58,13 +68,13 @@ const PostSchema = new Schema({
         type: Boolean,
         required: true
     },
-}, { timestamps: true })
+}, { timestamps: true });
 
 const Post = mongoose.model('Post', PostSchema);
 
 const postMut = {
     addPost (parent, args, context, info) {
-        const { title, content, region, type} = args
+        const { title, content, region, type} = args;
         const postObj = new Post({
             posterEmail: context.getUser().email,
             posterUsername: context.getUser().username,
@@ -76,18 +86,18 @@ const postMut = {
         });
         return postObj.save()
             .then (result => {
-                return { ...result._doc }
+                return { ...result._doc };
             })
             .catch (err => {
-                console.error(err)
-            })
+                console.error(err);
+            });
     }
-}
+};
 
 module.exports = {
     postDefs,
     postMutDef,
     Post,
     postMut,
-}
+};
 

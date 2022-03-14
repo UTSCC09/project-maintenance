@@ -1,32 +1,34 @@
+/*jshint esversion: 9 */
+
 const mongoose  = require('mongoose');
 const { Schema } = mongoose;
 const { User } = require('./userSchema');
 const { UserInputError } = require('apollo-server'); 
 // https://stackoverflow.com/questions/14040562/how-to-search-in-array-of-object-in-mongodb
 const chatDefs = `
-type Conversation {
-    _id: String
-    userEmails: [String]
-}
+    type Conversation {
+        _id: String
+        userEmails: [String]
+    }
 
-type Message {
-    _id: String
-    conversationId: String
-    email: String
-    username: String
-    content: String
-    createdAt: String
-    updatedAt: String
-}
-`
+    type Message {
+        _id: String
+        conversationId: String
+        email: String
+        username: String
+        content: String
+        createdAt: String
+        updatedAt: String
+    }
+`;
 
 const chatMutDef = `
-    createConvo(email: String): Conversation
-    createMessage(_id: String, content: String): Boolean
-`
+    createConvo(email: String!): Conversation
+    createMessage(_id: String!, content: String!): Boolean
+`;
 const chatQueryDef = `
-    getConvo(_id: String): Conversation
-`
+    getConvo(_id: String!): Conversation
+`;
 
 const ConversationSchema = new Schema({
     userEmails: {
@@ -67,11 +69,11 @@ const chatMut = {
         });
         return conversationObj.save()
             .then (result => {
-                return { ...result._doc }
+                return { ...result._doc };
             })
             .catch (err => {
-                console.error(err)
-            })
+                console.error(err);
+            });
     },
     async createMessage(parent, args, context, info){
         const { _id, content } = args;
@@ -87,18 +89,17 @@ const chatMut = {
         });
         return true;
     }
-
-}
+};
 
 const chatQuery = {
     async getConvo(parent, args, context, info){
-        const { _id } = args
+        const { _id } = args;
         const conv = await Conversation.findOne({ _id: _id});
         if (conv == null)
             throw new UserInputError("conversation does not exist");
         return conv;
     }
-}
+};
 
 module.exports = {
     chatDefs,
@@ -108,5 +109,5 @@ module.exports = {
     Message,
     chatMut,
     chatQuery,
-}
+};
 

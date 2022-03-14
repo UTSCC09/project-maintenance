@@ -1,8 +1,10 @@
+/*jshint esversion: 8 */
+
 const { and, or, rule, shield } = require('graphql-shield');
 
 function checkPermission(user, permission) {
-    if (user && user["permissions"]){
-        return user["permissions"].includes(permission);
+    if (user && user.permissions){
+        return user.permissions.includes(permission);
     }
     return false;
 }
@@ -19,8 +21,11 @@ const permissions = shield({
     Mutation: {
         createConvo: isAuthenticated,
         createMessage: isAuthenticated,
+        setUser: isAuthenticated,
     },
-}, {allowExternalErrors: true});
+}, 
+    {allowExternalErrors: true}
+);
 module.exports = {
     permissions
-}
+};
