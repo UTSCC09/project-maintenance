@@ -5,7 +5,7 @@ const { WebSocketServer } = require('ws');
 const { useServer } = require('graphql-ws/lib/use/ws');
 const { execute, subscribe } = require('graphql');
 const { SubscriptionServer } = require('subscriptions-transport-ws');
-const { ApolloServer, gql, AuthenticationError} = require('apollo-server-express');
+const { ApolloServer, gql } = require('apollo-server-express');
 const express = require('express');
 const session = require('express-session');
 const { applyMiddleware } = require('graphql-middleware');
@@ -19,7 +19,7 @@ const cookie = require('cookie');
 const {workerDataMutDef, workerDataDefs, WorkerData, workerDataMut} = require('./workerDataSchema');
 const {userMutDef, userDefs, User, userMut} = require('./userSchema');
 const { postMutDef, postDefs, Post, postMut} = require('./postSchema');
-const { chatMutDef, chatDefs, Conversation, Message, chatMut } = require('./chatSchema');
+const { chatMutDef, chatQueryDef, chatDefs, Conversation, Message, chatMut, chatQuery } = require('./chatSchema');
 const { permissions } = require('./permissions');
 
 const mongoose = require('mongoose');
@@ -57,10 +57,6 @@ var config = {
 
 const SESSION_SECRET = 'some secret';
 const app = express();
-var parseCookie = require('cookie-parser');
-const cookieParser = require('cookie-parser');
-const e = require('express');
-var expressWs = require('express-ws')(app);
 const httpServer = https.createServer(config, app);
 
 const sessionMid = session({
@@ -96,7 +92,7 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user);
+  done(null, user.email);
 });
 passport.deserializeUser(async (email, done) => {
   const matchingUser = await User.findOne({ email: email});
@@ -122,6 +118,8 @@ const typeDefs = gql(`
     WorkerData: [WorkerData]
     User: [User]
     currentUser: User
+    `+ chatQueryDef 
+    +`
   }
 
   # Mutation Types
@@ -165,8 +163,7 @@ const resolvers = {
           if (context.email == null)
             throw new Error("");
           else{
-            const sub_id = args.conversationId + context.email
-            return context.pubsub.asyncIterator(sub_id);
+            return context.pubsub.asyncIterator(args.conversationId);
           }
         }
       }
@@ -212,6 +209,7 @@ const resolvers = {
 }
 
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut, userMut, postMut, chatMut);
+resolvers.Query = Object.assign({}, resolvers.Query, chatQuery);
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut);
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, postMut);
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, chatMut);

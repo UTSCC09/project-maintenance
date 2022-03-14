@@ -15,6 +15,9 @@ const permissions = shield({
     Query: {
         currentUser: isAuthenticated,
     },
+    Mutation: {
+        createConvo: isAuthenticated,
+    }
 });
 module.exports = {
     permissions
