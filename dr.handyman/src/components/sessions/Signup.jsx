@@ -59,20 +59,20 @@ const Signup = () => {
   }, []);
 
   const handleFormSubmit = async values => {
-    try {
-      const name = values.name.split(' ');
-      const {
-        data
-      } = await axios.post(`${SERVER_URL}/auth/register`, {
-        first_name: name[0],
-        last_name: name[1],
-        email: values.email,
-        password: values.password
-      });
-      console.log(data);
-    } catch (error) {
-      console.log(error.response.data.message);
-    }
+    // try {
+    //   const name = values.name.split(' ');
+    //   const {
+    //     data
+    //   } = await axios.post(`${SERVER_URL}/auth/register`, {
+    //     first_name: name[0],
+    //     last_name: name[1],
+    //     email: values.email,
+    //     password: values.password
+    //   });
+    //   console.log(data);
+    // } catch (error) {
+    //   console.log(error.response.data.message);
+    // }
   };
   const {
     values,
