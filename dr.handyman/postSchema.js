@@ -31,6 +31,10 @@ const postMutDef = `
     addPost(title: String!, content: String!, region: String!, type: Int!): Post
 `;
 
+const postQueryDef = `
+	getAllPost: [Post]
+`;
+
 const PostSchema = new Schema({
     posterEmail: {
         type: String,
@@ -94,10 +98,21 @@ const postMut = {
     }
 };
 
+const postQuery = {
+	async getAllPost(parent, args, context, info){
+        const posts = await Post.find({});
+        if (posts == null)
+            throw new UserInputError("post does not exist");
+        return posts;
+    }
+}
+
 module.exports = {
     postDefs,
     postMutDef,
     Post,
     postMut,
+    postQuery,
+    postQueryDef
 };
 

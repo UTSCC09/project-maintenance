@@ -6,7 +6,7 @@ const { applyMiddleware } = require('graphql-middleware');
 const { makeExecutableSchema }  = require('@graphql-tools/schema');
 const { permissions } = require('./permissions');
 const { userMutDef, userDefs, User, userMut } = require('./userSchema');
-const { postMutDef, postDefs, Post, postMut } = require('./postSchema');
+const { postMutDef, postDefs, Post, postMut, postQuery, postQueryDef } = require('./postSchema');
 const { workerDataMutDef, workerDataDefs, WorkerData, workerDataMut } = require('./workerDataSchema');
 const { chatMutDef, chatQueryDef, chatDefs, Conversation, Message, chatMut, chatQuery } = require('./chatSchema');
 
@@ -44,6 +44,7 @@ const typeDefs = gql(`
         User: [User]
         currentUser: User` + 
         chatQueryDef +
+        postQueryDef +
         `
     }
 
@@ -125,7 +126,7 @@ const resolvers = {
 };
 
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut, userMut, postMut, chatMut);
-resolvers.Query = Object.assign({}, resolvers.Query, chatQuery);
+resolvers.Query = Object.assign({}, resolvers.Query, chatQuery, postQuery);
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut);
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, postMut);
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, chatMut);

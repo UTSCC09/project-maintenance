@@ -192,7 +192,8 @@
       await server.start();
       const cors = {
         credentials: true,
-        origin: 'https://studio.apollographql.com'
+        origin: '*',
+        //origin: ['https://studio.apollographql.com', 'http://localhost:300']
       };
       server.applyMiddleware({ app, cors });
   }
