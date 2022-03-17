@@ -91,8 +91,8 @@
     const user = await User.findOne({ email: req.session.passport.user});
     if (!user)
       return res.status(500).end('not authenicated');
-      
-    if (!user.profilePic || !fs.existsSync(__dirname + '/files/pictures/' + req.params.email + '.pic')){
+
+    if (user.profilePic == undefined || !fs.existsSync(__dirname + '/files/pictures/' + req.params.email + '.pic')){
       return res.status(500).end('no file associated with user');
     }
     res.setHeader('Content-Type', user.profilePic.mimetype);
