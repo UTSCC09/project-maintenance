@@ -56,6 +56,7 @@
   const express = require('express');
   const passport = require('passport');
   const session = require('express-session');
+  const { graphqlUploadExpress } = require('graphql-upload');
   const PORT = 4000;
 
   var privateKey = fs.readFileSync( 'server.key' );
@@ -76,8 +77,8 @@
     saveUninitialized: false,
     cookie: {
       maxAge: 360000,
-      secure: true,
-      httpOnly: true,
+      secure: false,
+      httpOnly: false,
       sameSite: "none",
     }
   });
@@ -110,6 +111,7 @@
 
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(graphqlUploadExpress());
 // Express X Passport X HTTPS setup
 
 // Initialize and start the HTTPS server
@@ -147,7 +149,7 @@
           async serverWillStart() {
             return {
               async drainServer() {
-                await serverCleanup.dispose();
+                subscriptionServer.close();
               },
             };
           },
@@ -193,8 +195,8 @@
       await server.start();
       const cors = {
         credentials: true,
-        origin: '*',
-        //origin: ['https://studio.apollographql.com', 'http://localhost:300']
+        // origin: '*',
+        origin: ['https://studio.apollographql.com']
       };
       server.applyMiddleware({ app, cors });
   }

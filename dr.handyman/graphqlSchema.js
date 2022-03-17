@@ -9,7 +9,7 @@ const { userMutDef, userDefs, User, userMut } = require('./userSchema');
 const { postMutDef, postDefs, Post, postMut, postQuery, postQueryDef } = require('./postSchema');
 const { workerDataMutDef, workerDataDefs, WorkerData, workerDataMut } = require('./workerDataSchema');
 const { chatMutDef, chatQueryDef, chatDefs, Conversation, Message, chatMut, chatQuery } = require('./chatSchema');
-
+const { fileUploadDef, fileUploadMut, fileUploadMutDef, fileUploadQueryDef, fileUploadScalar } = require('./userProfilePicUpload');
 async function addUser (parent, args, context, info) {
     const { email, password, username } = args;
     const userObj = new User({
@@ -36,7 +36,9 @@ const typeDefs = gql(`
     workerDataDefs + 
     userDefs + 
     postDefs + 
-    chatDefs +`
+    chatDefs +
+    fileUploadDef +
+    `
 
     # Query types
     type Query {
@@ -45,6 +47,7 @@ const typeDefs = gql(`
         currentUser: User` + 
         chatQueryDef +
         postQueryDef +
+        fileUploadQueryDef +
         `
     }
 
@@ -56,7 +59,9 @@ const typeDefs = gql(`
         workerDataMutDef + 
         userMutDef + 
         postMutDef + 
-        chatMutDef +`
+        chatMutDef +
+        fileUploadMutDef +
+        `
     }
 
     type Subscription {
@@ -67,6 +72,7 @@ const typeDefs = gql(`
 );
 
 const resolvers = {
+    Upload: fileUploadScalar.Upload,
     Subscription: {
         newUser: {
             subscribe: (parent, args, context) => {
@@ -125,8 +131,9 @@ const resolvers = {
     },
 };
 
-resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut, userMut, postMut, chatMut);
+resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut, userMut, postMut, chatMut, fileUploadMut);
 resolvers.Query = Object.assign({}, resolvers.Query, chatQuery, postQuery);
+// resolvers = Object.assign({}, resolvers, );
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut);
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, postMut);
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, chatMut);
