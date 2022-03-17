@@ -6,8 +6,37 @@ import { Grid, Pagination } from '@mui/material';
 import React from 'react';
 import PostRow from 'components/PostRow';
 
+import { GET_POSTS_QUERY } from "../../GraphQL/getAllPost";
+import { useMutation, useQuery } from "@apollo/client";
+import { Query } from 'react-query';
+import {useState, useEffect} from "react";
+
+
 
 const Posts = () => {
+
+  const [post, setPost] = useState([]);
+  // console.log(useQuery(GET_POSTS_QUERY));
+  const {data, loading, error } = useQuery(GET_POSTS_QUERY);
+  // useEffect(() => {
+  //   if (!loading){
+  //   setPost(data.getAllPost);
+  // },[])
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  console.log("load");
+  console.log(loading);
+  console.log(error);
+  console.log(data);
+
+  // if (!loading) {
+  // useEffect(() => {
+  //   setPost(data.getAllPost);
+  // },[])
+  // }
+
+
   return <NavbarLayout>
       
 

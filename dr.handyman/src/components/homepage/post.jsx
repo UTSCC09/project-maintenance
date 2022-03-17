@@ -21,19 +21,7 @@ const Post = ({
      
     }
   };
-
-  const getStateColor = status => {
-    switch (status) {
-      case 'Accepted':
-        return '#B6EBE5';
-
-      case 'Not Accepted':
-        return '#F8CBC9';
-
-     
-    }
-  };
-  return <Link href={post.postUrl}>
+  return <Link href={""/*post.postUrl*/}>
   <Row sx={{
         my: '1rem',
         padding: '6px 18px',
@@ -50,7 +38,7 @@ const Post = ({
            
           </Typography>
          
-          <Link href={post.userUrl}>
+          <Link href={""/*post.postUrl*/}>
           <Typography m={0.75} textAlign="left">
             {post.user}
           </Typography></Link>
@@ -68,20 +56,7 @@ const Post = ({
           {post.time}
           </Typography>
 
-          <Box m={0.75}>
-            <Chip size="5rem" label={post.state} sx={{
-          
-            fontSize: 13,
-            
-            backgroundColor: getStateColor(post.state)
-          }} />
-          </Box>
-
-          <Typography className="pre" m={0.75} textAlign="left">
-          {post.userAccept}
-          </Typography>
-
-          <Link href={post.postUrl}>
+          <Link href={""/*post.postUrl*/}>
           <Typography textAlign="center" color="grey.600" sx={{
           flex: '0 0 0 !important',
           display: {
