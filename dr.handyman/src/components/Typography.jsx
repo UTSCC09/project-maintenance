@@ -118,6 +118,21 @@ export const Small = ({
       {children}
     </StyledBox>;
 };
+
+export const Medium = ({
+  children,
+  className,
+  ellipsis,
+  textTransform,
+  ...props
+}) => {
+  return <StyledBox textTransformStyle={textTransform} ellipsis={ellipsis} className={clsx({
+    [className || '']: true
+  })} component="small" fontSize="15px" lineHeight="1.5" {...props}>
+      {children}
+    </StyledBox>;
+};
+
 export const Span = ({
   children,
   className,

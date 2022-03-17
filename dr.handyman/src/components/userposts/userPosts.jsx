@@ -1,13 +1,13 @@
 import FlexBox from 'components/FlexBox';
 import NavbarLayout from 'components/layout/NavbarLayout';
-import Post from './post';
+import UserPost from './userPost';
 import { H3, Span,H5 } from 'components/Typography';
 import { Grid, Pagination } from '@mui/material';
 import React from 'react';
 import PostRow from 'components/PostRow';
 
 
-const Posts = () => {
+const UserPosts = () => {
   return <NavbarLayout>
       
 
@@ -18,7 +18,7 @@ const Posts = () => {
       },
       padding: '0px 18px',
       background: 'none',
-      bgcolor: '#B9D9EF'
+      bgcolor: '#F7E1A9'
     }} elevation={0}>
         <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
           Title
@@ -26,9 +26,7 @@ const Posts = () => {
         <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
           Information
         </H5>
-        <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-          Posted By
-        </H5>
+       
         <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
           Posts Type
         </H5>
@@ -39,11 +37,11 @@ const Posts = () => {
           State
         </H5>
         <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-          Accept User
+          User Accept
         </H5>
         <H5 flex="0 0 0 !important" color="grey.600" px={2.75} py={0.5} my={0}></H5>
       </PostRow>
-      {postsList.map((item, ind) => <Post post={item} key={ind} />)}
+      {postsList.map((item, ind) => <UserPost post={item} key={ind} />)}
      
       <FlexBox flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={4}>
         <Span color="grey.600">Showing 1-6 of {postsList.length} Posts</Span>
@@ -60,8 +58,8 @@ const postsList = [{
   time: '2022-03-21',
   userUrl:'/users/500000',
   type: 'Find a Contractor',
-  state :'Not Accepted',
-  userAccept:'N/A'
+  state:'Accepted',
+  userAccept:'Bob'
   
 }, {
   title: 'Cat',
@@ -71,8 +69,8 @@ content: 'this is the content',
 time: '2022-03-21',
 userUrl:'/users/500000',
 type:'Find a Contractor',
-state :'Not Accepted',
-userAccept:'N/A'
+state:'Accepted',
+userAccept:'Bob'
 }, {
   title: 'Cat',
     user: 'Alice',
@@ -81,7 +79,7 @@ userAccept:'N/A'
   time: '2022-03-21',
   userUrl:'/users/500000',
   type:'Find a Contractor',
-  state :'Not Accepted',
+  state:'Not Accepted',
   userAccept:'N/A'
   
 }, {
@@ -92,8 +90,8 @@ content: 'this is the content',
 time: '2022-03-21',
 userUrl:'/users/500000',
 type:'Find a Handyman',
-state :'Accepted',
-userAccept:'Bob'
+state:'Not Accepted',
+userAccept:'N/A'
 
 }, {
   title: 'Cat',
@@ -103,19 +101,19 @@ content: 'this is the content',
 time: '2022-03-21',
 userUrl:'/users/500000',
 type:'Find a Handyman',
-state :'Accepted',
-userAccept:'Bob'
+state:'Not Accepted',
+userAccept:'N/A'
 
 }, {
   title: 'Cat',
   user: 'Alice',
 postUrl: '/posts/53244445',
-content: 'this is the content dhaoh dahd jwio hipdhw qipdh phiadwhipwqh djwipadj  djaij  jpwaj jdpqwj jdpj jpjwoqj jpwqji jpw jj eowpjqp jpqwpjp jqwjpjpj jjwpqjpoq jpwjqj oqwj pqjwrop',
+content: 'this is the content',
 time: '2022-03-21',
 userUrl:'/user/500000',
 type:'Find a Handyman',
-state :'Accepted',
-userAccept:'Bob'
+state:'Not Accepted',
+userAccept:'N/A'
 
 }];
-export default Posts;
+export default UserPosts;

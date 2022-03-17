@@ -4,8 +4,11 @@ import Maintainer from './maintainer';
 import { H3, Span } from 'components/Typography';
 import { Grid, Pagination } from '@mui/material';
 import React from 'react';
+import { useSelector } from "react-redux";
 
 const MaintainerList = () => {
+  const userData = useSelector(state => state.userData);
+  console.log('userData', userData)
   return <NavbarLayout>
       <H3 color="#2C2C2C" mb={2}>See Top Rated Mantainers</H3>
 
@@ -27,42 +30,42 @@ const maintainerList = [{
   rating: 5,
   address: 'Toronto',
   phone: '(613) 343-9004',
-  imgUrl: '/assets/images/faces/propic.png',
+  imgUrl: '/assets/u1.png',
   profileUrl: '/maintainers/53244445'
 }, {
   name: 'Adam',
   rating: 5,
   address: 'Markham',
   phone: '(613) 343-9004',
-  imgUrl: '/assets/images/faces/propic.png',
+  imgUrl: '/assets/u1.png',
   profileUrl: '/maintainers/53244445'
 }, {
   name: 'Kevin',
   rating: 4.5,
   address: 'Scarborough',
   phone: '(613) 343-9004',
-  imgUrl: '/assets/images/faces/propic.png',
+  imgUrl: '/assets/u1.png',
   profileUrl: '/maintainers/53244445'
 }, {
   name: 'Bob',
   rating: 2,
   address: 'Markham',
   phone: '(613) 343-9004',
-  imgUrl: '/assets/images/faces/propic.png',
+  imgUrl: '/assets/u1.png',
   profileUrl: '/maintainers/53244445'
 }, {
   name: 'Alice',
   rating: 3,
   address: 'Scarborough',
   phone: '(613) 343-9004',
-  imgUrl: '/assets/images/faces/propic.png',
+  imgUrl: '/assets/u1.png',
   profileUrl: '/maintainers/53244445'
 }, {
   name: 'John',
   rating: 4.3,
   address: 'Scarborough',
   phone: '(613) 343-9004',
-  imgUrl: '/assets/images/faces/propic.png',
+  imgUrl: '/assets/u1.png',
   profileUrl: '/maintainers/53244445'
 }];
 export default MaintainerList;

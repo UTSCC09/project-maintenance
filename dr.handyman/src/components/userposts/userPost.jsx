@@ -1,19 +1,19 @@
 import Row from 'components/PostRow';
 import { H5 } from 'components/Typography';
 import East from '@mui/icons-material/East';
-import { Chip, IconButton, Typography } from '@mui/material';
+import { Chip, IconButton, Typography ,Dialog} from '@mui/material';
 import { Box } from '@mui/system';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import React from 'react';
-
-const Post = ({
+import React, { useState } from 'react';
+import UserPostInfo from './userPostInfo';
+const UserPost = ({
   post
 }) => {
   const getTypeColor = status => {
     switch (status) {
       case 'Find a Handyman':
-        return '#EEDCBA';
+        return '#A9BDF7';
 
       case 'Find a Contractor':
         return '#B6EBAC';
@@ -33,13 +33,14 @@ const Post = ({
      
     }
   };
-  return <Link href={post.postUrl}>
-  <Row sx={{
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const toggleDialog = () => setDialogOpen(!dialogOpen);
+  return <Row sx={{
         my: '1rem',
         padding: '6px 18px',
-        bgcolor: '#B9D9EF',
+        bgcolor: '#F7E1A9',
         "&:hover": {   
-          bgcolor:"#AEC5F2"
+          bgcolor:"#F3B356"
         }
       }}>
           <H5 m={0.75} textAlign="left">
@@ -50,11 +51,7 @@ const Post = ({
            
           </Typography>
          
-          <Link href={post.userUrl}>
-          <Typography m={0.75} textAlign="left">
-            {post.user}
-          </Typography></Link>
-
+         
           <Box m={0.75}>
             <Chip size="5rem" label={post.type} sx={{
           
@@ -81,7 +78,8 @@ const Post = ({
           {post.userAccept}
           </Typography>
 
-          <Link href={post.postUrl}>
+         
+ 
           <Typography textAlign="center" color="grey.600" sx={{
           flex: '0 0 0 !important',
           display: {
@@ -89,13 +87,16 @@ const Post = ({
             md: 'block'
           }
         }}>
-            <IconButton>
-              <East fontSize="small" color="inherit" />
-            </IconButton>
+          <Box component={IconButton} ml={2} p={1.25} bgcolor="#F7E1A9" onClick={toggleDialog}>
+            <East />
+          </Box>
+            <Dialog open={dialogOpen} scroll="body" onClose={toggleDialog}>
+          <UserPostInfo post={post} />
+        </Dialog>
           </Typography>
-          </Link>
+         
         </Row>
-        </Link> 
+      
 };
 
-export default Post;
+export default UserPost;
