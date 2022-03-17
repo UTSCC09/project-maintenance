@@ -50,12 +50,13 @@
 // Express X Passport X HTTPS setup
   const fs = require('fs');
   const https = require('https');
+  const http = require('http');
   const uuid = require('uuid').v4;
   const bcrypt = require('bcrypt');
   const express = require('express');
   const passport = require('passport');
   const session = require('express-session');
-  const PORT = 3000;
+  const PORT = 4000;
 
   var privateKey = fs.readFileSync( 'server.key' );
   var certificate = fs.readFileSync( 'server.crt' );
@@ -66,7 +67,7 @@
 
   const SESSION_SECRET = 'some secret';
   const app = express();
-  const httpServer = https.createServer(config, app);
+  const httpServer = http.createServer(app);
 
   const sessionMid = session({
     genid: (req) => uuid(),
