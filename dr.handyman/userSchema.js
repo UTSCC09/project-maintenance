@@ -17,6 +17,7 @@ type User {
     type: String
     phone: Int
     rating: Int
+    profilePic: File
     permissions: [String]
     createdAt: String
 }
@@ -56,6 +57,21 @@ const UserSchema = new Schema({
     rating: {
         type: Number,
         required: true
+    },
+    profilePic: {
+        filepath: {
+            type: String,
+            required: true,
+        },
+        mimetype: {
+            type: String,
+            required: true,
+        },
+        encoding: {
+            type: String,
+            required: false,
+        },
+        required: false
     },
     permissions: {
         type: [String],

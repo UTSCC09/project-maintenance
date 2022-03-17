@@ -83,7 +83,22 @@
     }
   });
   app.use(sessionMid);
+  // app.use(express.static('files'));
 
+  app.get('/pictures/:email', async (req, res) => {
+    if (!req.session.passport)
+      return res.status(500).end('not authenicated');
+    const user = await User.findOne({ email: req.session.passport.user});
+    if (!user)
+      return res.status(500).end('not authenicated');
+      
+    if (!user.profilePic || !fs.existsSync(__dirname + '/files/pictures/' + req.params.email + '.pic')){
+      return res.status(500).end('no file associated with user');
+    }
+    res.setHeader('Content-Type', user.profilePic.mimetype);
+    res.sendFile(user.profilePic.filepath);
+  })
+  
   passport.use(
     new GraphQLLocalStrategy(async (email, password, done) => {
       const oneuser = await User.findOne({ email: email});
@@ -112,6 +127,16 @@
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(graphqlUploadExpress());
+//   app.get('/api/images/:imageId/picture/', function(req, res, next){
+//     if (!req.session.passport)  return res.status(500).end(err);
+//     images.findOne({ _id: req.params.imageId }, function(err, image){
+
+//         if (err) return res.status(500).end(err);
+//         if (!image) return res.status(404).end("Image Id does not exist");
+//         res.setHeader('Content-Type', image.file.mimetype);
+//         return res.sendFile(image.file.path, { root: __dirname });
+//     });
+// });
 // Express X Passport X HTTPS setup
 
 // Initialize and start the HTTPS server
@@ -195,8 +220,8 @@
       await server.start();
       const cors = {
         credentials: true,
-        // origin: '*',
-        origin: ['https://studio.apollographql.com']
+        origin: '*',
+        // origin: ['https://studio.apollographql.com']
       };
       server.applyMiddleware({ app, cors });
   }
