@@ -33,6 +33,7 @@ const userMutDef = `
 `;
 
 const userQueryDef = `
+    getOneWorker(email: String!): User
     getWorkerCount: Int
     getWorkerPage(workerPerPage: Int!, page: Int!): [User]
 `;
@@ -108,6 +109,9 @@ const userQuery = {
     async getWorkerCount(parent, args, context, info){
         return await User.countDocuments({ type: "worker" });
     },
+    async getOneWorker(parent, args, context, info){
+        return await User.findOne({email: args.email});
+    }
 
 };
 

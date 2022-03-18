@@ -20,19 +20,16 @@ const postDefs = `
     }
 `;
 
-/**
- * add post
- * delete post
- * acquire post
- * unacquire post
- * edit post
- */
 const postMutDef = `
     addPost(title: String!, content: String!, coordinates: [Float!], type: Int!): Post
+    acquirePost(_id: String!): Boolean
+    unacquirePost(_id: String!): Boolean
+    setPost(_id: String!, title: String!, content: String!): Boolean
 `;
 
 const postQueryDef = `
     getPostCount: Int
+    getOnePost(_id: String!): Post
 	getAllPost: [Post]
     getPostPage(postPerPage: Int!, page: Int!): [Post]
 `;
@@ -91,6 +88,8 @@ const postMut = {
         const postObj = new Post({
             posterEmail: context.getUser().email,
             posterUsername: context.getUser().username,
+            acceptorEmail: "",
+            acceptorUsername: "",
             title, 
             content,
             location: {coordinates, type: 'Point'},
@@ -104,10 +103,44 @@ const postMut = {
             .catch (err => {
                 console.error(err);
             });
+    },
+    async acquirePost(parent, args, context, info){
+        const post = await Post.findOne({_id: args._id});
+        if (post == null || post.acceptorEmail != "" || post.posterEmail == context.getUser().email)
+            throw new Error("Cannot acquire post");
+        const res = await Post.updateOne({ _id: args._id },
+                                         {acceptorEmail: context.getUser().email,
+                                          acceptorUsername: context.getUser().username,
+                                          state: 1});
+        return res.acknowledged;
+    },
+    async unacquirePost(parent, args, context, info){
+        const post = await Post.findOne({_id: args._id});
+        if (post == null || post.acceptorEmail != context.getUser().email)
+            throw new Error("Cannot unacquire post");
+        const res = await Post.updateOne({ _id: args._id },
+                                         {acceptorEmail: "",
+                                          acceptorUsername: "",
+                                          state: 0});
+        return res.acknowledged;
+    },
+    async setPost(parent, args, context, info){
+        const post = await Post.findOne({_id: args._id});
+        if (post == null || post.posterEmail != context.getUser().email)
+            throw new Error("Cannot unacquire post");
+        const { title, content } = args;
+        const res = await Post.updateOne({ _id: args._id },
+                                         { title: title == null ? post.title : title,
+                                           content: content == null ? post.content : content,});
+        return res.acknowledged;
     }
 };
 
 const postQuery = {
+    async getOnePost(parent, args, context, info){
+        return await Post.findOne({_id: args._id});
+    },
+
     async getPostCount(parent, args, context, info){
         return await Post.countDocuments();
     },
