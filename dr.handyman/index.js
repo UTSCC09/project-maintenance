@@ -21,9 +21,11 @@
   } = require('./graphqlSchema');
 // Schema and authorization imports
 
+require('dotenv').config();
+
 // Mongodb configuration
   const mongoose = require('mongoose');
-  const connection = "mongodb+srv://Chris:chris@dr-handyman.7i3hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+  const connection = process.env.MONGO;
   mongoose.connect(connection, { ssl: true });
 // Mongodb configuration
 
@@ -34,7 +36,7 @@
   const options = {
     host: "redis-19500.c239.us-east-1-2.ec2.cloud.redislabs.com",
     port: 19500,
-    password: "XnWsIUd2TZ4PFZBApx603S1WGBSCZK9R",
+    password: process.env.REDIS,
     retryStrategy: times => {
       // reconnect after
       return Math.min(times * 50, 2000);
@@ -57,7 +59,7 @@
   const passport = require('passport');
   const session = require('express-session');
   const { graphqlUploadExpress } = require('graphql-upload');
-  const PORT = 4000;
+  const PORT = process.env.PORT;
 
   var privateKey = fs.readFileSync( 'server.key' );
   var certificate = fs.readFileSync( 'server.crt' );
@@ -220,8 +222,8 @@
       await server.start();
       const cors = {
         credentials: true,
-        // origin: '*',
-        origin: ['https://studio.apollographql.com', '*']
+         origin: '*',
+        // origin: ['https://studio.apollographql.com', '*']
       };
       server.applyMiddleware({ app, cors });
   }

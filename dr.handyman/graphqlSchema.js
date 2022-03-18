@@ -78,7 +78,7 @@ const resolvers = {
         newUser: {
             subscribe: (parent, args, context) => {
             if (context.email == null)
-                throw new Error("");
+                throw new Error("Unauthorized");
             else
                 return context.pubsub.asyncIterator("NEW_USER");
             }
@@ -86,7 +86,7 @@ const resolvers = {
         getChat: {
             subscribe: (parent, args, context) => {  
             if (context.email == null)
-                throw new Error("");
+                throw new Error("Unauthorized");
             else{
                 return context.pubsub.asyncIterator(args.conversationId);
             }
