@@ -64,6 +64,10 @@ const chatMut = {
         const user = await User.findOne({ email: email });
         if (user == null || user.email == context.getUser().email)
             throw new UserInputError("End users does not exist");
+        const convo = await Conversation.findOne({ $or: [{userEmails: [email, context.getUser().email]},
+                                                         {userEmails: [context.getUser().email, email]}]});
+        if (convo != null)
+            return convo;
         const conversationObj = new Conversation({
             userEmails: [email , context.getUser().email]
         });
