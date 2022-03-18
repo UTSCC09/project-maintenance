@@ -33,6 +33,7 @@ const postMutDef = `
 
 const postQueryDef = `
 	getAllPost: [Post]
+    getPostPage(postPerPage: Int!, page: Int!): [Post]
 `;
 
 const PostSchema = new Schema({
@@ -99,6 +100,12 @@ const postMut = {
 };
 
 const postQuery = {
+    async getPostPage(parent, args, context, info){
+        const { postPerPage, page } = args;
+        if (postPerPage == 0)
+            return [];
+        return await Post.find({}).sort({ 'createdAt': 1 }).skip(page * postPerPage).limit(postPerPage);
+    },
 	async getAllPost(parent, args, context, info){
         const posts = await Post.find({});
         if (posts == null)

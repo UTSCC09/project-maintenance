@@ -220,8 +220,8 @@
       await server.start();
       const cors = {
         credentials: true,
-        origin: '*',
-        // origin: ['https://studio.apollographql.com']
+        // origin: '*',
+        origin: ['https://studio.apollographql.com', '*']
       };
       server.applyMiddleware({ app, cors });
   }

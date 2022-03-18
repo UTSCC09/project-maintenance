@@ -31,6 +31,7 @@ const userMutDef = `
 `;
 
 const userQueryDef = `
+    getUserPage(userPerPage: Int!, page: Int!): [User]
 `;
 
 const UserSchema = new Schema({
@@ -61,11 +62,11 @@ const UserSchema = new Schema({
     profilePic: {
         filepath: {
             type: String,
-            required: true,
+            required: false,
         },
         mimetype: {
             type: String,
-            required: true,
+            required: false,
         },
         encoding: {
             type: String,
@@ -77,13 +78,18 @@ const UserSchema = new Schema({
         type: [String],
         required: true
     },
-    createdAt: {
-        type: String,
-        required: false
-    }
 }, { timestamps: true });
 
 const User = mongoose.model('User', UserSchema);
+
+const userQuery = {
+    async getUserPage(parent, args, context, info){
+        const { userPerPage, page } = args;
+        if (userPerPage == 0)
+            return [];
+        return await User.find({}).sort({ 'createdAt': 1 }).skip(page * userPerPage).limit(userPerPage);
+    },
+};
 
 const userMut = {
     async deleteUser (parent, args, context, info){
@@ -108,8 +114,10 @@ const userMut = {
 
 module.exports = {
     userDefs,
+    userQueryDef,
     userMutDef,
     User,
     userMut,
+    userQuery
 };
 

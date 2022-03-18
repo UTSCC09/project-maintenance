@@ -5,7 +5,7 @@ const { gql } = require('apollo-server-express');
 const { applyMiddleware } = require('graphql-middleware');
 const { makeExecutableSchema }  = require('@graphql-tools/schema');
 const { permissions } = require('./permissions');
-const { userMutDef, userDefs, User, userMut } = require('./userSchema');
+const { userMutDef, userQueryDef, userDefs, User, userMut, userQuery } = require('./userSchema');
 const { postMutDef, postDefs, Post, postMut, postQuery, postQueryDef } = require('./postSchema');
 const { workerDataMutDef, workerDataDefs, WorkerData, workerDataMut } = require('./workerDataSchema');
 const { chatMutDef, chatQueryDef, chatDefs, Conversation, Message, chatMut, chatQuery } = require('./chatSchema');
@@ -48,6 +48,7 @@ const typeDefs = gql(`
         chatQueryDef +
         postQueryDef +
         fileUploadQueryDef +
+        userQueryDef +
         `
     }
 
@@ -132,7 +133,7 @@ const resolvers = {
 };
 
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut, userMut, postMut, chatMut, fileUploadMut);
-resolvers.Query = Object.assign({}, resolvers.Query, chatQuery, postQuery);
+resolvers.Query = Object.assign({}, resolvers.Query, chatQuery, postQuery, userQuery);
 // resolvers = Object.assign({}, resolvers, );
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut);
 // resolvers.Mutation = Object.assign({}, resolvers.Mutation, postMut);
