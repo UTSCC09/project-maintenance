@@ -72,7 +72,7 @@ const Posts = () => {
         </H5>
         <H5 flex="0 0 0 !important" color="grey.600" px={2.75} py={0.5} my={0}></H5>
       </PostRow>
-      {postsList.map((item, ind) => <Post post={item} key={ind} />)}
+      {data.getAllPost.map((item, ind) => <Post post={item} key={ind} />)}
      
       <FlexBox flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={4}>
         <Span color="grey.600">Showing 1-6 of {postsList.length} Posts</Span>
