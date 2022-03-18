@@ -33,6 +33,7 @@ const postMutDef = `
 `;
 
 const postQueryDef = `
+    getPostCount: Int
 	getAllPost: [Post]
     getPostPage(postPerPage: Int!, page: Int!): [Post]
 `;
@@ -112,6 +113,10 @@ const postMut = {
 };
 
 const postQuery = {
+    async getPostCount(parent, args, context, info){
+        return await Post.countDocuments();
+    },
+
     async getPostPage(parent, args, context, info){
         const { postPerPage, page } = args;
         if (postPerPage == 0)

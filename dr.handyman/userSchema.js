@@ -33,6 +33,7 @@ const userMutDef = `
 `;
 
 const userQueryDef = `
+    getUserCount: Int
     getUserPage(userPerPage: Int!, page: Int!): [User]
 `;
 
@@ -102,6 +103,10 @@ const userQuery = {
             return [];
         return await User.find({}).sort({ 'createdAt': 1 }).skip(page * userPerPage).limit(userPerPage);
     },
+    async getUserCount(parent, args, context, info){
+        return await User.countDocuments();
+    },
+
 };
 
 const userMut = {

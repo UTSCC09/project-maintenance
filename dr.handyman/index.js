@@ -223,7 +223,7 @@ require('dotenv').config();
       const cors = {
         credentials: true,
          origin: '*',
-       // origin: ['https://studio.apollographql.com', '*']
+        // origin: ['https://studio.apollographql.com', '*']
       };
       server.applyMiddleware({ app, cors });
   }
