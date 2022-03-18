@@ -17,6 +17,7 @@ type User {
     type: String
     phone: Int
     rating: Int
+    location: [Float!]
     profilePic: File
     permissions: [String]
     createdAt: String
@@ -28,6 +29,7 @@ type Del {
 const userMutDef = `
     deleteUser(email: String): Del
     setUser(user: UserInput!): Boolean
+    setWorker(coordiante: [Float!]): Boolean
 `;
 
 const userQueryDef = `
@@ -58,6 +60,17 @@ const UserSchema = new Schema({
     rating: {
         type: Number,
         required: true
+    },
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'], // 'location.type' must be 'Point'
+            required: false
+          },
+          coordinates: {
+            type: [Number],
+            required: false
+          }
     },
     profilePic: {
         filepath: {
@@ -108,6 +121,17 @@ const userMut = {
                                            phone: phone == null ? context.getUser().phone : phone,
                                            rating: rating == null ? context.getUser().rating : rating,
                                            permissions: permissions == null ? context.getUser().permissions : permissions,});
+        return res.acknowledged;
+    },
+    async setWorker (parent, args, context, info){
+        const { coordinate } = context;
+        const res = await User.updateOne({ email: context.getUser().email },
+                                         { $set:
+                                            {
+                                                type: "worker",
+                                                location: coordinate,
+                                            }
+                                         });
         return res.acknowledged;
     }
 };

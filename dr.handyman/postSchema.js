@@ -13,6 +13,7 @@ const postDefs = `
         title: String
         content: String
         region: String
+        location: [Float!]
         type: Int
         state: Boolean
         createdAt: String
@@ -60,6 +61,17 @@ const PostSchema = new Schema({
     content: {
         type: String,
         required: true
+    },
+    location :{
+        type: {
+            type: String,
+            enum: ['Point'], // 'location.type' must be 'Point'
+            required: true
+          },
+          coordinates: {
+            type: [Number],
+            required: true
+          }
     },
     region: {
         type: String,

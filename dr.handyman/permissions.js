@@ -19,6 +19,7 @@ const permissions = shield({
         getConvo: isAuthenticated,
     },
     Mutation: {
+        addPost: isAuthenticated,
         profilePicUpload: isAuthenticated,
         createConvo: isAuthenticated,
         createMessage: isAuthenticated,

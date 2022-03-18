@@ -10,6 +10,7 @@ const { postMutDef, postDefs, Post, postMut, postQuery, postQueryDef } = require
 const { workerDataMutDef, workerDataDefs, WorkerData, workerDataMut } = require('./workerDataSchema');
 const { chatMutDef, chatQueryDef, chatDefs, Conversation, Message, chatMut, chatQuery } = require('./chatSchema');
 const { fileUploadDef, fileUploadMut, fileUploadMutDef, fileUploadQueryDef, fileUploadScalar } = require('./userProfilePicUpload');
+
 async function addUser (parent, args, context, info) {
     const { email, password, username } = args;
     const userObj = new User({
@@ -32,7 +33,8 @@ const typeDefs = gql(`
     # Type Defs
     type AuthPayload {
         user: User
-    }` + 
+    }
+    ` + 
     workerDataDefs + 
     userDefs + 
     postDefs + 
