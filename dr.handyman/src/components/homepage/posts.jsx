@@ -6,7 +6,7 @@ import { Grid, Pagination } from '@mui/material';
 import React from 'react';
 import PostRow from 'components/PostRow';
 
-import { GET_POSTS_QUERY } from "../../GraphQL/getAllPost";
+import { GET_POSTS_QUERY, GET_COUNT } from "../../GraphQL/Queries";
 import { useMutation, useQuery } from "@apollo/client";
 import { Query } from 'react-query';
 import {useState, useEffect} from "react";
@@ -17,27 +17,37 @@ import { useLazyQuery } from '@apollo/client';
 const Posts = () => {
 
   // const [post, setPost] = useState([]);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   // console.log(useQuery(GET_POSTS_QUERY));
-  const {data, loading, error } = useQuery(GET_POSTS_QUERY);
+  const [getPosts, {data, loading, error }] = useLazyQuery(GET_POSTS_QUERY);
+  const [getCount, { data: cdata, loading: cloading }] = useLazyQuery(GET_COUNT);
   // useEffect(() => {
   //   if (!loading){
   //   setPost(data.getAllPost);
   // },[])
-  if (loading) {
+  useEffect(() => {
+    getCount();
+    getPosts({variables: {page: 0, postPerPage: 6}});
+   },[])
+  if (loading || cloading || data == undefined || cdata == undefined) {
     return <div>Loading...</div>;
   }
   console.log("load");
   console.log(loading);
   console.log(error);
   console.log(data);
+  console.log(cdata);
 
   // if (!loading) {
   // useEffect(() => {
-  //   setPost(data.getAllPost);
-  // },[])
-  // }
+  //   getPosts();
+  //  },[])
+   
+  const handleChange = (event, value) => {
+    getPosts({variables: {page: value-1, postPerPage: 6}});
 
+    setPage(value);
+  }
 
   return <NavbarLayout>
       
@@ -74,11 +84,11 @@ const Posts = () => {
         </H5>
         <H5 flex="0 0 0 !important" color="grey.600" px={2.75} py={0.5} my={0}></H5>
       </PostRow>
-      {data.getAllPost.map((item, ind) => <Post post={item} key={ind} />)}
+      {data.getPostPage.map((item, ind) => <Post post={item} key={ind} />)}
      
       <FlexBox flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={4}>
-        <Span color="grey.600">Showing 1-6 of {postsList.length} Posts</Span>
-        <Pagination count={Math.ceil(postsList.length / 6)} variant="outlined" color="primary" />
+        <Span color="grey.600">Showing 1-6 of {cdata.length} Posts</Span>
+        <Pagination count={Math.ceil(cdata.getPostCount/6)} page={page} onChange={handleChange} boundaryCount={0} siblingCount={0} variant="outlined" color="primary" />
       </FlexBox>
     </NavbarLayout>;
 };

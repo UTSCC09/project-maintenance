@@ -62,7 +62,7 @@ const Maintainer = ({
         border: '4px solid',
         borderColor: 'grey.100'
       }} />
-        <Link href={profileUrl}>
+        <Link href={"profileUrl"}>
           <a>
             <IconButton sx={{
             my: '0.25rem'
