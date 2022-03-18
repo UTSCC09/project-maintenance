@@ -10,12 +10,14 @@ import { GET_POSTS_QUERY } from "../../GraphQL/getAllPost";
 import { useMutation, useQuery } from "@apollo/client";
 import { Query } from 'react-query';
 import {useState, useEffect} from "react";
+import { useLazyQuery } from '@apollo/client';
 
 
 
 const Posts = () => {
 
-  const [post, setPost] = useState([]);
+  // const [post, setPost] = useState([]);
+  const [page, setPage] = useState(0);
   // console.log(useQuery(GET_POSTS_QUERY));
   const {data, loading, error } = useQuery(GET_POSTS_QUERY);
   // useEffect(() => {
