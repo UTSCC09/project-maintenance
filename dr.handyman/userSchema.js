@@ -33,8 +33,8 @@ const userMutDef = `
 `;
 
 const userQueryDef = `
-    getUserCount: Int
-    getUserPage(userPerPage: Int!, page: Int!): [User]
+    getWorkerCount: Int
+    getWorkerPage(workerPerPage: Int!, page: Int!): [User]
 `;
 
 const UserSchema = new Schema({
@@ -97,14 +97,16 @@ const UserSchema = new Schema({
 const User = mongoose.model('User', UserSchema);
 
 const userQuery = {
-    async getUserPage(parent, args, context, info){
-        const { userPerPage, page } = args;
-        if (userPerPage == 0)
+    async getWorkerPage(parent, args, context, info){
+        const { workerPerPage, page } = args;
+        if (page < 0)
+            throw new Error("page number undefined");
+        if (workerPerPage == 0)
             return [];
-        return await User.find({}).sort({ 'createdAt': 1 }).skip(page * userPerPage).limit(userPerPage);
+        return await User.find({ type: "worker" }).sort({ 'createdAt': 1 }).skip(page * workerPerPage).limit(workerPerPage);
     },
-    async getUserCount(parent, args, context, info){
-        return await User.countDocuments();
+    async getWorkerCount(parent, args, context, info){
+        return await User.countDocuments({ type: "worker" });
     },
 
 };

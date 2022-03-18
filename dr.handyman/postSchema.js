@@ -119,6 +119,8 @@ const postQuery = {
 
     async getPostPage(parent, args, context, info){
         const { postPerPage, page } = args;
+        if (page < 0)
+            throw new Error("page number undefined");
         if (postPerPage == 0)
             return [];
         return await Post.find({}).sort({ 'createdAt': 1 }).skip(page * postPerPage).limit(postPerPage);
