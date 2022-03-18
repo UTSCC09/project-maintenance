@@ -35,6 +35,7 @@ const MaintainerList = () => {
     setPage(value);
   }
 
+  console.log(cdata);
   return <NavbarLayout>
       <H3 color="#2C2C2C" mb={2}>See Top Rated Mantainers</H3>
 
@@ -46,7 +47,7 @@ const MaintainerList = () => {
 
       <FlexBox flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={4}>
         <Span color="grey.600">Showing 1-6 of {maintainerList.length} Maintaners</Span>
-        <Pagination count={Math.ceil(cdata / 6)} page={page} onChange={handleChange} boundaryCount={0} siblingCount={0} variant="outlined" color="primary" />
+        <Pagination count={Math.ceil(cdata.getWorkerCount/6)} page={page} onChange={handleChange} boundaryCount={1} siblingCount={1} variant="outlined" color="primary" />
       </FlexBox>
     </NavbarLayout>;
 };
