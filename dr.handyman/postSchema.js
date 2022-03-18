@@ -66,11 +66,11 @@ const PostSchema = new Schema({
         type: {
             type: String,
             enum: ['Point'], // 'location.type' must be 'Point'
-            required: true
+            required: false
           },
           coordinates: {
             type: [Number],
-            required: true
+            required: false
           }
     },
     region: {

@@ -68,9 +68,9 @@ require('dotenv').config();
           cert: certificate
   };
 
-  const SESSION_SECRET = 'some secret';
+  const SESSION_SECRET = process.env.SECRET;
   const app = express();
-  const httpServer = http.createServer(app);
+  const httpServer = https.createServer(config, app);
 
   const sessionMid = session({
     genid: (req) => uuid(),
@@ -79,9 +79,9 @@ require('dotenv').config();
     saveUninitialized: false,
     cookie: {
       maxAge: 360000,
-      secure: false,
-      httpOnly: false,
-      sameSite: "none",
+      secure: true,
+      httpOnly: true,
+      sameSite: true,
     }
   });
   app.use(sessionMid);
@@ -223,7 +223,7 @@ require('dotenv').config();
       const cors = {
         credentials: true,
          origin: '*',
-        // origin: ['https://studio.apollographql.com', '*']
+       // origin: ['https://studio.apollographql.com', '*']
       };
       server.applyMiddleware({ app, cors });
   }
