@@ -7,7 +7,7 @@ import FlexBox from 'components/FlexBox';
 import Login from 'components/sessions/Login';
 import Link from 'next/link';
 import { layoutConstant } from 'utils/constants';
-
+import NewPost from 'components/NewPost';
 import PersonOutline from '@mui/icons-material/PersonOutline';
 import {
   Box,
@@ -17,6 +17,7 @@ import {
   IconButton,
   styled,
   useMediaQuery,
+  Button
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
@@ -93,12 +94,13 @@ const Header = ({
   };
   const [sidenavOpen, setSidenavOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [postDialogOpen, setPostDialogOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
   const userData = useSelector(state => state.userData);
 
   const toggleSidenav = () => setSidenavOpen(!sidenavOpen);
-
+  const togglePostDialog = () => setPostDialogOpen(!postDialogOpen);
   const toggleDialog = () => {
     if (!userData.email) {
       setDialogOpen(!dialogOpen)
@@ -111,12 +113,12 @@ const Header = ({
 
   let button;
   if (userData.email) {
-    button = <Box component={IconButton} ml={2} p={1.25} mr={2} bgcolor="#92B6CE" onClick={handleClick} >
+    button = <Box component={IconButton} ml={2} p={1.25} mr={2} bgcolor="#99CBE9" onClick={handleClick} >
     <PersonOutline />
     
   </Box>;
   } else {
-    button = <Box component={IconButton} ml={2} p={1.25} mr={2} bgcolor="#92B6CE" onClick={toggleDialog} >
+    button = <Box component={IconButton} ml={2} p={1.25} mr={2} bgcolor="#99CBE9" onClick={toggleDialog} >
     <PersonOutline />
   </Box>
   }
@@ -144,7 +146,19 @@ const Header = ({
         <FlexBox justifyContent="center" flex="1 1 0">
           <SearchBox />
         </FlexBox>
+{/* {userData.email &&  */}
 
+<Button sx={{
+       
+        bgcolor: '#99CBE9',
+        color:"#3D3F40"
+      }} onClick={togglePostDialog}>
+              New Posts
+            </Button>
+{/* } */}
+<Dialog open={postDialogOpen} fullWidth={isMobile} scroll="body" onClose={togglePostDialog}>
+          <NewPost />
+        </Dialog>
         <FlexBox alignItems="center" sx={{
         display: {
           xs: 'none',
