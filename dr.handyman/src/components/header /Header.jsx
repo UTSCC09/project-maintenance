@@ -146,7 +146,7 @@ const Header = ({
         <FlexBox justifyContent="center" flex="1 1 0">
           <SearchBox />
         </FlexBox>
-{/* {userData.email &&  */}
+{userData.email && 
 
 <Button sx={{
        
@@ -155,7 +155,7 @@ const Header = ({
       }} onClick={togglePostDialog}>
               New Posts
             </Button>
-{/* } */}
+}
 <Dialog open={postDialogOpen} fullWidth={isMobile} scroll="body" onClose={togglePostDialog}>
           <NewPost />
         </Dialog>

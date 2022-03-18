@@ -5,7 +5,7 @@ import React, {
 } from 'react';
 
 import Footer from 'components/footer/Footer';
-import Header from 'components/header/Header';
+import Header from '../header /Header';
 import Head from 'next/head';
 
 const AppLayout = ({
