@@ -29,7 +29,7 @@ type Del {
 const userMutDef = `
     deleteUser(email: String): Del
     setUser(user: UserInput!): Boolean
-    setWorker(coordinate: [Float!]): Boolean
+    setWorker(coordinates: [Float!]): Boolean
 `;
 
 const userQueryDef = `
@@ -131,12 +131,12 @@ const userMut = {
         return res.acknowledged;
     },
     async setWorker (parent, args, context, info){
-        const { coordinate } = args;
+        const { coordinates } = args;
         const res = await User.updateOne({ email: context.getUser().email },
                                          { $set:
                                             {
                                                 type: "worker",
-                                                location: coordinate,
+                                                location: {coordinates, type: 'Point'}
                                             }
                                          });
         return res.acknowledged;

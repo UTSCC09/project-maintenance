@@ -12,7 +12,6 @@ const postDefs = `
         acceptorUsername: String
         title: String
         content: String
-        region: String
         location: [Float!]
         type: Int
         state: Boolean
@@ -29,7 +28,7 @@ const postDefs = `
  * edit post
  */
 const postMutDef = `
-    addPost(title: String!, content: String!, region: String!, type: Int!): Post
+    addPost(title: String!, content: String!, coordinates: [Float!], type: Int!): Post
 `;
 
 const postQueryDef = `
@@ -63,20 +62,16 @@ const PostSchema = new Schema({
         type: String,
         required: true
     },
-    location :{
+    location: {
         type: {
             type: String,
             enum: ['Point'], // 'location.type' must be 'Point'
-            required: false
+            required: true
           },
           coordinates: {
             type: [Number],
-            required: false
+            required: true
           }
-    },
-    region: {
-        type: String,
-        required: true
     },
     type: {
         type: Number,
@@ -92,13 +87,13 @@ const Post = mongoose.model('Post', PostSchema);
 
 const postMut = {
     addPost (parent, args, context, info) {
-        const { title, content, region, type} = args;
+        const { title, content, coordinates, type} = args;
         const postObj = new Post({
             posterEmail: context.getUser().email,
             posterUsername: context.getUser().username,
             title, 
             content,
-            region,
+            location: {coordinates, type: 'Point'},
             type,
             state: 0,
         });
