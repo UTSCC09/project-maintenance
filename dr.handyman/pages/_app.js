@@ -12,12 +12,14 @@ import { UPDATE_USER_DATA } from '../src/store/constants'
 import Message from 'components/message';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router'
+import { useLazyQuery } from "@apollo/client";
 
-const link = new createHttpLink({
+
+const link = new HttpLink({
 	// uri: "http://www.drhandyman.me:4000/graphql"
-	uri: "https://localhost:3000/graphql",
-	// uri: "https://www.drhandyman.me:4000/graphql",
-	credentials: "include",
+	//uri: "https://localhost:4000/graphql",
+	uri: "https://www.drhandyman.me:4000/graphql",
+	 credentials: "include",
 	opts: {
 		credentials: "include",
 	},
@@ -45,6 +47,7 @@ export default function App({ Component, pageProps }) {
 
 	if (!state.userData.isLogin) {
 		client
+
 			.query({
 				query: GET_USER_DATA,
 			})
@@ -69,6 +72,7 @@ export default function App({ Component, pageProps }) {
     const handlerRouterUpdate = (url) => {
       console.log('userData', userData)
       if (url !== '/' && url !== '/login'&& url !== '/signup' && !userData.isLogin) {
+      
         router.replace('/login', undefined, { shallow: true})
       }
     }

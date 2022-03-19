@@ -81,3 +81,21 @@ query WorkerData($id: String!) {
   }
 }
 `
+export const GET_USER_POST = gql `
+query GetUserPosts($userPostPerPage: Int!, $page: Int!){
+  getUserPostsPage(userPostPerPage: $userPostPerPage, page: $page) {
+    posterEmail
+    title
+    content
+    posterUsername
+    acceptorUsername
+    createdAt
+  }
+}
+`
+
+export const GET_USER_POST_COUNT = gql `
+query Query {
+  getUserPostCount
+}
+`
