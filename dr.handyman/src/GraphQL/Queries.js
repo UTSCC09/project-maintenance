@@ -6,9 +6,22 @@ export const LOAD_USERS = gql `
       id
       firstName
       email
-      password
     }
   }
+`;
+
+export const GET_USER_DATA = gql `
+query {
+  currentUser {
+    email
+    username
+    type
+    phone
+    rating
+    createdAt
+    permissions
+  }
+}
 `;
 
 export const GET_POSTS_QUERY = gql `
@@ -21,6 +34,9 @@ query GetPostPage($postPerPage: Int!, $page: Int!) {
     state
     posterEmail
     createdAt
+    _id
+    acceptorUsername
+    acceptorEmail
   }
 }
 `;
@@ -49,16 +65,19 @@ query Query {
 }
 `;
 
-export const GET_USER_DATA = gql `
-query {
-  currentUser {
-    email
-    username
-    password
+export const GET_POST_DETAIL = gql `
+query WorkerData($id: String!) {
+  getOnePost(_id: $id) {
+    _id
+    posterEmail
+    posterUsername
+    acceptorUsername
+    acceptorEmail
+    title
+    content
     type
-    phone
-    rating
-    permissions
+    state,
     createdAt
   }
-}`;
+}
+`

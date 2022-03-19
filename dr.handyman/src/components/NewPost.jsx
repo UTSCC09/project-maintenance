@@ -1,85 +1,113 @@
-import React, { useState } from 'react';
-import { Typography } from '@mui/material';
-import TextField from '@mui/material/TextField';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
+import React, { useState } from "react";
+import { Typography } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 import * as yup from "yup";
-import DialogTitle from '@mui/material/DialogTitle';
+import DialogTitle from "@mui/material/DialogTitle";
 import { useFormik } from "formik";
-import FormLabel from '@mui/material/FormLabel';
-import Checkbox from '@mui/material/Checkbox';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FlexBox from 'components/FlexBox';
-import { CREATE_POST_MUTATION } from '../GraphQL/Mutations'
+import FormLabel from "@mui/material/FormLabel";
+import Checkbox from "@mui/material/Checkbox";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import FlexBox from "components/FlexBox";
+import { CREATE_POST_MUTATION } from "../GraphQL/Mutations";
 import { useMutation } from "@apollo/client";
-import {
+import { H5, Medium } from "components/Typography";
+import { getLocation } from "../utils";
+import { useDispatch, useSelector } from 'react-redux'
+import { TRIGGER_MESSAGE } from '../store/constants'
 
-  H5,
-  Medium,
-} from 'components/Typography';
 
-  import Link from 'next/link';
+import { Box, Card, Divider, Button } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
-  
-  
-  import {
-    Box,
-    Card,
-    Divider,
-    
-    Button
-  } from '@mui/material';
-  import { styled } from '@mui/material/styles';
-  
-  
-  const StyledCard = styled(({
-    children,
+const StyledCard = styled(
+	({
+		children,
 
-    ...rest
-  }) => <Card {...rest}>{children}</Card>)(({
-    
+		...rest
+	}) => <Card {...rest}>{children}</Card>
+)(({}) => ({
+	width: 600,
 
-  }) => ({
-    width: 600,
-    
-    ".content": {
-      textAlign: "center",
-      padding: "3rem 3.75rem 0px",
-      
-    },
-   
-  }));
-  
-  const NewPost =({
-    setDialog
-  }) => {
-    const [sendPost] = useMutation(CREATE_POST_MUTATION);
-    const handleFormSubmit = async (values) => {
-      const { title, description: content, type } = values;
-      console.log(values);
-      sendPost({
-        variables: {
-          title,
-          region: "ZH",
-          type: +type,
-          content
-        }
-      }).then(res => {
-        if (res.data && res.data.addPost && res.data.addPost._id) {
-          setDialog(false);
-        }
-      })
-	  };
-    const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
+	".content": {
+		textAlign: "center",
+		padding: "3rem 3.75rem 0px",
+	},
+}));
+
+const NewPost = ({ setDialog }) => {
+	const [sendPost] = useMutation(CREATE_POST_MUTATION);
+	const dispatch = useDispatch();
+	const userData = useSelector(state => state.userData);
+	const handleFormSubmit = async (values) => {
+		if (!userData.isLogin) {
+			dispatch({
+				type: TRIGGER_MESSAGE,
+				payload: {
+					globalMessage: {
+						message: "Please login first.",
+						severity: "error"
+					}
+				}
+			})
+		}
+		getLocation().then((res) => {
+			const coords = res.coords;
+			const { title, description: content, type } = values;
+			sendPost({
+				variables: {
+					title,
+					type: +type,
+					content,
+					coordinates: [coords.longitude, coords.latitude],
+				},
+			}).then((res) => {
+				if (res.data && res.data.addPost && res.data.addPost._id) {
+					dispatch({
+						type: TRIGGER_MESSAGE,
+						payload: {
+							globalMessage: {
+								message: "Add new post success.",
+								severity: "success"
+							}
+						}
+					})
+					setDialog(false);
+				}
+			}).catch(() => {
+				dispatch({
+					type: TRIGGER_MESSAGE,
+					payload: {
+						globalMessage: {
+							message: "Add new post failed.",
+							severity: "error"
+						}
+					}
+				})
+			});
+		}).catch(() => {
+			dispatch({
+				type: TRIGGER_MESSAGE,
+				payload: {
+					globalMessage: {
+						message: "Get location failed.",
+						severity: "error"
+					}
+				}
+			})
+		});
+	};
+	const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
 		useFormik({
 			initialValues,
 			onSubmit: handleFormSubmit,
 			validationSchema: formSchema,
 		});
-    
-    return (
+
+	return (
 		<StyledCard
 			elevation={3}
 			sx={{
@@ -87,7 +115,7 @@ import {
 			}}
 		>
 			<form className="content" onSubmit={handleSubmit}>
-				<DialogTitle fontSize="25px" >New Post</DialogTitle>
+				<DialogTitle fontSize="25px">New Post</DialogTitle>
 
 				<TextField
 					autoFocus
@@ -123,9 +151,10 @@ import {
 						row
 						aria-labelledby="demo-row-radio-buttons-group-label"
 						name="type"
-            onChange={handleChange}
+						onChange={handleChange}
 					>
 						<FormControlLabel
+							disabled={userData.type === 'user'}
 							value={1}
 							control={<Radio />}
 							label="Find a Contractor"
@@ -179,20 +208,19 @@ import {
 			</form>
 		</StyledCard>
 	);
-  };
-  const initialValues = {
+};
+const initialValues = {
 	title: "",
 	description: "",
+
 	
-	type: "",
+	type:"",
+
 };
-  const formSchema = yup.object().shape({
+const formSchema = yup.object().shape({
 	title: yup.string().required("title is required"),
 	description: yup.string().required("post description is required"),
+    type: yup.string().required("type is required"),
 	//type 必选验证 to be done
-	
-	
 });
-  export default NewPost;
-
-  
+export default NewPost;

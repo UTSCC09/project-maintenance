@@ -1,7 +1,7 @@
 import FlexBox from 'components/FlexBox';
 import NavbarLayout from 'components/layout/NavbarLayout';
 import Maintainer from './maintainer';
-import { H3, Span } from 'components/Typography';
+import { H3, Span,H4 } from 'components/Typography';
 import { Grid, Pagination } from '@mui/material';
 import React from 'react';
 import { useSelector } from "react-redux";
@@ -14,7 +14,6 @@ import { useLazyQuery } from '@apollo/client';
 
 const MaintainerList = () => {
   const userData = useSelector(state => state.userData);
-  console.log('userData', userData)
 
   const [page, setPage] = useState(1);
   // console.log(useQuery(GET_POSTS_QUERY));
@@ -28,7 +27,15 @@ const MaintainerList = () => {
   if (loading || cloading || data == undefined || cdata == undefined) {
     return <div>Loading...</div>;
   }
-
+  let index1 = (page-1)*6+1;
+  let index2 = page*6;
+  if (cdata.getWorkerCount <= page*6) {
+    index2 = cdata.getWorkerCount;
+  }
+  if (cdata.getWorkerCount == 0){
+    index1=0;
+    index2 =0;
+  }
   const handleChange = (event, value) => {
     getWorkers({variables: {page: value-1, workerPerPage: 6}});
 
@@ -38,7 +45,9 @@ const MaintainerList = () => {
   console.log(cdata);
   return <NavbarLayout>
       <H3 color="#2C2C2C" mb={2}>See Top Rated Mantainers</H3>
-
+      {cdata.getWorkerCount == 0 && 	<H4 color="#2C2C2C" mt={3}>
+				No Handyman found.
+			</H4>}
       <Grid container spacing={3}>
         {data.getWorkerPage.map((item, ind) => <Grid item lg={4} sm={6} xs={12} key={ind}>
             <Maintainer {...item} />
@@ -46,12 +55,11 @@ const MaintainerList = () => {
       </Grid>
 
       <FlexBox flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={4}>
-        <Span color="grey.600">Showing 1-6 of {maintainerList.length} Maintaners</Span>
+        <Span color="grey.600">Showing {index1}-{index2} of {cdata.getWorkerCount} Maintaners</Span>
         <Pagination count={Math.ceil(cdata.getWorkerCount/6)} page={page} onChange={handleChange} boundaryCount={1} siblingCount={1} variant="outlined" color="primary" />
       </FlexBox>
     </NavbarLayout>;
 };
-
 const maintainerList = [{
   name: 'Cat',
   rating: 5,

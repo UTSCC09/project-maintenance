@@ -16,7 +16,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { Box, Card, Divider, IconButton, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useDispatch } from "react-redux";
-import { UPDATE_USER_DATA } from '../../store/constants'
+import { UPDATE_USER_DATA } from "../../store/constants";
 
 const StyledCard = styled(({ children, passwordVisibility, ...rest }) => (
 	<Card {...rest}>{children}</Card>
@@ -35,7 +35,7 @@ const StyledCard = styled(({ children, passwordVisibility, ...rest }) => (
 const Login = () => {
 	const [passwordVisibility, setPasswordVisibility] = useState(false);
 	const router = useRouter();
-  const dispatch = useDispatch();
+	const dispatch = useDispatch();
 
 	const [login] = useMutation(CREATE_USER_MUTATION);
 
@@ -59,13 +59,15 @@ const Login = () => {
 					response.data.login.user) ||
 				{};
 			if (response.data.login) userData.isLogin = true;
-      dispatch({
-        type: UPDATE_USER_DATA,
-        payload: {
-          userData,
-        }
-      })
-       router.replace('/');
+			dispatch({
+				type: UPDATE_USER_DATA,
+				payload: {
+					userData,
+				},
+			});
+			router.replace("/", undefined, {
+				shallow: true,
+			});
 		});
 	};
 	const { values, errors, touched, handleBlur, handleChange, handleSubmit } =

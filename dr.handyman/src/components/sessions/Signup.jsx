@@ -44,9 +44,7 @@ const StyledCard = styled(({ children, passwordVisibility, ...rest }) => (
 const Signup = () => {
 	const [passwordVisibility, setPasswordVisibility] = useState(false);
 	const router = useRouter();
-	const [invokeSignUp] = useMutation(
-		CREATE_SIGN_UP_MUTATION
-	);
+	const [invokeSignUp] = useMutation(CREATE_SIGN_UP_MUTATION);
 
 	const togglePasswordVisibility = useCallback(() => {
 		setPasswordVisibility((visible) => !visible);
@@ -54,24 +52,29 @@ const Signup = () => {
 
 	const handleFormSubmit = async (values) => {
 		try {
-			const { email, name: username, password } = values;
-      if (username && email && password) {
-        invokeSignUp({
-          variables: {
-            username,
-            email,
-            password,
-          },
-        }).then(res => {
-          if (res) {
-            //console.log(signUpData)
-            const userData = res.data.signup;
-            return router.replace('/'); //going back to homepage instead of login page is more make sense.
-          }
-        }).catch(e => {
-          console.log(e)
-        });
-      }
+			const { email, name: username, password, phone } = values;
+			if (username && email && password) {
+				invokeSignUp({
+					variables: {
+						username,
+						email,
+						password,
+            phone
+					},
+				})
+					.then((res) => {
+						if (res) {
+							//console.log(signUpData)
+							const userData = res.data.signup;
+							return router.replace("/", undefined, {
+								shallow: true,
+							}); //going back to homepage instead of login page is more make sense.
+						}
+					})
+					.catch((e) => {
+						console.log(e);
+					});
+			}
 		} catch (error) {
 			console.log(error);
 		}
@@ -85,6 +88,7 @@ const Signup = () => {
 
 	return (
 		<StyledCard elevation={3} passwordVisibility={passwordVisibility}>
+      
 			<form className="content" onSubmit={handleSubmit}>
 				<H3 textAlign="center" mb={1}>
 					Create Your Account
@@ -118,7 +122,7 @@ const Signup = () => {
 				<TextField
 					mb={1.5}
 					name="email"
-					label="Email or Phone Number"
+					label="Email"
 					placeholder="Email"
 					variant="outlined"
 					size="small"
@@ -129,6 +133,22 @@ const Signup = () => {
 					value={values.email || ""}
 					error={!!touched.email && !!errors.email}
 					helperText={touched.email && errors.email}
+				/>
+
+        <TextField
+					mb={1.5}
+					name="phone"
+					label="Phone Number"
+					placeholder="Phone"
+					variant="outlined"
+					size="small"
+					type="number"
+					fullWidth
+					onBlur={handleBlur}
+					onChange={handleChange}
+					value={values.phone || ""}
+					error={!!touched.phone && !!errors.phone}
+					helperText={touched.phone && errors.phone}
 				/>
 
 				<TextField
@@ -225,7 +245,7 @@ const Signup = () => {
 						>
 							By signing up, you agree to
 							<a
-								href="/"
+								
 								target="_blank"
 								rel="noreferrer noopener"
 							>
@@ -289,10 +309,14 @@ const initialValues = {
 	password: "",
 	re_password: "",
 	agreement: false,
+  phone:""
 };
+const phoneRegEx = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+
 const formSchema = yup.object().shape({
 	name: yup.string().required("${path} is required"),
 	email: yup.string().email("invalid email").required("${path} is required"),
+  phone: yup.string().matches(phoneRegEx, 'Phone number is not valid').required("${path} is required"),
 	password: yup.string().required("${path} is required"),
 	re_password: yup
 		.string()

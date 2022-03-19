@@ -1,1 +1,2 @@
 export const UPDATE_USER_DATA = 'UPDATE_USER_DATA';
+export const TRIGGER_MESSAGE = 'TRIGGER_MESSAGE';

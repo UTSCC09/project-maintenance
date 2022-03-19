@@ -9,7 +9,7 @@ import Link from 'next/link';
 import React from 'react';
 
 const Maintainer = ({
-  name,
+  username,
   rating,
   address,
   phone,
@@ -26,7 +26,7 @@ const Maintainer = ({
       }
     }}>
         <H3 fontWeight="600" mb={1}>
-          {name}
+          {username}
         </H3>
 
         <Rating value={rating || 0} color="warn" size="small" readOnly sx={{

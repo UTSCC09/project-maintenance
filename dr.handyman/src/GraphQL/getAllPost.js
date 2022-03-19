@@ -10,6 +10,7 @@ query GetAllPost {
     createdAt
     acceptorUsername
     state
+    _id
   }
 }
 `;
