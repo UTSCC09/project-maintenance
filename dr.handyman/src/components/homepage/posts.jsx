@@ -50,7 +50,7 @@ const Posts = () => {
   }
 
   return <NavbarLayout>
-      
+       <H3 color="#2C2C2C" mb={2}>See Newest Posts</H3>
 
       <PostRow sx={{
       display: {
@@ -64,23 +64,24 @@ const Posts = () => {
         <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
           Title
         </H5>
-        <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
+        {/* <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
           Information
-        </H5>
+        </H5> */}
         <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
           Posted By
         </H5>
+       
         <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
           Posts Type
-        </H5>
-        <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-          Post Time
         </H5>
         <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
           State
         </H5>
         <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
           Accept User
+        </H5>
+        <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
+          Post Time
         </H5>
         <H5 flex="0 0 0 !important" color="grey.600" px={2.75} py={0.5} my={0}></H5>
       </PostRow>

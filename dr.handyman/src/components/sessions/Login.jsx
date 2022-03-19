@@ -37,7 +37,7 @@ const Login = () => {
 	const router = useRouter();
   const dispatch = useDispatch();
 
-	const [login, { error, data }] = useMutation(CREATE_USER_MUTATION);
+	const [login] = useMutation(CREATE_USER_MUTATION);
 
 	const togglePasswordVisibility = useCallback(() => {
 		setPasswordVisibility((visible) => !visible);
@@ -53,16 +53,16 @@ const Login = () => {
 				password: password,
 			},
 		}).then((response) => {
-			console.log(response);
 			const userData =
 				(response.data &&
 					response.data.login &&
 					response.data.login.user) ||
 				{};
+			if (response.data.login) userData.isLogin = true;
       dispatch({
         type: UPDATE_USER_DATA,
         payload: {
-          userData
+          userData,
         }
       })
        router.replace('/');

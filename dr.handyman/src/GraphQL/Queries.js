@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const LOAD_USERS = gql`
+export const LOAD_USERS = gql `
   query {
     getAllUsers {
       id
@@ -11,7 +11,7 @@ export const LOAD_USERS = gql`
   }
 `;
 
-export const GET_POSTS_QUERY = gql`
+export const GET_POSTS_QUERY = gql `
 query GetPostPage($postPerPage: Int!, $page: Int!) {
   getPostPage(postPerPage: $postPerPage, page: $page) {
     posterUsername
@@ -25,13 +25,13 @@ query GetPostPage($postPerPage: Int!, $page: Int!) {
 }
 `;
 
-export const GET_COUNT = gql`
+export const GET_COUNT = gql `
 query GetPostCount {
   getPostCount 
 }
 `;
 
-export const GET_WORKER = gql`
+export const GET_WORKER = gql `
 query GetWorkerPage($workerPerPage: Int!, $page: Int!) {
   getWorkerPage(workerPerPage: $workerPerPage, page: $page) {
     email
@@ -43,8 +43,22 @@ query GetWorkerPage($workerPerPage: Int!, $page: Int!) {
 }
 `;
 
-export const WORKER_COUNT = gql`
+export const WORKER_COUNT = gql `
 query Query {
   getWorkerCount
 }
 `;
+
+export const GET_USER_DATA = gql `
+query {
+  currentUser {
+    email
+    username
+    password
+    type
+    phone
+    rating
+    permissions
+    createdAt
+  }
+}`;
