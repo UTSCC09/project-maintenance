@@ -30,7 +30,8 @@ const postMutDef = `
 const postQueryDef = `
     getPostCount: Int
     getOnePost(_id: String!): Post
-    getUserPosts: [Post]
+    getUserPostsPage(userPostPerPage: Int!, page: Int!): [Post]
+    getUserPostCount: Int
     getAcceptedPosts: [Post]
 	getAllPost: [Post]
     getPostPage(postPerPage: Int!, page: Int!): [Post]
@@ -149,8 +150,16 @@ const postQuery = {
     async getPostCount(parent, args, context, info){
         return await Post.countDocuments();
     },
-    async getUserPosts(parent, args, context, info){
-        return await Post.find({posterEmail: context.getUser().email});
+    async getUserPostsPage(parent, args, context, info){
+        const { userPostPerPage, page } = args;
+        if (page < 0)
+            throw new Error("page number undefined");
+        if (userPostPerPage == 0)
+            return [];
+        return await Post.find({posterEmail: context.getUser().email}).sort({ 'createdAt': 1 }).skip(page * userPostPerPage).limit(userPostPerPage);
+    },
+    async getUserPostCount(parent, args, context, info){
+        return await Post.countDocuments({posterEmail: context.getUser().email});
     },
     async getAcceptedPosts(parent, args, context, info){
         return await Post.find({acceptorEmail: context.getUser().email});
