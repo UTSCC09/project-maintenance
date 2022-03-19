@@ -126,39 +126,51 @@ require('dotenv').config();
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(graphqlUploadExpress());
-//   app.get('/api/images/:imageId/picture/', function(req, res, next){
-//     if (!req.session.passport)  return res.status(500).end(err);
-//     images.findOne({ _id: req.params.imageId }, function(err, image){
-
-//         if (err) return res.status(500).end(err);
-//         if (!image) return res.status(404).end("Image Id does not exist");
-//         res.setHeader('Content-Type', image.file.mimetype);
-//         return res.sendFile(image.file.path, { root: __dirname });
-//     });
-// });
 // Express X Passport X HTTPS setup
-
 const io = require("socket.io")(httpServer, {
-	cors: {
-		origin: "*",
-		methods: [ "GET", "POST" ]
-	}
+  cors: {
+    origin: "*",
+    methods: [ "GET", "POST" ]
+  },
 })
 
+// user need to send their email on login
+// each user has list of sockets
+// if one user openned multiple pages, only one page will be alerted
+const users = {}
 io.on("connection", (socket) => {
-	socket.emit("me", socket.id)
+  socket.emit("me", socket.id)
+  socket.on('login', function(data){
+    console.log(data);
+    if (data.email in users)
+      users[data.email].push(socket.id);
+    else
+      users[data.email] = [socket.id];
+    
+  })
+  socket.on("disconnect", () => {
+    socket.broadcast.emit("callEnded");
+    for (const email in users) {
+      if (users.hasOwnProperty(email)) {
+        const index = users[email].indexOf(socket.id);
+        if (index > -1) {
+          users[email].splice(index, 1);
+          if (users[email]== 0) 
+            delete users[email];   
+          break;
+        }
+      }
+    }
+      
+  })
 
-	socket.on("disconnect", () => {
-		socket.broadcast.emit("callEnded")
-	})
+  socket.on("callUser", (data) => {
+    io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
+  })
 
-	socket.on("callUser", (data) => {
-		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
-	})
-
-	socket.on("answerCall", (data) => {
-		io.to(data.to).emit("callAccepted", data.signal)
-	})
+  socket.on("answerCall", (data) => {
+    io.to(data.to).emit("callAccepted", data.signal)
+  })
 })
 // Initialize and start the HTTPS server
   async function startServer() {
@@ -248,6 +260,7 @@ io.on("connection", (socket) => {
   }
   startServer();
 
+
   // The `listen` method launches a web server.
 
   httpServer.listen(PORT, function (err) {
@@ -255,6 +268,8 @@ io.on("connection", (socket) => {
       else console.log("HTTPS server on https://localhost:%s", PORT);
       
   });
+
+  
 
 module.exports = {
     WorkerData,
