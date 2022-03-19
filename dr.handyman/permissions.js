@@ -16,7 +16,10 @@ const isAuthenticated = rule()((parent, args, context) => {
 const permissions = shield({
     Query: {
         currentUser: isAuthenticated,
-        getConvo: isAuthenticated,
+        getOneConvo: isAuthenticated,
+        getUserPosts: isAuthenticated,
+        getAcceptedPosts: isAuthenticated,
+        getCurrentConvos: isAuthenticated,
     },
     Mutation: {
         setPost: isAuthenticated,

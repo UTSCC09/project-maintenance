@@ -27,7 +27,8 @@ const chatMutDef = `
     createMessage(_id: String!, content: String!): Boolean
 `;
 const chatQueryDef = `
-    getConvo(_id: String!): Conversation
+    getOneConvo(_id: String!): Conversation
+    getCurrentConvos: [Conversation]
 `;
 
 const ConversationSchema = new Schema({
@@ -96,13 +97,16 @@ const chatMut = {
 };
 
 const chatQuery = {
-    async getConvo(parent, args, context, info){
+    async getOneConvo(parent, args, context, info){
         const { _id } = args;
         const conv = await Conversation.findOne({ _id: _id});
         if (conv == null)
             throw new UserInputError("conversation does not exist");
         return conv;
-    }
+    },
+    async getCurrentConvos(parent, args, context, info){
+        return await Conversation.find({userEmails: context.getUser().email});
+    }   
 };
 
 module.exports = {

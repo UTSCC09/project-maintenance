@@ -30,6 +30,8 @@ const postMutDef = `
 const postQueryDef = `
     getPostCount: Int
     getOnePost(_id: String!): Post
+    getUserPosts: [Post]
+    getAcceptedPosts: [Post]
 	getAllPost: [Post]
     getPostPage(postPerPage: Int!, page: Int!): [Post]
 `;
@@ -138,13 +140,21 @@ const postMut = {
 
 const postQuery = {
     async getOnePost(parent, args, context, info){
-        return await Post.findOne({_id: args._id});
+        const post = await Post.findOne({_id: args._id});
+        if (post == null)
+            throw new Error('Post does not exist');
+        return post;
     },
 
     async getPostCount(parent, args, context, info){
         return await Post.countDocuments();
     },
-
+    async getUserPosts(parent, args, context, info){
+        return await Post.find({posterEmail: context.getUser().email});
+    },
+    async getAcceptedPosts(parent, args, context, info){
+        return await Post.find({acceptorEmail: context.getUser().email});
+    },
     async getPostPage(parent, args, context, info){
         const { postPerPage, page } = args;
         if (page < 0)

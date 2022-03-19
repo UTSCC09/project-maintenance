@@ -33,6 +33,7 @@ const userMutDef = `
 `;
 
 const userQueryDef = `
+    getOneUser(email: String!): User
     getOneWorker(email: String!): User
     getWorkerCount: Int
     getWorkerPage(workerPerPage: Int!, page: Int!): [User]
@@ -110,7 +111,19 @@ const userQuery = {
         return await User.countDocuments({ type: "worker" });
     },
     async getOneWorker(parent, args, context, info){
-        return await User.findOne({email: args.email});
+        const worker = await User.findOne({$and : [
+            {email: args.email},
+            {type: "worker"}   
+        ]});
+        if (worker == null)
+            throw new Error('worker does not exist');
+        return worker;
+    },
+    async getOneUser(parent, args, context, info){
+        const user = await User.findOne({email: args.email});
+        if (user == null)
+            throw new Error('worker does not exist');
+        return user;
     }
 
 };

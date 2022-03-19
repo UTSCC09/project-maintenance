@@ -87,8 +87,6 @@ require('dotenv').config();
   app.use(sessionMid);
 
   app.get('/pictures/:email', async (req, res) => {
-    if (!req.session.passport)
-      return res.status(500).end('not authenicated');
     const user = await User.findOne({ email: req.session.passport.user});
     if (!user)
       return res.status(500).end('not authenicated');
