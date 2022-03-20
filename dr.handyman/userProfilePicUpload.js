@@ -9,10 +9,10 @@ const fileUploadDef = `
   scalar Upload
 
   type File {
-    filepath: String!
-    fileGetPath: String!
-    mimetype: String!
-    encoding: String!
+    filepath: String
+    fileGetPath: String
+    mimetype: String
+    encoding: String
   }
 `;
 
