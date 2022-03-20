@@ -89,7 +89,7 @@ require('dotenv').config();
   app.get('/pictures/:email', async (req, res) => {
     const user = await User.findOne({ email: req.params.email});
     if (!user)
-      throw new Error ("no user");
+      return res.status(500).end('no such user');
 
     if (user.profilePic == undefined || !fs.existsSync(__dirname + '/files/pictures/' + req.params.email + '.pic')){
       return res.status(500).end('no file associated with user');
