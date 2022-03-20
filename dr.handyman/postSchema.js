@@ -3,6 +3,24 @@
 const mongoose  = require('mongoose');
 const { Schema } = mongoose;
 const { Post } = require('./mongooseSchemas');
+
+var rad = function(x) {
+    return x * Math.PI / 180;
+};
+  
+var getDistance = function(p1, p2) {
+    // 1 is lat, 0 is long
+    var R = 6378137; // Earth’s mean radius in meter
+    var dLat = rad(p2[1] - p1[1]);
+    var dLong = rad(p2[0] - p1[0]);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(rad(p1[1])) * Math.cos(rad(p2[1])) *
+        Math.sin(dLong / 2) * Math.sin(dLong / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c;
+    return d; // returns the distance in meter
+};
+
 const postDefs = `
     type Post {
         _id: String
@@ -12,6 +30,7 @@ const postDefs = `
         acceptorUsername: String
         title: String
         content: String
+        distance: Float
         location: [Float!]
         type: Int
         state: Boolean
@@ -30,7 +49,7 @@ const postMutDef = `
 
 const postQueryDef = `
     getPostCount: Int
-    getOnePost(_id: String!): Post
+    getOnePost(_id: String!, coordinates: [Float]): Post
 
     getUserPostsPage(userPostPerPage: Int!, page: Int!): [Post]
     getUserPostsPageByEmail(email: String!, userPostPerPage: Int!, page: Int!): [Post]
@@ -119,6 +138,11 @@ const postQuery = {
         const post = await Post.findOne({_id: args._id});
         if (post == null)
             throw new Error('Post does not exist');
+        post["distance"] = null;
+        if (args.coordinates != null && args.coordinates != undefined && args.coordinates.length == 2
+            && typeof args.coordinates[0] === "number" && typeof args.coordinates[1] === "number"){
+                post["distance"] = getDistance(args.coordinates, post.location.coordinates) / 1000;
+            }
         return post;
     },
 
