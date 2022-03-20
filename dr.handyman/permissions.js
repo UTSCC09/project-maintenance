@@ -17,10 +17,15 @@ const permissions = shield({
     Query: {
         currentUser: isAuthenticated,
         getOneConvo: isAuthenticated,
+
         getUserPostsPage: isAuthenticated,
-        getAcceptedPosts: isAuthenticated,
+        getUserPostCount: isAuthenticated,
+        
+        getAcceptedPostsPage: isAuthenticated,
+        getAcceptedPostCount: isAuthenticated,
+
         getCurrentConvos: isAuthenticated,
-        getUserPostCount: isAuthenticated
+        
     },
     Mutation: {
         setPost: isAuthenticated,
@@ -32,6 +37,7 @@ const permissions = shield({
         createConvo: isAuthenticated,
         createMessage: isAuthenticated,
         setUser: isAuthenticated,
+        deletePost: isAuthenticated,
     },
 }, 
     {allowExternalErrors: true}

@@ -28,7 +28,7 @@ type Del {
 
 const userMutDef = `
     deleteUser(email: String): Del
-    setUser(user: UserInput!): Boolean
+    setUser(email: String!, username: String!, phone: String!): Boolean
     setWorker(coordinates: [Float!]): Boolean
 `;
 
@@ -138,15 +138,13 @@ const userMut = {
                                     console.error(err);
                                 });
     },
-    async setUser (parent, { user }, context, info){
-        const { type, phone, rating, permissions } = user;
-        const res = await User.updateOne({ email: context.getUser().email },
-                                         { type: type == null ? context.getUser().type : type,
-                                           phone: phone == null ? context.getUser().phone : phone,
-                                           rating: rating == null ? context.getUser().rating : rating,
-                                           permissions: permissions == null ? context.getUser().permissions : permissions,});
-        return res.acknowledged;
-    },
+    // async setUser (parent, args, context, info){
+    //     const { email, username, phone } = args;
+    //     const res = await User.updateOne({ email: context.getUser().email },
+    //                                      { 
+    //                                        phone: phone == null ? context.getUser().phone : phone,});
+    //     return res.acknowledged;
+    // },
     async setWorker (parent, args, context, info){
         const { coordinates } = args;
         const res = await User.updateOne({ email: context.getUser().email },
