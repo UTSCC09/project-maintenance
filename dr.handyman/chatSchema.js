@@ -2,7 +2,7 @@
 
 const mongoose  = require('mongoose');
 const { Schema } = mongoose;
-const { User } = require('./userSchema');
+const { Conversation, Message, User } = require('./mongooseSchemas');
 const { UserInputError } = require('apollo-server'); 
 // https://stackoverflow.com/questions/14040562/how-to-search-in-array-of-object-in-mongodb
 const chatDefs = `
@@ -30,34 +30,6 @@ const chatQueryDef = `
     getOneConvo(_id: String!): Conversation
     getCurrentConvos: [Conversation]
 `;
-
-const ConversationSchema = new Schema({
-    userEmails: {
-        type: [String],
-        required: true
-    },
-});
-const MessageSchema = new Schema({
-    conversationId: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true
-    },
-    username: {
-        type: String,
-        required: true
-    },
-    content: {
-        type: String,
-        required: true
-    },
-}, { timestamps: true });
-
-const Conversation = mongoose.model('Conversation', ConversationSchema);
-const Message = mongoose.model('Message', MessageSchema);
 
 const chatMut = {
     async createConvo(parent, args, context, info){

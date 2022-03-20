@@ -1,6 +1,7 @@
 /*jshint esversion: 8 */
 
 const mongoose  = require('mongoose');
+const { Message, Post, User } = require('./mongooseSchemas');
 const { Schema } = mongoose;
 
 const userDefs = `
@@ -28,7 +29,7 @@ type Del {
 
 const userMutDef = `
     deleteUser(email: String): Del
-    setUser(email: String!, username: String!, phone: String!): Boolean
+    setUser(username: String!, phone: Int!): Boolean
     setWorker(coordinates: [Float!]): Boolean
 `;
 
@@ -37,66 +38,10 @@ const userQueryDef = `
     getOneWorker(email: String!): User
     getWorkerCount: Int
     getWorkerPage(workerPerPage: Int!, page: Int!): [User]
+
+    searchWorkerPage(queryText: String!, workerPerPage: Int!, page: Int!): [User]
+    searchWorkerPageCount(queryText: String!): Int
 `;
-
-const UserSchema = new Schema({
-    email: {
-        type: String,
-        required: true
-    },
-    username: {
-        type: String,
-        required: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    type: {
-        type: String,
-        required: true
-    },
-    phone: {
-        type: Number,
-        required: true
-    },
-    rating: {
-        type: Number,
-        required: true
-    },
-    location: {
-        type: {
-            type: String,
-            enum: ['Point'], // 'location.type' must be 'Point'
-            required: false
-          },
-          coordinates: {
-            type: [Number],
-            required: false
-          }
-    },
-    profilePic: {
-        filepath: {
-            type: String,
-            required: false,
-        },
-        mimetype: {
-            type: String,
-            required: false,
-        },
-        encoding: {
-            type: String,
-            required: false,
-        },
-        required: false
-    },
-    permissions: {
-        type: [String],
-        required: true
-    },
-}, { timestamps: true });
-
-const User = mongoose.model('User', UserSchema);
 
 const userQuery = {
     async getWorkerPage(parent, args, context, info){
@@ -124,6 +69,19 @@ const userQuery = {
         if (user == null)
             throw new Error('worker does not exist');
         return user;
+    },
+    async searchWorkerPage(parent, args, content, info){
+        const { queryText, workerPerPage, page } = args;
+        if (page < 0)
+            throw new Error("page number undefined");
+        if (workerPerPage == 0)
+            return [];
+        return await User.find({$and: [{ $text: {$search: queryText } }, 
+                                       { type: "worker" }]}).sort({ score: {$meta: "textScore" } }).skip(page * workerPerPage).limit(workerPerPage);
+    },
+    async searchWorkerPageCount(parent, args, content, info){
+        return await User.countDocuments({$and: [{ $text: {$search: args.queryText } }, 
+            { type: "worker" }]});
     }
 
 };
@@ -138,13 +96,28 @@ const userMut = {
                                     console.error(err);
                                 });
     },
-    // async setUser (parent, args, context, info){
-    //     const { email, username, phone } = args;
-    //     const res = await User.updateOne({ email: context.getUser().email },
-    //                                      { 
-    //                                        phone: phone == null ? context.getUser().phone : phone,});
-    //     return res.acknowledged;
-    // },
+    async setUser (parent, args, context, info){
+        const { username, phone } = args;
+        let res = await User.updateOne({ email: context.getUser().email },
+                                         { phone, username});
+        if (!res.acknowledged)
+            throw new Error("update failed");
+        res = await Message.updateMany({email: context.getUser().email}, 
+                                       {username});
+        if (!res.acknowledged)
+            throw new Error("update failed");
+
+        res = await Post.updateMany({posterEmail: context.getUser().email}, 
+                                    {posterUsername: username});
+        if (!res.acknowledged)
+            throw new Error("update failed");
+
+        res = await Post.updateMany({acceptorEmail: context.getUser().email}, 
+                                    {acceptorUsername: username});
+        if (!res.acknowledged)
+            throw new Error("update failed");
+        return res.acknowledged;
+    },
     async setWorker (parent, args, context, info){
         const { coordinates } = args;
         const res = await User.updateOne({ email: context.getUser().email },

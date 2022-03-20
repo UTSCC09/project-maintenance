@@ -2,7 +2,7 @@
 
 const mongoose  = require('mongoose');
 const { Schema } = mongoose;
-
+const { Post } = require('./mongooseSchemas');
 const postDefs = `
     type Post {
         _id: String
@@ -44,55 +44,10 @@ const postQueryDef = `
     
 	getAllPost: [Post]
     getPostPage(postPerPage: Int!, page: Int!): [Post]
+
+    searchPostPage(queryText: String!, postPerPage: Int!, page: Int!): [Post]
+    searchPostPageCount(queryText: String!): Int
 `;
-
-const PostSchema = new Schema({
-    posterEmail: {
-        type: String,
-        required: true
-    },
-    posterUsername: {
-        type: String,
-        required: true
-    },
-    acceptorEmail: {
-        type: String,
-        required: false
-    },
-    acceptorUsername: {
-        type: String,
-        required: false
-    },
-    title: {
-        type: String,
-        required: true
-    },
-    content: {
-        type: String,
-        required: true
-    },
-    location: {
-        type: {
-            type: String,
-            enum: ['Point'], // 'location.type' must be 'Point'
-            required: true
-          },
-          coordinates: {
-            type: [Number],
-            required: true
-          }
-    },
-    type: {
-        type: Number,
-        required: true
-    },
-    state: {
-        type: Boolean,
-        required: true
-    },
-}, { timestamps: true });
-
-const Post = mongoose.model('Post', PostSchema);
 
 const postMut = {
     addPost (parent, args, context, info) {
@@ -228,6 +183,18 @@ const postQuery = {
         if (posts == null)
             throw new UserInputError("post does not exist");
         return posts;
+    },
+
+    async searchPostPage(parent, args, content, info){
+        const { queryText, postPerPage, page } = args;
+        if (page < 0)
+            throw new Error("page number undefined");
+        if (postPerPage == 0)
+            return [];
+        return await Post.find({ $text: {$search: queryText } }).sort({ score: {$meta: "textScore" } }).skip(page * postPerPage).limit(postPerPage);
+    },
+    async searchPostPageCount(parent, args, content, info){
+        return await Post.countDocuments({ $text: {$search: args.queryText }});
     }
 }
 
