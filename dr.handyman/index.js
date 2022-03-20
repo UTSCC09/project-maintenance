@@ -92,6 +92,7 @@ require('dotenv').config();
       return res.status(500).end('no such user');
 
     if (user.profilePic == undefined || !fs.existsSync(__dirname + '/files/pictures/' + req.params.email + '.pic')){
+      res.setHeader('Content-Type', '7bit');
       return res.sendFile(__dirname + '/files/pictures/default');
     }
     res.setHeader('Content-Type', user.profilePic.mimetype);
