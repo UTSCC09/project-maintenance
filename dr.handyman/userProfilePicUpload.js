@@ -10,6 +10,7 @@ const fileUploadDef = `
 
   type File {
     filepath: String!
+    fileGetPath: String!
     mimetype: String!
     encoding: String!
   }
@@ -54,7 +55,7 @@ const fileUploadMut = {
     stream.pipe(out);
     await finished(out);
     const res = await User.updateOne({ email: context.getUser().email },
-                                        { profilePic: { filepath: __dirname + '/files/pictures/' + context.getUser().email + '.pic', mimetype, encoding }});
+                                        { profilePic: { fileGetPath: 'https://drhandyman.me:4000/pictures/'+context.getUser().email + '.pic', filepath: __dirname + '/files/pictures/' + context.getUser().email + '.pic', mimetype, encoding }});
     return res.acknowledged;
   },
 };

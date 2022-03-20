@@ -87,9 +87,9 @@ require('dotenv').config();
   app.use(sessionMid);
 
   app.get('/pictures/:email', async (req, res) => {
-    const user = await User.findOne({ email: req.session.passport.user});
+    const user = await User.findOne({ email: req.params.email});
     if (!user)
-      return res.status(500).end('not authenicated');
+      throw new Error ("no user");
 
     if (user.profilePic == undefined || !fs.existsSync(__dirname + '/files/pictures/' + req.params.email + '.pic')){
       return res.status(500).end('no file associated with user');

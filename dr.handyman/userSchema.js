@@ -16,7 +16,7 @@ type User {
     username: String
     password: String
     type: String
-    phone: Int
+    phone: String
     rating: Int
     location: [Float!]
     profilePic: File
@@ -29,7 +29,7 @@ type Del {
 
 const userMutDef = `
     deleteUser(email: String): Del
-    setUser(username: String!, phone: Int!): Boolean
+    setUser(username: String!, phone: String!): Boolean
     setWorker(coordinates: [Float!]): Boolean
 `;
 

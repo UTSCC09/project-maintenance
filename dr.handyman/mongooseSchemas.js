@@ -20,7 +20,7 @@ const UserSchema = new Schema({
         required: true
     },
     phone: {
-        type: Number,
+        type: String,
         required: true
     },
     rating: {
@@ -40,6 +40,10 @@ const UserSchema = new Schema({
     },
     profilePic: {
         filepath: {
+            type: String,
+            required: false,
+        },
+        fileGetPath:{
             type: String,
             required: false,
         },
