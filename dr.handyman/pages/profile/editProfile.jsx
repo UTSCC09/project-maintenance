@@ -12,81 +12,131 @@ import { TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { Formik, useFormik } from "formik";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import * as yup from "yup";
 import AppLayout from "components/layout/AppLayout";
 import { SET_USER } from "../../src/GraphQL/Mutations";
 import { useMutation, useLazyQuery } from "@apollo/client";
 import { useSelector, useDispatch } from "react-redux";
 import { TRIGGER_MESSAGE, UPDATE_USER_DATA } from "../../src/store/constants";
-import { useRouter } from 'next/router'
-import { GET_USER_DATA } from '../../src/GraphQL/Queries'
+import { useRouter } from "next/router";
+import { GET_USER_DATA } from "../../src/GraphQL/Queries";
+import Emitter from "@/utils/eventEmitter";
+import axios from "axios";
 
 const ProfileEdit = () => {
 	const [modifyUser] = useMutation(SET_USER);
 	const userData = useSelector((state) => state.userData);
 	const dispatch = useDispatch();
-  const router = useRouter();
-  const [fetchUserData] = useLazyQuery(GET_USER_DATA)
+	const router = useRouter();
+	const [fetchUserData] = useLazyQuery(GET_USER_DATA);
+	const [waitForUserProfileAvatarFile, setWaitForUserProfileAvatarFile] = useState(null)
 
-	const handleSubmit = (values) => {
-		const { username, phone, email } = values;
-		modifyUser({
-			variables: {
-				user: {
-					type: userData.type,
-					phone,
-					rating: userData.rating,
-					permissions: userData.permissions,
-				},
-			},
+	let userProfileImage = "/assets/u1.png";
+	console.log(userData)
+	if (userData.profilePic) {
+		userProfileImage = userData.profilePic.fileGetPath;
+		// userProfileImage = `https://www.drhandyman.me:4000/pictures/${userData.email}`;
+	}
+	if (waitForUserProfileAvatarFile) {
+		userProfileImage = window.URL.createObjectURL(waitForUserProfileAvatarFile)
+	}
+
+	const uploadAvatar = () => {
+		const formData = new FormData();
+		formData.append(
+			"operations",
+			JSON.stringify({
+				query: "mutation Mutation($file: Upload!){ profilePicUpload(file: $file)}",
+			})
+		);
+		formData.append("map", JSON.stringify({ 0: ["variables.file"] }));
+		formData.append("0", waitForUserProfileAvatarFile);
+
+		return axios({
+			url: "https://www.drhandyman.me:4000/graphql",
+			method: "POST",
+			withCredentials: true,
+			data: formData,
 		})
-			.then(() => {
-				dispatch({
-					type: TRIGGER_MESSAGE,
-					payload: {
-						globalMessage: {
-							message: `Update Success.`,
-							severity: "success",
-						},
-					},
-				});
-        fetchUserData().then((res) => {
-          if (res.data && res.data.currentUser) {
-            dispatch({
-              type: UPDATE_USER_DATA,
-              payload: {
-                userData: {
-                  ...res.data.currentUser,
-                  isLogin: true,
-                },
-              },
-            });
-          }
-        }).catch(() => {
-          console.log('Not Login!')
-        });
-        router.push('/profile')
+			.then((res) => {
+				if (
+					res.data &&
+					res.data.data &&
+					res.data.data.profilePicUpload
+				) {
+					Emitter.emit("showMessage", {
+						message: "upload successfully",
+						severity: "success",
+					});
+				}
 			})
 			.catch((err) => {
-				console.log(err);
-				dispatch({
-					type: TRIGGER_MESSAGE,
-					payload: {
-						globalMessage: {
-							message: `Update Failed.`,
-							severity: "error",
-						},
-					},
+				Emitter.emit("showMessage", {
+					message: err.message,
+					severity: "error",
 				});
 			});
 	};
 
+	const handleSubmit = (values) => {
+		const { username, phone, email } = values;
+		uploadAvatar().then(() => {
+			modifyUser({
+				variables: {
+					phone,
+					username,
+				},
+			})
+				.then(() => {
+					dispatch({
+						type: TRIGGER_MESSAGE,
+						payload: {
+							globalMessage: {
+								message: `Update Successfully.`,
+								severity: "success",
+							},
+						},
+					});
+					fetchUserData()
+						.then((res) => {
+							if (res.data && res.data.currentUser) {
+								dispatch({
+									type: UPDATE_USER_DATA,
+									payload: {
+										userData: {
+											...res.data.currentUser,
+											isLogin: true,
+										},
+									},
+								});
+							}
+						})
+						.catch(() => {
+							console.log("Not Login!");
+						});
+					router.push("/profile");
+				})
+				.catch((err) => {
+					console.log(err);
+					dispatch({
+						type: TRIGGER_MESSAGE,
+						payload: {
+							globalMessage: {
+								message: `Update Failed.`,
+								severity: "error",
+							},
+						},
+					});
+				});
+		});
+	};
+
 	const formik = useFormik({
 		initialValues: {
-			username: "",
-			email: "",
-			phone: null,
+			username: userData.username || "",
+			email: userData.email || "",
+			phone: userData.phone || "",
 		},
 		validationSchema: checkoutSchema,
 		onSubmit: handleSubmit,
@@ -117,7 +167,7 @@ const ProfileEdit = () => {
 				<Card sx={{ p: 4, bgcolor: "#FFF9EC" }}>
 					<FlexBox alignItems="flex-end" mb={3}>
 						<Avatar
-							src="/assets/u1.png"
+							src={`https://www.drhandyman.me:4000/pictures/${userData.email}`}
 							sx={{
 								height: 64,
 								width: 64,
@@ -143,7 +193,9 @@ const ProfileEdit = () => {
 						</Box>
 						<Box display="none">
 							<input
-								onChange={(e) => console.log(e.target.files)}
+								onChange={(e) =>
+									setWaitForUserProfileAvatarFile(e.target.files[0])
+								}
 								id="profile-image"
 								accept="image/*"
 								type="file"
@@ -153,7 +205,7 @@ const ProfileEdit = () => {
 					<form onSubmit={formik.handleSubmit}>
 						<Box mb={4}>
 							<Grid container spacing={3}>
-								{/* <Grid item md={6} xs={12}>
+								<Grid item md={6} xs={12}>
 									<TextField
 										name="username"
 										label="Name"
@@ -170,25 +222,8 @@ const ProfileEdit = () => {
 											formik.errors.username
 										}
 									/>
-								</Grid> */}
-								{/* <Grid item md={6} xs={12}>
-											<TextField
-												name="last_name"
-												label="Last Name"
-												fullWidth
-												onBlur={handleBlur}
-												onChange={handleChange}
-												value={values.last_name || ""}
-												error={
-													!!touched.last_name &&
-													!!errors.last_name
-												}
-												helperText={
-													touched.last_name &&
-													errors.last_name
-												}
-											/>
-										</Grid> */}
+								</Grid>
+							
 								{/* <Grid item md={6} xs={12}>
 									<TextField
 										name="email"
@@ -212,7 +247,6 @@ const ProfileEdit = () => {
 									<TextField
 										name="phone"
 										label="Phone"
-                    type="number"
 										fullWidth
 										onBlur={formik.handleBlur}
 										onChange={formik.handleChange}
@@ -287,20 +321,14 @@ const ProfileEdit = () => {
 	);
 };
 
-const initialValues = {
-	// username: "",
-	// last_name: "",
-	// email: "",
-	phone: "",
-	// birth_date: new Date(),
-};
 const phoneRegEx = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
 const checkoutSchema = yup.object().shape({
-	// username: yup.string().required("required"),
+	username: yup.string().required("required"),
 	// last_name: yup.string().required("required"),
 	// email: yup.string().email("invalid email").required("required"),
-	phone: yup.string().matches(phoneRegEx, 'Phone number is not valid').required("${path} is required"),
+	 phone: yup.string().matches(phoneRegEx, 'Phone number is not valid').required("${path} is required"),
+	//phone: yup.string().required("required"),
 	// birth_date: yup.date().required("invalid date"),
 });
 export default ProfileEdit;

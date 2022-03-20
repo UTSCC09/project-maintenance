@@ -13,10 +13,9 @@ export default () => {
 
 	useEffect(() => {
 		setOpenStatus(globalMessage.show);
-		if (globalMessage.show) {
-      clearTimeout(timer)
-      timer = setTimeout(() => {
-        setOpenStatus(false);
+
+		const clearMessage = () => {
+			setOpenStatus(false);
         dispatch({
           type: TRIGGER_MESSAGE,
           payload: {
@@ -25,6 +24,11 @@ export default () => {
             },
           },
         });
+		}
+		if (globalMessage.show) {
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        clearMessage();
       }, globalMessage.duration)
 		}
 	}, [globalMessage]);

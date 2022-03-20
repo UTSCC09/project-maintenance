@@ -6,41 +6,45 @@ import { Box, Grid, Card, Hidden } from "@mui/material";
 import FlexBox from "components/FlexBox";
 import Link from "next/link";
 import { Chip, IconButton, Button, Typography } from "@mui/material";
-import LoadingButton from '@mui/lab/LoadingButton';
+import LoadingButton from "@mui/lab/LoadingButton";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import { GET_POST_DETAIL } from "../src/GraphQL/Queries";
-import { ACCEPT_POST, CANCEL_ACCEPT_POST } from '../src/GraphQL/Mutations'
+import { ACCEPT_POST, CANCEL_ACCEPT_POST } from "../src/GraphQL/Mutations";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { FIND_TYPE_MAP } from "../src/constant";
+import { FIND_TYPE_MAP } from "@/utils/constants";
 import { formatTime, getUrlQuery } from "../src/utils";
 import { useSelector } from "react-redux";
-import { useDispatch } from 'react-redux'
-import { TRIGGER_MESSAGE } from '../src/store/constants'
-import { useState } from 'react'
+import { useDispatch } from "react-redux";
+import { TRIGGER_MESSAGE } from "../src/store/constants";
+import { useState } from "react";
 
 const PostInformation = () => {
-  const router = useRouter();
-	const [getPostDetail, { loading, error, data = {} }] =
-		useLazyQuery(GET_POST_DETAIL, {
-			fetchPolicy: "network-only"
-		});
+	const router = useRouter();
+	const [getPostDetail, { loading, error, data = {} }] = useLazyQuery(
+		GET_POST_DETAIL,
+		{
+			fetchPolicy: "network-only",
+		}
+	);
 	const postDetail = data.getOnePost || {};
-	const userData = useSelector(state => state.userData);
-	const [fetchAcceptPost] = useMutation(ACCEPT_POST)
+	const userData = useSelector((state) => state.userData);
+	const [fetchAcceptPost] = useMutation(ACCEPT_POST);
 	const [fetchCancelAcceptPost] = useMutation(CANCEL_ACCEPT_POST);
 	const dispatch = useDispatch();
 	const [btnLoading, setBtnLoading] = useState(false);
 
 	// const isAccepted = postDetail.acceptorEmail && postDetail.acceptorEmail.indexOf(userData.email) === -1;
-    const isAccepted = postDetail.acceptorEmail !== '';
-    const sameUser = userData.email === postDetail.posterEmail;
-    const isAcceptedByCurrentUser = postDetail.acceptorEmail !== '' && userData.email === postDetail.acceptorEmail;
-	console.log('postDetail', postDetail)
+	const isAccepted = postDetail.acceptorEmail !== "";
+	const sameUser = userData.email === postDetail.posterEmail;
+	const isAcceptedByCurrentUser =
+		postDetail.acceptorEmail !== "" &&
+		userData.email === postDetail.acceptorEmail;
+	console.log("postDetail", postDetail);
 	console.log(btnLoading);
-    console.log('is accepted', isAccepted);
-    console.log('is accepted by current user', isAcceptedByCurrentUser);
+	console.log("is accepted", isAccepted);
+	console.log("is accepted by current user", isAcceptedByCurrentUser);
 
 	const getDetailInfo = () => {
 		const urlQuery = getUrlQuery();
@@ -50,56 +54,72 @@ const PostInformation = () => {
 				id,
 				$id: id,
 			},
-		}).then(res => {
-			setBtnLoading(false)
-		}).catch((res) => {
-			setBtnLoading(false)
-			console.log(res);
-		});
-	}
+		})
+			.then((res) => {
+				setBtnLoading(false);
+			})
+			.catch((res) => {
+				setBtnLoading(false);
+				console.log(res);
+			});
+	};
 
 	const acceptOrCancelPost = () => {
 		const urlQuery = getUrlQuery();
 		const id = router.query.id || urlQuery.id;
-		const fetchMethod = isAccepted ? fetchCancelAcceptPost : fetchAcceptPost;
+		const fetchMethod = isAccepted
+			? fetchCancelAcceptPost
+			: fetchAcceptPost;
 		setBtnLoading(true);
 		fetchMethod({
 			variables: {
-				id
-			}
-		}).then(res => {
-			dispatch({
-				type: TRIGGER_MESSAGE,
-				payload: {
-					globalMessage: {
-						message: `${isAccepted ? "Cancel" : "Accept"} Post Success.`,
-						severity: "success"
-					}
-				}
-			})
-			getDetailInfo()
-		}).catch((res) => {
-			setBtnLoading(false)
-			dispatch({
-				type: TRIGGER_MESSAGE,
-				payload: {
-					globalMessage: {
-						message: `${isAccepted ? "Cancel" : "Accept"} Post Failed.`,
-						severity: "error"
-					}
-				}
-			})
+				id,
+			},
 		})
-	}
+			.then((res) => {
+				dispatch({
+					type: TRIGGER_MESSAGE,
+					payload: {
+						globalMessage: {
+							message: `${
+								isAccepted ? "Cancel" : "Accept"
+							} Post Success.`,
+							severity: "success",
+						},
+					},
+				});
+				getDetailInfo();
+			})
+			.catch((res) => {
+				setBtnLoading(false);
+				dispatch({
+					type: TRIGGER_MESSAGE,
+					payload: {
+						globalMessage: {
+							message: `${
+								isAccepted ? "Cancel" : "Accept"
+							} Post Failed.`,
+							severity: "error",
+						},
+					},
+				});
+			});
+	};
 
 	useEffect(() => {
-		getDetailInfo()
+		getDetailInfo();
 	}, []);
-
 
 	return (
 		<AppLayout>
-			<Card sx={{ width: "700px", ml: "150px", mt: "40px", margin: "100px auto" }}>
+			<Card
+				sx={{
+					width: "700px",
+					ml: "150px",
+					mt: "40px",
+					margin: "100px auto",
+				}}
+			>
 				<Grid
 					container
 					spacing={3}
@@ -155,44 +175,53 @@ const PostInformation = () => {
 								? postDetail.acceptorUsername
 								: "N/A"}
 						</Box>
-					
+
 						<Box mb={3}>
 							Post Time: {formatTime(postDetail.createdAt)}
 						</Box>
-                      {!isAccepted && !sameUser && <Hidden>
-                        <LoadingButton
-							variant={isAccepted ? "outlined" : "contained"}
-							type="submit"
-							loading={btnLoading}
-							disabled={ (+postDetail.type === 0 && userData.type !== "worker") }
-							fullWidth
-							onClick={acceptOrCancelPost}
-							color={isAccepted ? 'secondary' : "primary"}
-							sx={{
-								mb: "1.65rem",
-								height: 44
-							}}
-						>
-							
-                             Accept Post
-						</LoadingButton> </Hidden> }
+						{!isAccepted && !sameUser && (
+							<Hidden>
+								<LoadingButton
+									variant={
+										isAccepted ? "outlined" : "contained"
+									}
+									type="submit"
+									loading={btnLoading}
+									disabled={
+										+postDetail.type === 0 &&
+										userData.type !== "worker"
+									}
+									fullWidth
+									onClick={acceptOrCancelPost}
+									color={isAccepted ? "secondary" : "primary"}
+									sx={{
+										mb: "1.65rem",
+										height: 44,
+									}}
+								>
+									Accept Post
+								</LoadingButton>
+							</Hidden>
+						)}
 
-					{isAcceptedByCurrentUser && <LoadingButton
-							variant={isAccepted ? "outlined" : "contained"}
-							type="submit"
-							loading={btnLoading}
-							// disabled={ (+postDetail.type === 0 && userData.type !== "worker") }
-							fullWidth
-							onClick={acceptOrCancelPost}
-							color={isAccepted ? 'secondary' : "primary"}
-							sx={{
-								mb: "1.65rem",
-								height: 44
-							}}
-						>
-							{/* {isAccepted ? "Cancel Accepted Post" : "Accept Post"} */}
-                           Cancel Accepted Post
-						</LoadingButton> }
+						{isAcceptedByCurrentUser && (
+							<LoadingButton
+								variant={isAccepted ? "outlined" : "contained"}
+								type="submit"
+								loading={btnLoading}
+								// disabled={ (+postDetail.type === 0 && userData.type !== "worker") }
+								fullWidth
+								onClick={acceptOrCancelPost}
+								color={isAccepted ? "secondary" : "primary"}
+								sx={{
+									mb: "1.65rem",
+									height: 44,
+								}}
+							>
+								{/* {isAccepted ? "Cancel Accepted Post" : "Accept Post"} */}
+								Cancel Accepted Post
+							</LoadingButton>
+						)}
 					</Grid>
 				</Grid>
 			</Card>

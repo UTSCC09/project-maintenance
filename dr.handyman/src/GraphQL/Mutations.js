@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const CREATE_USER_MUTATION = gql`
+export const CREATE_USER_MUTATION = gql `
 	mutation Login($email: String!, $password: String!) {
 		login(email: $email, password: $password) {
 			user {
@@ -16,7 +16,7 @@ export const CREATE_USER_MUTATION = gql`
 	}
 `;
 
-export const CREATE_SIGN_UP_MUTATION = gql`
+export const CREATE_SIGN_UP_MUTATION = gql `
 	mutation Signup($username: String!, $email: String!, $password: String!) {
 		signup(username: $username, email: $email, password: $password) {
 			user {
@@ -32,7 +32,7 @@ export const CREATE_SIGN_UP_MUTATION = gql`
 	}
 `;
 
-export const CREATE_POST_MUTATION = gql`
+export const CREATE_POST_MUTATION = gql `
 	mutation AddPost(
 		$title: String!
 		$type: Int!
@@ -50,32 +50,57 @@ export const CREATE_POST_MUTATION = gql`
 	}
 `;
 
-export const CREATE_LOGOUT_MUTATION = gql`
+export const CREATE_LOGOUT_MUTATION = gql `
 	mutation Mutation {
 		logout
 	}
 `;
 
-export const SET_USER = gql`
-	mutation SetUser($user: UserInput!) {
-		setUser(user: $user)
+export const SET_USER = gql `
+	mutation SetUser($username: String!, $phone: String!) {
+		setUser(username: $username, phone: $phone)
 	}
 `;
 
-export const SET_WORKER = gql`
+export const SET_WORKER = gql `
 	mutation SetWorker($coordinates: [Float!]) {
 		setWorker(coordinates: $coordinates)
 	}
 `;
 
-export const ACCEPT_POST = gql`
+export const ACCEPT_POST = gql `
 	mutation AcquirePost($id: String!) {
 		acquirePost(_id: $id)
 	}
 `;
 
-export const CANCEL_ACCEPT_POST = gql`
+export const CANCEL_ACCEPT_POST = gql `
+	mutation UnacquirePost($id: String!) {
+		unacquirePost(_id: $id)
+	}
+`;
+
+export const DEL_POST = gql `
+	mutation DeletePost($id: String!) {
+		deletePost(_id: $id)
+	}
+`;
+
+export const UPLOAD_AVATAR = gql `
+mutation ProfilePicUpload($file: Upload!) {
+  profilePicUpload(file: $file)
+}
+`
+
+export const CANCEL_ACCEPT = gql `
 mutation UnacquirePost($id: String!) {
   unacquirePost(_id: $id)
+}
+`
+
+export const SET_POST = gql `
+
+mutation SetPost($id: String!, $content: String!, $title: String!) {
+  setPost(_id: $id, content: $content, title: $title)
 }
 `

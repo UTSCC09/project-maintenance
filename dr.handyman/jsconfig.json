@@ -1,6 +1,11 @@
 {
     "compilerOptions": {
-        "baseUrl": "src"
+        "baseUrl": "src",
+        "paths": {
+            "@/utils/*": ["utils/*"],
+            "@/GraphQL/*": ["GraphQL/*"],
+            "@/*": ["./*"]
+        }
     },
     "include": ["src"]
 }

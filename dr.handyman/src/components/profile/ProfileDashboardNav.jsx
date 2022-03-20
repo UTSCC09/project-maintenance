@@ -48,7 +48,7 @@ const linkList = [{
     icon: PostAddIcon,
     
   }, {
-    href: '/userAcceptedPostPage',
+    href: '/userAcceptedPosts',
     title: 'My Accepted Posts',
     icon: AssignmentTurnedInIcon,
     

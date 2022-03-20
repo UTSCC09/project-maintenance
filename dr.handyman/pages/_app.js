@@ -8,23 +8,27 @@ import {
 import { store } from "../src/store";
 import { Provider } from "react-redux";
 import { GET_USER_DATA } from "../src/GraphQL/Queries";
-import { UPDATE_USER_DATA } from '../src/store/constants'
+import { UPDATE_USER_DATA, TRIGGER_MESSAGE } from '../src/store/constants'
 import Message from 'components/message';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router'
-import { useLazyQuery } from "@apollo/client";
+import Emitter from '@/utils/eventEmitter';
 
-
-const link = new HttpLink({
+const link = new createHttpLink({
 	// uri: "http://www.drhandyman.me:4000/graphql"
-	//uri: "https://localhost:4000/graphql",
-	uri: "https://www.drhandyman.me:4000/graphql",
-	 credentials: "include",
+	// uri: "https://localhost:3000/graphql",
+	 uri: "https://www.drhandyman.me:4000/graphql",
+	credentials: "include",
 	opts: {
 		credentials: "include",
 	},
 });
+// const link = new HttpLink({
+// 	// uri: "http://www.drhandyman.me:4000/graphql"
+// 	//uri: "https://localhost:3000/graphql",
+// 	 uri: "https://www.drhandyman.me:4000/graphql",
 
+// });
 const client = new ApolloClient({
 	cache: new InMemoryCache(),
 	link,
@@ -33,6 +37,8 @@ const client = new ApolloClient({
 	},
 	credentials: "include",
 });
+
+const whiteList = ['/', '/login', '/sign'];
 
 export default function App({ Component, pageProps }) {
 	const state = store.getState();
@@ -45,37 +51,71 @@ export default function App({ Component, pageProps }) {
     setStateChanged(true);
   });
 
-	if (!state.userData.isLogin) {
-		client
-
-			.query({
-				query: GET_USER_DATA,
-			})
-			.then((res) => {
-				if (res.data && res.data.currentUser) {
-					dispatch({
-						type: UPDATE_USER_DATA,
-						payload: {
-							userData: {
-								...res.data.currentUser,
-								isLogin: true,
+	const updateUserData = () => {
+		console.log('updateUserData');
+		if (!state.userData.isLogin) {
+			client
+				.query({
+					query: GET_USER_DATA,
+					fetchPolicy: "network-only"
+				})
+				.then((res) => {
+					if (res.data && res.data.currentUser) {
+						dispatch({
+							type: UPDATE_USER_DATA,
+							payload: {
+								userData: {
+									...res.data.currentUser,
+									isLogin: true,
+									isLoaded: true
+								},
 							},
-						},
-					});
-				}
-			}).catch(() => {
-        console.log('Not Login!')
-      });
+						});
+					}
+				}).catch((err) => {
+					if (err.message.indexOf('Not Authorised') !== -1) {
+						const url = document.location.pathname;
+						if (whiteList.indexOf(url) === -1) {
+							router.push('/login', undefined, {
+								shallow: true
+							})
+							console.log('Not Login!')
+						}
+					}
+					Emitter.emit('showMessage', {
+						message: err.message,
+						severity: "error"
+					})
+				});
+		}
 	}
+
+	useEffect(() => {
+		updateUserData();
+		const messageHandler = (data) => {
+			dispatch({
+				type: TRIGGER_MESSAGE,
+				payload: {
+					globalMessage: data || {}
+				}
+			})
+		}
+
+		Emitter.on('updateUserData', updateUserData);
+		Emitter.on('showMessage', messageHandler);
+		return () => {
+			Emitter.off('updateUserData', updateUserData);
+			Emitter.off('showMessage', messageHandler);
+		}
+	}, [])
 
   useEffect(() => {
     const handlerRouterUpdate = (url) => {
-      console.log('userData', userData)
-      if (url !== '/' && url !== '/login'&& url !== '/signup' && !userData.isLogin) {
-      
+      if (whiteList.indexOf(url) === -1 && userData.isLoaded && !userData.isLogin) {
         router.replace('/login', undefined, { shallow: true})
       }
     }
+		handlerRouterUpdate();
 
     router.events.on('routeChangeComplete', handlerRouterUpdate);
 

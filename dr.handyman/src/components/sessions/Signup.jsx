@@ -22,6 +22,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { useMutation } from "@apollo/client";
 import { CREATE_SIGN_UP_MUTATION } from "../../GraphQL/Mutations";
+import Emitter from '@/utils/eventEmitter';
 
 const StyledCard = styled(({ children, passwordVisibility, ...rest }) => (
 	<Card {...rest}>{children}</Card>
@@ -52,14 +53,14 @@ const Signup = () => {
 
 	const handleFormSubmit = async (values) => {
 		try {
-			const { email, name: username, password, phone } = values;
+			const { email, name: username, password} = values;
+     
 			if (username && email && password) {
 				invokeSignUp({
 					variables: {
 						username,
 						email,
-						password,
-            phone
+						password
 					},
 				})
 					.then((res) => {
@@ -71,11 +72,19 @@ const Signup = () => {
 							}); //going back to homepage instead of login page is more make sense.
 						}
 					})
-					.catch((e) => {
-						console.log(e);
+					.catch((err) => {
+						Emitter.emit('showMessage', {
+							message: err.message,
+							severity: "error"
+						})
+						console.log(err);
 					});
 			}
 		} catch (error) {
+			Emitter.emit('showMessage', {
+				message: err.message,
+				severity: "error"
+			})
 			console.log(error);
 		}
 	};
@@ -135,21 +144,7 @@ const Signup = () => {
 					helperText={touched.email && errors.email}
 				/>
 
-        <TextField
-					mb={1.5}
-					name="phone"
-					label="Phone Number"
-					placeholder="Phone"
-					variant="outlined"
-					size="small"
-					type="number"
-					fullWidth
-					onBlur={handleBlur}
-					onChange={handleChange}
-					value={values.phone || ""}
-					error={!!touched.phone && !!errors.phone}
-					helperText={touched.phone && errors.phone}
-				/>
+        
 
 				<TextField
 					mb={1.5}
@@ -309,14 +304,13 @@ const initialValues = {
 	password: "",
 	re_password: "",
 	agreement: false,
-  phone:""
 };
-const phoneRegEx = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+
 
 const formSchema = yup.object().shape({
 	name: yup.string().required("${path} is required"),
 	email: yup.string().email("invalid email").required("${path} is required"),
-  phone: yup.string().matches(phoneRegEx, 'Phone number is not valid').required("${path} is required"),
+  
 	password: yup.string().required("${path} is required"),
 	re_password: yup
 		.string()

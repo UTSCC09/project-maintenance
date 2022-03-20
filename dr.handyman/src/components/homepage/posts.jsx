@@ -1,51 +1,105 @@
 import FlexBox from "components/FlexBox";
 import NavbarLayout from "components/layout/NavbarLayout";
 import Post from "./post";
-import { H3, Span, H5,H4 } from "components/Typography";
+import { H3, Span, H5, H4 } from "components/Typography";
 import { Grid, Pagination } from "@mui/material";
 import React from "react";
 import PostRow from "components/PostRow";
 
-import { GET_POSTS_QUERY, GET_COUNT } from "../../GraphQL/Queries";
+import { GET_POSTS_QUERY, GET_COUNT, SEARCH_POST, SEARCH_POST_COUNT } from "../../GraphQL/Queries";
 import { useMutation, useQuery } from "@apollo/client";
 import { Query } from "react-query";
 import { useState, useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
+import Emitter from "@/utils/eventEmitter";
 
 const Posts = () => {
 	// const [post, setPost] = useState([]);
 	const [page, setPage] = useState(1);
 	// console.log(useQuery(GET_POSTS_QUERY));
-	const [getPosts, { data, loading, error }] = useLazyQuery(GET_POSTS_QUERY);
-	const [getCount, { data: cdata, loading: cloading }] =
-		useLazyQuery(GET_COUNT);
+	const [getPosts, { loading }] = useLazyQuery(GET_POSTS_QUERY, {
+		fetchPolicy: "no-cache"
+	});
+	const [postsData, setPostsData] = useState([]);
+	const [postsCount, setPostsCount] = useState(0);
+	const [searchPost] = useLazyQuery(SEARCH_POST);
+	const [searchPostCount] = useLazyQuery(SEARCH_POST_COUNT);
+	const [getCount, { loading: cloading }] =
+		useLazyQuery(GET_COUNT, {
+			fetchPolicy: "no-cache"
+		});
+  
 	// useEffect(() => {
 	//   if (!loading){
 	//   setPost(data.getAllPost);
 	// },[])
 	useEffect(() => {
-		getCount();
-		getPosts({ variables: { page: 0, postPerPage: 6 } });
+		const updatePostInfo = () => {
+			getPosts({ variables: { page: 0, postPerPage: 6 } }).then(res => {
+				setPostsData(res.data.getPostPage)
+			});
+			getCount().then(res => {
+				setPostsCount(res.data.getPostCount)
+			});;
+		}
+
+		const handlerPostsSearch = ({ queryText = "" }) => {
+			if (!queryText) return updatePostInfo();
+      searchPostCount({
+				variables: { page: 0, postPerPage: 6, queryText },
+			})
+				.then((res) => {
+					setPostsCount(res.data.searchPostCount || []);
+				})
+				.catch((err) => {
+					Emitter.emit("showMessage", {
+						message: err.message,
+						severity: "error",
+					});
+				});
+			searchPost({
+				variables: { page: 0, postPerPage: 6, queryText },
+			})
+				.then((res) => {
+					setPostsData(res.data.searchPostPage || []);
+				})
+				.catch((err) => {
+					Emitter.emit("showMessage", {
+						message: err.message,
+						severity: "error",
+					});
+				});
+		};
+
+		updatePostInfo();
+		Emitter.on('updatePostInfo', updatePostInfo)
+		Emitter.on("searchPosts", handlerPostsSearch);
+
+		return () => {
+			Emitter.off('updatePostInfo', updatePostInfo)
+			Emitter.off("searchPosts", handlerPostsSearch);
+		}
 	}, []);
-	if (loading || cloading || data == undefined || cdata == undefined) {
-		return <NavbarLayout><H3 color="#2C2C2C" mb={2}>
-    See Newest Posts
-  </H3><div>Loading...</div></NavbarLayout>;
+
+	if (loading || cloading) {
+		return (
+			<NavbarLayout>
+				<H3 color="#2C2C2C" mb={2}>
+					See Newest Posts
+				</H3>
+				<div>Loading...</div>
+			</NavbarLayout>
+		);
 	}
-	console.log("load");
-	console.log(loading);
-	console.log(error);
-	console.log(data);
-	console.log(cdata);
-let index1 = (page-1)*6+1;
-let index2 = page*6;
-if (cdata.getPostCount <= page*6) {
-  index2 = cdata.getPostCount;
-}
-if (cdata.getPostCount == 0){
-  index1=0;
-  index2 = 0;
-}
+	let index1 = (page - 1) * 6 + 1;
+	let index2 = page * 6;
+	if (postsCount <= page * 6) {
+		index2 = postsCount;
+	}
+	if (postsCount == 0) {
+		index1 = 0;
+		index2 = 0;
+	}
 	// if (!loading) {
 	// useEffect(() => {
 	//   getPosts();
@@ -83,7 +137,7 @@ if (cdata.getPostCount == 0){
 				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
 					Posted By
 				</H5>
-			
+
 				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
 					Posts Type
 				</H5>
@@ -93,7 +147,7 @@ if (cdata.getPostCount == 0){
 				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
 					Accept User
 				</H5>
-        <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
+				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
 					Post Time
 				</H5>
 				<H5
@@ -104,10 +158,12 @@ if (cdata.getPostCount == 0){
 					my={0}
 				></H5>
 			</PostRow>
-      {cdata.getPostCount == 0 && 	<H4 color="#2C2C2C" mt={3}>
-				No posts found.
-			</H4>}
-			{data.getPostPage.map((item, ind) => (
+			{/* {postsCount == 0 && (
+				<H4 color="#2C2C2C" mt={3}>
+					No posts found.
+				</H4>
+			)} */}
+			{postsData.map((item, ind) => (
 				<Post post={item} key={ind} />
 			))}
 
@@ -118,11 +174,11 @@ if (cdata.getPostCount == 0){
 				mt={5}
 			>
 				<Span color="grey.600">
-          {}
-					Showing {index1}-{index2} of {cdata.getPostCount} Posts
+					{}
+					Showing {index1}-{index2} of {postsCount} Posts
 				</Span>
 				<Pagination
-					count={Math.ceil(cdata.getPostCount / 6)}
+					count={Math.ceil(postsCount / 6)}
 					page={page}
 					onChange={handleChange}
 					boundaryCount={0}
@@ -134,6 +190,5 @@ if (cdata.getPostCount == 0){
 		</NavbarLayout>
 	);
 };
-
 
 export default Posts;

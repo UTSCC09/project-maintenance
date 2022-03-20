@@ -17,6 +17,7 @@ import { Box, Card, Divider, IconButton, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useDispatch } from "react-redux";
 import { UPDATE_USER_DATA } from "../../store/constants";
+import Emitter from '@/utils/eventEmitter';
 
 const StyledCard = styled(({ children, passwordVisibility, ...rest }) => (
 	<Card {...rest}>{children}</Card>
@@ -53,6 +54,7 @@ const Login = () => {
 				password: password,
 			},
 		}).then((response) => {
+			Emitter.emit('updatePostInfo');
 			const userData =
 				(response.data &&
 					response.data.login &&
@@ -68,6 +70,12 @@ const Login = () => {
 			router.replace("/", undefined, {
 				shallow: true,
 			});
+		}).catch((err) => {
+			Emitter.emit('showMessage', {
+				message: err.message,
+				severity: "error"
+			})
+			console.log(err.message);
 		});
 	};
 	const { values, errors, touched, handleBlur, handleChange, handleSubmit } =

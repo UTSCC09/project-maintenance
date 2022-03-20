@@ -19,7 +19,8 @@ import {
 	useMediaQuery,
 	Button,
 	DialogTitle,
-	DialogActions
+	DialogActions,
+  Avatar
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
@@ -27,11 +28,13 @@ import SearchBox from "../homepage/SearchBox"; // component props interface
 import { useSelector, useDispatch } from "react-redux";
 import { useMutation, useLazyQuery } from "@apollo/client";
 import { CREATE_LOGOUT_MUTATION, SET_WORKER } from "../../GraphQL/Mutations";
-import { GET_USER_DATA } from '../../GraphQL/Queries'
 import { UPDATE_USER_DATA, TRIGGER_MESSAGE } from "../../store/constants";
 import { useRouter } from "next/router";
 import { getLocation } from '../../utils'
+import Emitter from '@/utils/eventEmitter';
+import SvgIcon from '@mui/material/SvgIcon';
 
+ 
 // styled component
 export const HeaderWrapper = styled(Box)(({ theme }) => ({
 	position: "relative",
@@ -90,7 +93,6 @@ const Header = ({ isFixed, className }) => {
 	const dispatch = useDispatch();
 	const open = Boolean(anchorEl);
 	const router = useRouter();
-	const [fetchUserData] = useLazyQuery(GET_USER_DATA)
 	const handleClick = (event) => {
 		setAnchorEl(event.currentTarget);
 	};
@@ -127,6 +129,7 @@ const Header = ({ isFixed, className }) => {
 				}
 			}).then(res => {
 				if (res.data.setWorker) {
+					Emitter.emit('updatePostInfo')
 					dispatch({
 						type: TRIGGER_MESSAGE,
 						payload: {
@@ -135,7 +138,7 @@ const Header = ({ isFixed, className }) => {
 							}
 						}
 					})
-					fetchUserData();
+					Emitter.emit('updateUserData');
 					setRepairmanDialogOpen(false)
 				}
 			})
@@ -145,6 +148,7 @@ const Header = ({ isFixed, className }) => {
 	const [fetchLogout] = useMutation(CREATE_LOGOUT_MUTATION);
 	const logout = () => {
 		fetchLogout().then((res) => {
+			console.log(res);
 			if (res.data) {
 				dispatch({
 					type: UPDATE_USER_DATA,
@@ -161,7 +165,6 @@ const Header = ({ isFixed, className }) => {
 	useEffect(() => {
 		if (userData.isLogin) setDialogOpen(false);
 	}, [userData]);
-console.log(userData);
 	let button;
 	if (userData.isLogin) {
 		button = (
@@ -170,10 +173,19 @@ console.log(userData);
 				ml={2}
 				p={1.25}
 				mr={2}
-				bgcolor="#99CBE9"
+				
 				onClick={handleClick}
 			>
-				<PersonOutline />
+        <Avatar
+									src={`https://www.drhandyman.me:4000/pictures/${userData.email}`}
+									sx={{
+										height: 50,
+										width: 50,
+										bgcolor: "#FFFFFF",
+									}}
+								/>
+       
+				{/* <PersonOutline /> */}
 			</Box>
 		);
 	} else {

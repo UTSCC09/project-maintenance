@@ -13,8 +13,8 @@ const Maintainer = ({
   rating,
   address,
   phone,
-  imgUrl,
-  profileUrl
+  email,
+  _id
 }) => {
   return <Card>
       <Box sx={{
@@ -55,14 +55,15 @@ const Maintainer = ({
       </Box>
 
       <FlexBox pl="30px" pr={1} justifyContent="space-between">
-        <Avatar src={imgUrl} sx={{
+        <Avatar src={`https://www.drhandyman.me:4000/pictures/${email}`} sx={{
         height: 64,
         width: 64,
         mt: '-32px',
         border: '4px solid',
-        borderColor: 'grey.100'
+        borderColor: 'grey.100',
+        bgcolor: "#FFFFFF"
       }} />
-        <Link href={"profileUrl"}>
+        <Link href={`/userProfile?email=${email}`}>
           <a>
             <IconButton sx={{
             my: '0.25rem'

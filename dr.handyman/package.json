@@ -3,7 +3,7 @@
     "version": "2.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev",
+        "dev": "next dev -p 3001",
         "build": "next build",
         "build:local": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next build",
         "start": "next start",
@@ -36,6 +36,7 @@
         "clsx": "^1.1.1",
         "cross-env": "^7.0.3",
         "date-fns": "^2.25.0",
+        "eventemitter3": "^4.0.7",
         "formik": "^2.2.9",
         "immer": "^9.0.12",
         "merge": "^2.1.1",

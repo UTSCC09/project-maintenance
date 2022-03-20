@@ -16,12 +16,12 @@ import { CREATE_POST_MUTATION } from "../GraphQL/Mutations";
 import { useMutation } from "@apollo/client";
 import { H5, Medium } from "components/Typography";
 import { getLocation } from "../utils";
-import { useDispatch, useSelector } from 'react-redux'
-import { TRIGGER_MESSAGE } from '../store/constants'
-
+import { useDispatch, useSelector } from "react-redux";
+import { TRIGGER_MESSAGE } from "../store/constants";
 
 import { Box, Card, Divider, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import Emitter from "@/utils/eventEmitter";
 
 const StyledCard = styled(
 	({
@@ -38,10 +38,10 @@ const StyledCard = styled(
 	},
 }));
 
-const NewPost = ({ setDialog }) => {
+const NewPost = ({ setDialog, post = {} }) => {
 	const [sendPost] = useMutation(CREATE_POST_MUTATION);
 	const dispatch = useDispatch();
-	const userData = useSelector(state => state.userData);
+	const userData = useSelector((state) => state.userData);
 	const handleFormSubmit = async (values) => {
 		if (!userData.isLogin) {
 			dispatch({
@@ -49,60 +49,74 @@ const NewPost = ({ setDialog }) => {
 				payload: {
 					globalMessage: {
 						message: "Please login first.",
-						severity: "error"
-					}
-				}
-			})
-		}
-		getLocation().then((res) => {
-			const coords = res.coords;
-			const { title, description: content, type } = values;
-			sendPost({
-				variables: {
-					title,
-					type: +type,
-					content,
-					coordinates: [coords.longitude, coords.latitude],
+						severity: "error",
+					},
 				},
-			}).then((res) => {
-				if (res.data && res.data.addPost && res.data.addPost._id) {
-					dispatch({
-						type: TRIGGER_MESSAGE,
-						payload: {
-							globalMessage: {
-								message: "Add new post success.",
-								severity: "success"
-							}
+			});
+		}
+		getLocation()
+			.then((res) => {
+				const coords = res.coords;
+				const { title, description: content, type } = values;
+				sendPost({
+					variables: {
+						title,
+						type: +type,
+						content,
+						coordinates: [coords.longitude, coords.latitude],
+					},
+				})
+					.then((res) => {
+						if (
+							res.data &&
+							res.data.addPost &&
+							res.data.addPost._id
+						) {
+							Emitter.emit("updatePostInfo");
+							Emitter.emit("updateMyPosts");
+							dispatch({
+								type: TRIGGER_MESSAGE,
+								payload: {
+									globalMessage: {
+										message: "Add new post success.",
+										severity: "success",
+									},
+								},
+							});
+							setDialog(false);
 						}
 					})
-					setDialog(false);
-				}
-			}).catch(() => {
+					.catch(() => {
+						dispatch({
+							type: TRIGGER_MESSAGE,
+							payload: {
+								globalMessage: {
+									message: "Add new post failed.",
+									severity: "error",
+								},
+							},
+						});
+					});
+			})
+			.catch(() => {
 				dispatch({
 					type: TRIGGER_MESSAGE,
 					payload: {
 						globalMessage: {
-							message: "Add new post failed.",
-							severity: "error"
-						}
-					}
-				})
+							message: "Get location failed.",
+							severity: "error",
+						},
+					},
+				});
 			});
-		}).catch(() => {
-			dispatch({
-				type: TRIGGER_MESSAGE,
-				payload: {
-					globalMessage: {
-						message: "Get location failed.",
-						severity: "error"
-					}
-				}
-			})
-		});
 	};
 	const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
 		useFormik({
-			initialValues,
+			initialValues: {
+				title: post.title || "",
+				description: post.content || "",
+				type: post.type || null,
+			},
 			onSubmit: handleFormSubmit,
 			validationSchema: formSchema,
 		});
@@ -154,7 +168,7 @@ const NewPost = ({ setDialog }) => {
 						onChange={handleChange}
 					>
 						<FormControlLabel
-							disabled={userData.type === 'user'}
+							disabled={userData.type === "user"}
 							value={1}
 							control={<Radio />}
 							label="Find a Contractor"
@@ -209,18 +223,10 @@ const NewPost = ({ setDialog }) => {
 		</StyledCard>
 	);
 };
-const initialValues = {
-	title: "",
-	description: "",
-
-	
-	type:"",
-
-};
 const formSchema = yup.object().shape({
 	title: yup.string().required("title is required"),
 	description: yup.string().required("post description is required"),
-    type: yup.string().required("type is required"),
+	type: yup.string().required("type is required"),
 	//type 必选验证 to be done
 });
 export default NewPost;
