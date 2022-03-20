@@ -4,6 +4,23 @@ const mongoose  = require('mongoose');
 const { Message, Post, User } = require('./mongooseSchemas');
 const { Schema } = mongoose;
 
+var rad = function(x) {
+    return x * Math.PI / 180;
+};
+  
+var getDistance = function(p1, p2) {
+    // 1 is lat, 0 is long
+    var R = 6378137; // Earth’s mean radius in meter
+    var dLat = rad(p2[1] - p1[1]);
+    var dLong = rad(p2[0] - p1[0]);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(rad(p1[1])) * Math.cos(rad(p2[1])) *
+        Math.sin(dLong / 2) * Math.sin(dLong / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c;
+    return d; // returns the distance in meter
+};
+
 const userDefs = `
 input UserInput {
     type: String
@@ -19,6 +36,7 @@ type User {
     phone: String
     rating: Int
     location: [Float!]
+    distance: Float
     profilePic: File
     permissions: [String]
     createdAt: String
@@ -35,7 +53,7 @@ const userMutDef = `
 
 const userQueryDef = `
     getOneUser(email: String!): User
-    getOneWorker(email: String!): User
+    getOneWorker(email: String!, coordinates: [Float]): User
     getWorkerCount: Int
     getWorkerPage(workerPerPage: Int!, page: Int!): [User]
 
@@ -62,6 +80,11 @@ const userQuery = {
         ]});
         if (worker == null)
             throw new Error('worker does not exist');
+        worker["distance"] = null;
+        if (args.coordinates != null && args.coordinates != undefined && args.coordinates.length == 2
+            && typeof args.coordinates[0] === "number" && typeof args.coordinates[1] === "number"){
+                worker["distance"] = getDistance(args.coordinates, worker.location.coordinates) / 1000;
+            }
         return worker;
     },
     async getOneUser(parent, args, context, info){

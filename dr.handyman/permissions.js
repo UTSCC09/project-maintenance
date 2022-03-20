@@ -17,13 +17,6 @@ const permissions = shield({
     Query: {
         currentUser: isAuthenticated,
         getOneConvo: isAuthenticated,
-
-        getUserPostsPage: isAuthenticated,
-        getUserPostCount: isAuthenticated,
-        
-        getAcceptedPostsPage: isAuthenticated,
-        getAcceptedPostCount: isAuthenticated,
-
         getCurrentConvos: isAuthenticated,
         
     },
