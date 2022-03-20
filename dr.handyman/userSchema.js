@@ -21,6 +21,23 @@ var getDistance = function(p1, p2) {
     return d; // returns the distance in meter
 };
 
+function addDistances (inputList, coordinates)
+{
+    if (coordinates != null && coordinates != undefined && coordinates.length == 2
+        && typeof coordinates[0] === "number" && typeof coordinates[1] === "number"){
+            inputList.forEach((elem) => {
+                elem["distance"] = getDistance(coordinates, elem.location.coordinates) / 1000;
+            })
+            
+        }
+    else{
+        inputList.forEach((elem) => {
+            elem["distance"] = null;
+        })
+    }
+    return inputList;
+}
+
 const userDefs = `
 input UserInput {
     type: String
@@ -55,20 +72,21 @@ const userQueryDef = `
     getOneUser(email: String!): User
     getOneWorker(email: String!, coordinates: [Float]): User
     getWorkerCount: Int
-    getWorkerPage(workerPerPage: Int!, page: Int!): [User]
+    getWorkerPage(workerPerPage: Int!, page: Int!, coordinates: [Float]): [User]
 
-    searchWorkerPage(queryText: String!, workerPerPage: Int!, page: Int!): [User]
+    searchWorkerPage(queryText: String!, workerPerPage: Int!, page: Int!, coordinates: [Float]): [User]
     searchWorkerPageCount(queryText: String!): Int
 `;
 
 const userQuery = {
     async getWorkerPage(parent, args, context, info){
-        const { workerPerPage, page } = args;
+        const { workerPerPage, page, coordinates } = args;
         if (page < 0)
             throw new Error("page number undefined");
         if (workerPerPage == 0)
             return [];
-        return await User.find({ type: "worker" }).sort({ 'createdAt': 1 }).skip(page * workerPerPage).limit(workerPerPage);
+        const workers =  await User.find({ type: "worker" }).sort({ 'createdAt': 1 }).skip(page * workerPerPage).limit(workerPerPage);
+        return addDistances (workers, coordinates);
     },
     async getWorkerCount(parent, args, context, info){
         return await User.countDocuments({ type: "worker" });
@@ -94,13 +112,14 @@ const userQuery = {
         return user;
     },
     async searchWorkerPage(parent, args, content, info){
-        const { queryText, workerPerPage, page } = args;
+        const { queryText, workerPerPage, page, coordinates } = args;
         if (page < 0)
             throw new Error("page number undefined");
         if (workerPerPage == 0)
             return [];
-        return await User.find({$and: [{ $text: {$search: queryText } }, 
+        const workers = await User.find({$and: [{ $text: {$search: queryText } }, 
                                        { type: "worker" }]}).sort({ score: {$meta: "textScore" } }).skip(page * workerPerPage).limit(workerPerPage);
+        return addDistances(workers, coordinates);
     },
     async searchWorkerPageCount(parent, args, content, info){
         return await User.countDocuments({$and: [{ $text: {$search: args.queryText } }, 

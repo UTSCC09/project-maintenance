@@ -18,7 +18,10 @@ const permissions = shield({
         currentUser: isAuthenticated,
         getOneConvo: isAuthenticated,
         getCurrentConvos: isAuthenticated,
-        
+        getUserPostsPage: isAuthenticated,
+        getAcceptedPostsPage: isAuthenticated,
+        getUserPostCount: isAuthenticated,
+        getAcceptedPostCount: isAuthenticated
     },
     Mutation: {
         setPost: isAuthenticated,

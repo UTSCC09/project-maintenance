@@ -21,6 +21,22 @@ var getDistance = function(p1, p2) {
     return d; // returns the distance in meter
 };
 
+function addDistances (inputList, coordinates)
+{
+    if (coordinates != null && coordinates != undefined && coordinates.length == 2
+        && typeof coordinates[0] === "number" && typeof coordinates[1] === "number"){
+            inputList.forEach((elem) => {
+                elem["distance"] = getDistance(coordinates, elem.location.coordinates) / 1000;
+            })
+            
+        }
+    else{
+        inputList.forEach((elem) => {
+            elem["distance"] = null;
+        })
+    }
+    return inputList;
+}
 const postDefs = `
     type Post {
         _id: String
@@ -51,10 +67,10 @@ const postQueryDef = `
     getPostCount: Int
     getOnePost(_id: String!, coordinates: [Float]): Post
 
-    getUserPostsPage(userPostPerPage: Int!, page: Int!): [Post]
-    getUserPostsPageByEmail(email: String!, userPostPerPage: Int!, page: Int!): [Post]
-    getAcceptedPostsPage(acceptedPostPerPage: Int!, page: Int!): [Post]
-    getAcceptedPostsPageByEmail(email: String!, acceptedPostPerPage: Int!, page: Int!): [Post]
+    getUserPostsPage(userPostPerPage: Int!, page: Int!, coordinates: [Float]): [Post]
+    getUserPostsPageByEmail(email: String!, userPostPerPage: Int!, page: Int!, coordinates: [Float]): [Post]
+    getAcceptedPostsPage(acceptedPostPerPage: Int!, page: Int!, coordinates: [Float]): [Post]
+    getAcceptedPostsPageByEmail(email: String!, acceptedPostPerPage: Int!, page: Int!, coordinates: [Float]): [Post]
 
     getUserPostCount: Int
     getUserPostCountByEmail(email: String!): Int
@@ -64,7 +80,7 @@ const postQueryDef = `
 	getAllPost: [Post]
     getPostPage(postPerPage: Int!, page: Int!): [Post]
 
-    searchPostPage(queryText: String!, postPerPage: Int!, page: Int!): [Post]
+    searchPostPage(queryText: String!, postPerPage: Int!, page: Int!, coordinates: [Float]): [Post]
     searchPostPageCount(queryText: String!): Int
 `;
 
@@ -145,41 +161,41 @@ const postQuery = {
             }
         return post;
     },
-
-    async getPostCount(parent, args, context, info){
-        return await Post.countDocuments();
-    },
     async getUserPostsPage(parent, args, context, info){
-        const { userPostPerPage, page } = args;
+        const { userPostPerPage, page, coordinates } = args;
         if (page < 0)
             throw new Error("page number undefined");
         if (userPostPerPage == 0)
             return [];
-        return await Post.find({posterEmail: context.getUser().email}).sort({ 'createdAt': 1 }).skip(page * userPostPerPage).limit(userPostPerPage);
+        const posts = await Post.find({posterEmail: context.getUser().email}).sort({ 'createdAt': 1 }).skip(page * userPostPerPage).limit(userPostPerPage);
+        return addDistances (posts, coordinates);
     },
     async getUserPostsPageByEmail(parent, args, context, info){
-        const { email, userPostPerPage, page } = args;
+        const { email, userPostPerPage, page, coordinates } = args;
         if (page < 0)
             throw new Error("page number undefined");
         if (userPostPerPage == 0)
             return [];
-        return await Post.find({posterEmail: email}).sort({ 'createdAt': 1 }).skip(page * userPostPerPage).limit(userPostPerPage);
+        const posts = await Post.find({posterEmail: email}).sort({ 'createdAt': 1 }).skip(page * userPostPerPage).limit(userPostPerPage);
+        return addDistances (posts, coordinates);
     },
     async getAcceptedPostsPage(parent, args, context, info){
-        const { acceptedPostPerPage, page } = args;
+        const { acceptedPostPerPage, page, coordinates } = args;
         if (page < 0)
             throw new Error("page number undefined");
         if (acceptedPostPerPage == 0)
             return [];
-        return await Post.find({acceptorEmail: context.getUser().email}).sort({ 'createdAt': 1 }).skip(page * acceptedPostPerPage).limit(acceptedPostPerPage);
+        const posts = await Post.find({acceptorEmail: context.getUser().email}).sort({ 'createdAt': 1 }).skip(page * acceptedPostPerPage).limit(acceptedPostPerPage);
+        return addDistances (posts, coordinates);
     },
     async getAcceptedPostsPageByEmail(parent, args, context, info){
-        const { email, acceptedPostPerPage, page } = args;
+        const { email, acceptedPostPerPage, page, coordinates } = args;
         if (page < 0)
             throw new Error("page number undefined");
         if (acceptedPostPerPage == 0)
             return [];
-        return await Post.find({acceptorEmail: email}).sort({ 'createdAt': 1 }).skip(page * acceptedPostPerPage).limit(acceptedPostPerPage);
+        const posts =  await Post.find({acceptorEmail: email}).sort({ 'createdAt': 1 }).skip(page * acceptedPostPerPage).limit(acceptedPostPerPage);
+        return addDistances (posts, coordinates);
     },
     async getUserPostCount(parent, args, context, info){
         return await Post.countDocuments({posterEmail: context.getUser().email});
@@ -202,6 +218,9 @@ const postQuery = {
             return [];
         return await Post.find({}).sort({ 'createdAt': 1 }).skip(page * postPerPage).limit(postPerPage);
     },
+    async getPostCount(parent, args, context, info){
+        return await Post.countDocuments();
+    },
 	async getAllPost(parent, args, context, info){
         const posts = await Post.find({});
         if (posts == null)
@@ -210,12 +229,13 @@ const postQuery = {
     },
 
     async searchPostPage(parent, args, content, info){
-        const { queryText, postPerPage, page } = args;
+        const { queryText, postPerPage, page, coordinates } = args;
         if (page < 0)
             throw new Error("page number undefined");
         if (postPerPage == 0)
             return [];
-        return await Post.find({ $text: {$search: queryText } }).sort({ score: {$meta: "textScore" } }).skip(page * postPerPage).limit(postPerPage);
+        const posts = await Post.find({ $text: {$search: queryText } }).sort({ score: {$meta: "textScore" } }).skip(page * postPerPage).limit(postPerPage);
+        return addDistances(posts, coordinates);
     },
     async searchPostPageCount(parent, args, content, info){
         return await Post.countDocuments({ $text: {$search: args.queryText }});
