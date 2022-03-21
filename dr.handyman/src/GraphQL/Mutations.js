@@ -17,8 +17,8 @@ export const CREATE_USER_MUTATION = gql `
 `;
 
 export const CREATE_SIGN_UP_MUTATION = gql `
-	mutation Signup($username: String!, $email: String!, $password: String!) {
-		signup(username: $username, email: $email, password: $password) {
+	mutation Signup($username: String!, $email: String!, $password: String!, $phone: String!) {
+		signup(username: $username, email: $email, password: $password, phone: $phone) {
 			user {
 				email
 				username

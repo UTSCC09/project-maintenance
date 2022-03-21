@@ -38,7 +38,7 @@ const client = new ApolloClient({
 	credentials: "include",
 });
 
-const whiteList = ['/', '/login', '/sign'];
+const whiteList = ['/', '/login', '/signup'];
 
 export default function App({ Component, pageProps }) {
 	const state = store.getState();

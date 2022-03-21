@@ -148,7 +148,7 @@ const Header = ({ isFixed, className }) => {
 	const [fetchLogout] = useMutation(CREATE_LOGOUT_MUTATION);
 	const logout = () => {
 		fetchLogout().then((res) => {
-			console.log(res);
+			
 			if (res.data) {
 				dispatch({
 					type: UPDATE_USER_DATA,
@@ -158,6 +158,7 @@ const Header = ({ isFixed, className }) => {
 						}
 					},
 				});
+				router.replace('/');
 			}
 		});
 	};

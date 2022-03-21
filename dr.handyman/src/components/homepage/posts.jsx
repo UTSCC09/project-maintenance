@@ -106,11 +106,12 @@ const Posts = () => {
 	//  },[])
 
 	const handleChange = (event, value) => {
-		getPosts({ variables: { page: value - 1, postPerPage: 6 } });
+		getPosts({ variables: { page: value - 1, postPerPage: 6 } }).then(res => {
+			setPostsData(res.data.getPostPage)
+		});;
 		console.log(page);
 		setPage(value);
 	};
-
 	return (
 		<NavbarLayout>
 			<H3 color="#2C2C2C" mb={2}>

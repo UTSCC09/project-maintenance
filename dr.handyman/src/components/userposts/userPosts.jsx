@@ -183,7 +183,7 @@ const UserPosts = ({ type = "all" }) => {
 				mt={4}
 			>
 				<Span color="grey.600">
-					Showing {index1}-{index2} of {postCount.length} Posts
+					Showing {index1}-{index2} of {postCount} Posts
 				</Span>
 				<Pagination
 					count={Math.ceil(postCount / 6)}

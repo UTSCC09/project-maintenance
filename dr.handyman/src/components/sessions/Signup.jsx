@@ -22,7 +22,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { useMutation } from "@apollo/client";
 import { CREATE_SIGN_UP_MUTATION } from "../../GraphQL/Mutations";
-import Emitter from '@/utils/eventEmitter';
+import Emitter from "@/utils/eventEmitter";
 
 const StyledCard = styled(({ children, passwordVisibility, ...rest }) => (
 	<Card {...rest}>{children}</Card>
@@ -53,14 +53,15 @@ const Signup = () => {
 
 	const handleFormSubmit = async (values) => {
 		try {
-			const { email, name: username, password} = values;
-     
+			const { email, name: username, password, phone } = values;
+
 			if (username && email && password) {
 				invokeSignUp({
 					variables: {
 						username,
 						email,
-						password
+						password,
+						phone
 					},
 				})
 					.then((res) => {
@@ -73,18 +74,18 @@ const Signup = () => {
 						}
 					})
 					.catch((err) => {
-						Emitter.emit('showMessage', {
+						Emitter.emit("showMessage", {
 							message: err.message,
-							severity: "error"
-						})
+							severity: "error",
+						});
 						console.log(err);
 					});
 			}
 		} catch (error) {
-			Emitter.emit('showMessage', {
+			Emitter.emit("showMessage", {
 				message: err.message,
-				severity: "error"
-			})
+				severity: "error",
+			});
 			console.log(error);
 		}
 	};
@@ -97,7 +98,6 @@ const Signup = () => {
 
 	return (
 		<StyledCard elevation={3} passwordVisibility={passwordVisibility}>
-      
 			<form className="content" onSubmit={handleSubmit}>
 				<H3 textAlign="center" mb={1}>
 					Create Your Account
@@ -144,7 +144,20 @@ const Signup = () => {
 					helperText={touched.email && errors.email}
 				/>
 
-        
+				<TextField
+					mb={1.5}
+					name="phone"
+					label="Phone"
+					placeholder="Phone"
+					variant="outlined"
+					size="small"
+					fullWidth
+					onBlur={handleBlur}
+					onChange={handleChange}
+					value={values.phone || ""}
+					error={!!touched.phone && !!errors.phone}
+					helperText={touched.phone && errors.phone}
+				/>
 
 				<TextField
 					mb={1.5}
@@ -239,11 +252,7 @@ const Signup = () => {
 							justifyContent="flex-start"
 						>
 							By signing up, you agree to
-							<a
-								
-								target="_blank"
-								rel="noreferrer noopener"
-							>
+							<a target="_blank" rel="noreferrer noopener">
 								<H6 ml={1} borderColor="grey.900">
 									Terms & Condtion
 								</H6>
@@ -301,17 +310,17 @@ const Signup = () => {
 const initialValues = {
 	name: "",
 	email: "",
+	phone: "",
 	password: "",
 	re_password: "",
 	agreement: false,
 };
 
-
 const formSchema = yup.object().shape({
 	name: yup.string().required("${path} is required"),
 	email: yup.string().email("invalid email").required("${path} is required"),
-  
 	password: yup.string().required("${path} is required"),
+	phone: yup.string().required("${path} is required"),
 	re_password: yup
 		.string()
 		.oneOf([yup.ref("password"), null], "Passwords must match")

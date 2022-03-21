@@ -142,7 +142,6 @@ query GetAcceptedPostsPage($acceptedPostPerPage: Int!, $page: Int!) {
     acceptorUsername
     title
     content
-    location
     state
     type
     updatedAt
@@ -151,7 +150,7 @@ query GetAcceptedPostsPage($acceptedPostPerPage: Int!, $page: Int!) {
 }
 `
 
-export const GET_ACCEPT_USER_POST_COUNT = gql`
+export const GET_ACCEPT_USER_POST_COUNT = gql `
 query GetAcceptedPostsPage {
   getAcceptedPostCount
 }
@@ -185,7 +184,7 @@ query Query($queryText: String!) {
 }
 `
 
-export const SEARCH_POST = gql`
+export const SEARCH_POST = gql `
 query SearchPostPage($queryText: String!, $page: Int!, $postPerPage: Int!) {
   searchPostPage(queryText: $queryText, page: $page, postPerPage: $postPerPage) {
     updatedAt
@@ -204,7 +203,7 @@ query SearchPostPage($queryText: String!, $page: Int!, $postPerPage: Int!) {
 }
 `
 
-export const SEARCH_POST_COUNT = gql`
+export const SEARCH_POST_COUNT = gql `
 query Query($queryText: String!) {
   searchPostPageCount(queryText: $queryText)
 }
