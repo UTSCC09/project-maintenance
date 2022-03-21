@@ -69,7 +69,7 @@ const typeDefs = gql(`
 
     type Subscription {
         newUser: User
-        getChat(conversationId: String): [Message]
+        getChat(conversationId: String!, count: Int!): [Message]
     }
 `
 );

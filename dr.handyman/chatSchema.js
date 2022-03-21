@@ -10,7 +10,11 @@ const chatDefs = `
         _id: String
         userEmails: [String]
     }
-
+    type ConversationDescrciption {
+        username1: String!
+        username2: String!
+        conversation: Conversation!
+    }
     type Message {
         _id: String
         conversationId: String
@@ -29,6 +33,8 @@ const chatMutDef = `
 const chatQueryDef = `
     getOneConvo(_id: String!): Conversation
     getCurrentConvos: [Conversation]
+    getCurrentConvosWithDescription: [ConversationDescrciption]
+    getLatestMessage(_id: String!): Message
 `;
 
 const chatMut = {
@@ -78,6 +84,22 @@ const chatQuery = {
     },
     async getCurrentConvos(parent, args, context, info){
         return await Conversation.find({userEmails: context.getUser().email});
+    },
+    async getCurrentConvosWithDescription(parent, args, context, info){
+        const conversations = await Conversation.find({userEmails: context.getUser().email});
+        const convDescriptions = [];
+        await Promise.all(conversations.map(async (elem) => {
+            const user1 = await User.findOne({email: elem.userEmails[0]});
+            const user2 = await User.findOne({email: elem.userEmails[1]});
+            convDescriptions.push({username1: user1.username, username2: user2.username, conversation: elem});
+        }));
+        return convDescriptions;
+    },
+    async getLatestMessage(parent, args, context, info){
+        const latestMessage = await Message.find({conversationId: args._id}).sort({ 'createdAt': -1 }).limit(1);
+        if (latestMessage.length != 1)
+            return null;
+        return latestMessage[0];
     }   
 };
 
