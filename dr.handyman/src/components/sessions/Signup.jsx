@@ -316,11 +316,13 @@ const initialValues = {
 	agreement: false,
 };
 
+const phoneRegEx = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+
 const formSchema = yup.object().shape({
 	name: yup.string().required("${path} is required"),
 	email: yup.string().email("invalid email").required("${path} is required"),
 	password: yup.string().required("${path} is required"),
-	phone: yup.string().required("${path} is required"),
+	phone: yup.string().matches(phoneRegEx, 'Phone number is not valid').required("${path} is required"),
 	re_password: yup
 		.string()
 		.oneOf([yup.ref("password"), null], "Passwords must match")
