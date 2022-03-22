@@ -34,11 +34,7 @@ import { getLocation } from "../../utils";
 import Emitter from "@/utils/eventEmitter";
 import SvgIcon from "@mui/material/SvgIcon";
 
-<<<<<<< HEAD
 
-
-=======
->>>>>>> 9cc59214059db9eace3e8193e082e5ee672a961b
 // styled component
 export const HeaderWrapper = styled(Box)(({ theme }) => ({
 	position: "relative",
