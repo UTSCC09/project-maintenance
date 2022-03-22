@@ -11,9 +11,9 @@ import React from 'react';
 const Maintainer = ({
   username,
   rating,
-  address,
   phone,
   email,
+  distance,
   _id
 }) => {
   return <Card>
@@ -38,9 +38,14 @@ const Maintainer = ({
           fontSize: '18px',
           mt: '3px'
         }} />
-          <Span color="secondary" ml={1.5}>
-            {address}
-          </Span>
+         
+          {distance !== null && <Span color="secondary" ml={1.5}>
+					{(distance).toFixed(2) || "N/A"} KM
+				</Span>}
+
+			{ distance === null && <Span color="secondary" ml={1.5}>
+					{Math.ceil(distance) || "N/A"} KM
+				</Span>}
         </FlexBox>
 
         <FlexBox>

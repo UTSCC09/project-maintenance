@@ -20,7 +20,7 @@ import {
 	Button,
 	DialogTitle,
 	DialogActions,
-  Avatar
+	Avatar,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
@@ -28,14 +28,17 @@ import SearchBox from "../homepage/SearchBox"; // component props interface
 import { useSelector, useDispatch } from "react-redux";
 import { useMutation, useLazyQuery } from "@apollo/client";
 import { CREATE_LOGOUT_MUTATION, SET_WORKER } from "../../GraphQL/Mutations";
-import { UPDATE_USER_DATA, TRIGGER_MESSAGE } from "../../store/constants";
+import { UPDATE_USER_DATA, TRIGGER_MESSAGE, UPDATE_USER_POSITION } from "../../store/constants";
 import { useRouter } from "next/router";
-import { getLocation } from '../../utils'
-import Emitter from '@/utils/eventEmitter';
-import SvgIcon from '@mui/material/SvgIcon';
+import { getLocation } from "../../utils";
+import Emitter from "@/utils/eventEmitter";
+import SvgIcon from "@mui/material/SvgIcon";
+
+<<<<<<< HEAD
 
 
-
+=======
+>>>>>>> 9cc59214059db9eace3e8193e082e5ee672a961b
 // styled component
 export const HeaderWrapper = styled(Box)(({ theme }) => ({
 	position: "relative",
@@ -117,48 +120,64 @@ const Header = ({ isFixed, className }) => {
 		}
 	};
 
-	const handleCloseRepairmanDialog = () => {
-		setRepairmanDialogOpen(false)
+	const authorizePosition = () => {
+		getLocation().then((data) => {
+			const coords = data.coords;
+			dispatch({
+				type: UPDATE_USER_POSITION,
+				payload: {
+					userLocation: coords || {}
+				}
+			})
+			Emitter.emit("showMessage", {
+				message: "User Location Authorization Success",
+				severity: "success",
+			});
+		});
 	}
 
+	const handleCloseRepairmanDialog = () => {
+		setRepairmanDialogOpen(false);
+	};
+
 	const fetchApplyRepairman = () => {
-		getLocation().then(data => {
+		getLocation().then((data) => {
 			const coords = data.coords;
 			fetchApplyRepairmanApi({
 				variables: {
-					coordinates: [coords.longitude, coords.latitude]
-				}
-			}).then(res => {
+					coordinates: [coords.longitude, coords.latitude],
+				},
+			}).then((res) => {
 				if (res.data.setWorker) {
-					Emitter.emit('updatePostInfo')
+					Emitter.emit("updatePostInfo");
 					dispatch({
 						type: TRIGGER_MESSAGE,
 						payload: {
 							globalMessage: {
 								message: "You have applied as a Handyman now.",
-							}
-						}
-					})
-					Emitter.emit('updateUserData');
-					setRepairmanDialogOpen(false)
+							},
+						},
+					});
+					Emitter.emit("updateUserData");
+					setRepairmanDialogOpen(false);
 				}
-			})
-		})
-	}
+			});
+		});
+	};
 
 	const [fetchLogout] = useMutation(CREATE_LOGOUT_MUTATION);
 	const logout = () => {
 		fetchLogout().then((res) => {
-			console.log(res);
 			if (res.data) {
 				dispatch({
 					type: UPDATE_USER_DATA,
 					payload: {
 						userData: {
 							isLogin: false,
-						}
+						},
 					},
 				});
+				router.replace("/");
 			}
 		});
 	};
@@ -174,18 +193,17 @@ const Header = ({ isFixed, className }) => {
 				ml={2}
 				p={1.25}
 				mr={2}
-				
 				onClick={handleClick}
 			>
-        <Avatar
-									src={`https://www.drhandyman.me:4000/pictures/${userData.email}`}
-									sx={{
-										height: 50,
-										width: 50,
-										bgcolor: "#FFFFFF",
-									}}
-								/>
-       
+				<Avatar
+					src={`https://www.drhandyman.me:4000/pictures/${userData.email}`}
+					sx={{
+						height: 50,
+						width: 50,
+						bgcolor: "#FFFFFF",
+					}}
+				/>
+
 				{/* <PersonOutline /> */}
 			</Box>
 		);
@@ -239,6 +257,16 @@ const Header = ({ isFixed, className }) => {
 				<FlexBox justifyContent="center" flex="1 1 0">
 					<SearchBox />
 				</FlexBox>
+				<Button
+					sx={{
+						bgcolor: "#99CBE9",
+						color: "#3D3F40",
+						margin: "0 10px",
+					}}
+					onClick={authorizePosition}
+				>
+					Authorize Position
+				</Button>
 				{userData && userData.isLogin && (
 					<>
 						<Button
@@ -251,17 +279,18 @@ const Header = ({ isFixed, className }) => {
 						>
 							New Posts
 						</Button>
-{userData.type !='worker' &&
-						<Button
-							sx={{
-								bgcolor: "#99CBE9",
-								color: "#3D3F40",
-								margin: "0 10px",
-							}}
-							onClick={() => setRepairmanDialogOpen(true)}
-						>
-							Apply be a Handyman
-						</Button> }
+						{userData.type != "worker" && (
+							<Button
+								sx={{
+									bgcolor: "#99CBE9",
+									color: "#3D3F40",
+									margin: "0 10px",
+								}}
+								onClick={() => setRepairmanDialogOpen(true)}
+							>
+								Apply be a Handyman
+							</Button>
+						)}
 					</>
 				)}
 
@@ -275,7 +304,12 @@ const Header = ({ isFixed, className }) => {
 						{"Are you sure you want to apply to be a Handyman?"}
 					</DialogTitle>
 					<DialogActions>
-						<Button onClick={handleCloseRepairmanDialog} sx={{color:"#FD3A2E"}}>Cancel</Button>
+						<Button
+							onClick={handleCloseRepairmanDialog}
+							sx={{ color: "#FD3A2E" }}
+						>
+							Cancel
+						</Button>
 						<Button onClick={fetchApplyRepairman} autoFocus>
 							Confirm
 						</Button>

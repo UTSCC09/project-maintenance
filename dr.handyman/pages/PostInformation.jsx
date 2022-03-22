@@ -28,6 +28,7 @@ const PostInformation = () => {
 			fetchPolicy: "network-only",
 		}
 	);
+	const userLocation = useSelector((state) => state.userLocation);
 	const postDetail = data.getOnePost || {};
 	const userData = useSelector((state) => state.userData);
 	const [fetchAcceptPost] = useMutation(ACCEPT_POST);
@@ -41,10 +42,6 @@ const PostInformation = () => {
 	const isAcceptedByCurrentUser =
 		postDetail.acceptorEmail !== "" &&
 		userData.email === postDetail.acceptorEmail;
-	console.log("postDetail", postDetail);
-	console.log(btnLoading);
-	console.log("is accepted", isAccepted);
-	console.log("is accepted by current user", isAcceptedByCurrentUser);
 
 	const getDetailInfo = () => {
 		const urlQuery = getUrlQuery();
@@ -53,6 +50,7 @@ const PostInformation = () => {
 			variables: {
 				id,
 				$id: id,
+				coordinates: [userLocation.longitude, userLocation.latitude],
 			},
 		})
 			.then((res) => {
@@ -175,6 +173,19 @@ const PostInformation = () => {
 								? postDetail.acceptorUsername
 								: "N/A"}
 						</Box>
+
+            {postDetail.distance === null && <Box mb={3}>
+							Distance: {Math.ceil(postDetail.distance) || "N/A"} {" "}
+							KM
+						</Box>}
+              {console.log(postDetail.distance)}
+              {postDetail.distance && <Box mb={3}>
+							Distance: {(postDetail.distance).toFixed(2) || "N/A"} {" "}
+							KM
+						</Box>}
+
+					
+					
 
 						<Box mb={3}>
 							Post Time: {formatTime(postDetail.createdAt)}

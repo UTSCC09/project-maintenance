@@ -16,8 +16,7 @@ import Emitter from "@/utils/eventEmitter";
 import LoadingButton from "@mui/lab/LoadingButton";
 import EditPost from "./editPost";
 
-
-import { CANCEL_ACCEPT } from "@/GraphQL/Mutations";
+import { CANCEL_ACCEPT_POST } from "@/GraphQL/Mutations";
 const StyledCard = styled(
 	({
 		children,
@@ -33,10 +32,10 @@ const StyledCard = styled(
 	},
 }));
 
-const UserPostInfo = ({ post, closeDialog,type }) => {
+const UserPostInfo = ({ post, closeDialog, type }) => {
 	const [fetchDelPost] = useMutation(DEL_POST);
 	const [showDelBtnLoading, setShowDelBtnLoading] = useState(false);
-	const [displayType, setDisplayType] = useState('');
+	const [displayType, setDisplayType] = useState("");
 
 	const delPost = () => {
 		setShowDelBtnLoading(true);
@@ -49,38 +48,43 @@ const UserPostInfo = ({ post, closeDialog,type }) => {
 				Emitter.emit("updateMyPosts");
 				closeDialog();
 				Emitter.emit("showMessage", {
-					message: "Del Post Success.",
+					message: "Delete Post Success.",
 					severity: "success",
 				});
 				setShowDelBtnLoading(false);
 			})
 			.catch((err) => {
 				Emitter.emit("showMessage", {
-					message: err.message || "Del Post Failed.",
+					message: err.message || "Delete Post Failed.",
 					severity: "error",
 				});
 				setShowDelBtnLoading(false);
 			});
 	};
 
-    const [fetchCancelAccept,{ loading: btnLoading }] = useMutation(CANCEL_ACCEPT, {
-        variables: {
-          id: post._id
-        }
-      });
-    
-      const cancelAccept = () => {
-        fetchCancelAccept().then(res => {
-          if (res.data) {
-            Emitter.emit('updateMyPosts')
-          }
-        }).catch(err => {
-          Emitter.emit('showMessage', {
-            message: err.message || "Cancel Post Failed.",
-            severity: "error"
-          })
-        })
-      }
+	const [fetchCancelAccept, { loading: btnLoading }] = useMutation(
+		CANCEL_ACCEPT_POST,
+		{
+			variables: {
+				id: post._id,
+			},
+		}
+	);
+
+	const cancelAccept = () => {
+		fetchCancelAccept()
+			.then((res) => {
+				if (res.data) {
+					Emitter.emit("updateMyPosts");
+				}
+			})
+			.catch((err) => {
+				Emitter.emit("showMessage", {
+					message: err.message || "Cancel Post Failed.",
+					severity: "error",
+				});
+			});
+	};
 	return (
 		<StyledCard elevation={3}>
 			{displayType === "edit" ? (
@@ -135,69 +139,97 @@ const UserPostInfo = ({ post, closeDialog,type }) => {
 					>
 						State: {post.state ? "Accpted" : "Not Accepted"}
 					</Medium>
-                    {type === 'accept' ? (<Medium
-						fontSize="16px"
-						color="grey.800"
-						textAlign="center"
-						mb={4.5}
-						display="block"
-					>
-						User Accept: {post.posterUsername || "N/A"}
-					</Medium>) : 	(<Medium
-						fontSize="16px"
-						color="grey.800"
-						textAlign="center"
-						mb={4.5}
-						display="block"
-					>
-						User Accept: {post.acceptorUsername || "N/A"}
-					</Medium>)}
-					
+					{type === "accept" ? (
+						<Medium
+							fontSize="16px"
+							color="grey.800"
+							textAlign="center"
+							mb={4.5}
+							display="block"
+						>
+							Posted By: {post.posterUsername || "N/A"}
+						</Medium>
+					) : (
+						<Medium
+							fontSize="16px"
+							color="grey.800"
+							textAlign="center"
+							mb={4.5}
+							display="block"
+						>
+							User Accept: {post.acceptorUsername || "N/A"}
+						</Medium>
+					)}
 
-        {type === "accept" ? ( <LoadingButton
-          type="submit"
-          loading={btnLoading}
-          onClick={cancelAccept}
-          variant="outlined"
-          color="warning"
-         sx={{mb:"20px"}}
-        >
-          Cancel Accept
-        </LoadingButton>
-				) : 	(<><Button
-                                variant="contained"
-                                fullWidth
-                                onClick={() => setDisplayType("edit")}
-                                sx={{
-                                    mb: "1.65rem",
-                                    height: 44,
-                                    bgcolor: "#4790E5",
-                                    "&:hover": {
-                                        bgcolor: "#4790E5",
-                                    },
-                                }}
-                            >
-                                Edit Post
-                            </Button>
-                            <LoadingButton
-                                variant="contained"
-                                fullWidth
-                                loading={showDelBtnLoading}
-                                onClick={delPost}
-                                sx={{
-                                    mb: "1.65rem",
-                                    height: 44,
-                                    bgcolor: "#FFAB92",
-                                    "&:hover": {
-                                        bgcolor: "#F20E0E",
-                                    },
-                                    
-                                }}
-                            >
-                                    Delete Post
-                                </LoadingButton>
-                                
-                                </>)}
+					
+					{post.distance === null ? (<Medium
+						fontSize="16px"
+						color="grey.800"
+						textAlign="center"
+						mb={4.5}
+						display="block"
+					>
+						Distance: {Math.ceil(post.distance) || "N/A"} KM
+					</Medium>): (<Medium
+						fontSize="16px"
+						color="grey.800"
+						textAlign="center"
+						mb={4.5}
+						display="block"
+					>
+						Distance: {(post.distance).toFixed(2) || "N/A"} KM
+						
+					</Medium>)
+					
+				}
+
+			
+
+					{type === "accept" ? (
+						<LoadingButton
+							loading={btnLoading}
+							onClick={cancelAccept}
+							variant="outlined"
+							color="warning"
+							sx={{ mb: "20px" }}
+						>
+							Cancel Accept
+						</LoadingButton>
+					) : (
+						<>
+							<Button
+								variant="contained"
+								fullWidth
+								onClick={() => setDisplayType("edit")}
+								sx={{
+									mb: "1.65rem",
+									height: 44,
+									bgcolor: "#4790E5",
+									"&:hover": {
+										bgcolor: "#4790E5",
+									},
+								}}
+							>
+								Edit Post
+							</Button>
+							<LoadingButton
+								variant="contained"
+								fullWidth
+								loading={showDelBtnLoading}
+								onClick={delPost}
+								sx={{
+									mb: "1.65rem",
+									height: 44,
+									bgcolor: "#FFAB92",
+									"&:hover": {
+										bgcolor: "#F20E0E",
+									},
+								}}
+							>
+								Delete Post
+							</LoadingButton>
+						</>
+					)}
 					{/* <Button
 						variant="contained"
 						fullWidth
@@ -231,7 +263,6 @@ const UserPostInfo = ({ post, closeDialog,type }) => {
 					</LoadingButton> */}
 
 					<Box mb={2}>
-						
 						<FlexBox justifyContent="center" mt={-1.625}>
 							<Box color="#AEB4BE" bgcolor="#F6F9FC" px={2}></Box>
 						</FlexBox>
