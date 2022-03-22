@@ -12,7 +12,7 @@ import { formatTime } from "@/utils/index";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useMutation } from "@apollo/client";
 import { CANCEL_ACCEPT } from "@/GraphQL/Mutations";
-import Emitter from '@/utils/eventEmitter';
+import Emitter from "@/utils/eventEmitter";
 
 const UserPost = ({ post, type }) => {
 	const getTypeColor = (status) => {
@@ -36,24 +36,24 @@ const UserPost = ({ post, type }) => {
 	};
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const toggleDialog = () => setDialogOpen(!dialogOpen);
-  // const [fetchCancelAccept,{ loading: btnLoading }] = useMutation(CANCEL_ACCEPT, {
-  //   variables: {
-  //     id: post._id
-  //   }
-  // });
+	// const [fetchCancelAccept,{ loading: btnLoading }] = useMutation(CANCEL_ACCEPT, {
+	//   variables: {
+	//     id: post._id
+	//   }
+	// });
 
-  // const cancelAccept = () => {
-  //   fetchCancelAccept().then(res => {
-  //     if (res.data) {
-  //       Emitter.emit('updateMyPosts')
-  //     }
-  //   }).catch(err => {
-  //     Emitter.emit('showMessage', {
-  //       message: err.message || "Cancel Post Failed.",
-  //       severity: "error"
-  //     })
-  //   })
-  // }
+	// const cancelAccept = () => {
+	//   fetchCancelAccept().then(res => {
+	//     if (res.data) {
+	//       Emitter.emit('updateMyPosts')
+	//     }
+	//   }).catch(err => {
+	//     Emitter.emit('showMessage', {
+	//       message: err.message || "Cancel Post Failed.",
+	//       severity: "error"
+	//     })
+	//   })
+	// }
 
 	return (
 		<Row
@@ -81,7 +81,6 @@ const UserPost = ({ post, type }) => {
 				/>
 			</Box>
 
-		
 			<Box m={0.75}>
 				<Chip
 					size="5rem"
@@ -93,18 +92,30 @@ const UserPost = ({ post, type }) => {
 					}}
 				/>
 			</Box>
-      {type === 'accept' ? (<Typography className="pre" m={0.75} textAlign="left">
-				{post.posterUsername || "N/A"}
-			</Typography>) : 	(<Typography className="pre" m={0.75} textAlign="left">
-				{post.acceptorUsername || "N/A"}
-			</Typography>)}
+			{type === "accept" ? (
+				<Typography className="pre" m={0.75} textAlign="left">
+					{post.posterUsername || "N/A"}
+				</Typography>
+			) : (
+				<Typography className="pre" m={0.75} textAlign="left">
+					{post.acceptorUsername || "N/A"}
+				</Typography>
+			)}
 			{/* <Typography className="pre" m={0.75} textAlign="left">
 				{post.acceptorUsername || "N/A"}
 			</Typography> */}
 
-      <Typography className="pre" m={0.75} textAlign="left">
+			<Typography className="pre" m={0.75} textAlign="left">
 				{formatTime(post.createdAt)}
 			</Typography>
+			{post.distance !== null && <Typography className="pre" ml={2.75} textAlign="left">
+					{(post.distance).toFixed(2) || "N/A"} KM
+				</Typography>}
+
+			{ post.distance === null && <Typography className="pre" ml={2.75} textAlign="left">
+					{Math.ceil(post.distance) || "N/A"} KM
+				</Typography>}
+
 
 			<Typography
 				textAlign="center"
@@ -130,17 +141,21 @@ const UserPost = ({ post, type }) => {
 				) : (
 				
 				)} */}
-	      <Box
-						component={IconButton}
-						ml={2}
-						p={1.25}
-						bgcolor="#F7E1A9"
-						onClick={toggleDialog}
-					>
-						<East />
-					</Box>
+				<Box
+					component={IconButton}
+					ml={2}
+					p={1.25}
+					bgcolor="#F7E1A9"
+					onClick={toggleDialog}
+				>
+					<East />
+				</Box>
 				<Dialog open={dialogOpen} scroll="body" onClose={toggleDialog}>
-					<UserPostInfo post={post} closeDialog={toggleDialog} type = {type}/>
+					<UserPostInfo
+						post={post}
+						closeDialog={toggleDialog}
+						type={type}
+					/>
 				</Dialog>
 			</Typography>
 		</Row>

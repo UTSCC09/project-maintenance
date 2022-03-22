@@ -4,7 +4,7 @@ import Maintainer from "./maintainer";
 import { H3, Span, H4 } from "components/Typography";
 import { Grid, Pagination } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useStore } from "react-redux";
 
 import {
 	SEARCH_WORKER,
@@ -19,9 +19,10 @@ import { useLazyQuery } from "@apollo/client";
 import Emitter from "@/utils/eventEmitter";
 
 const MaintainerList = () => {
-	const userData = useSelector((state) => state.userData);
+	const userLocation = useSelector((state) => state.userLocation);
 	const [workersData, setWorkersData] = useState([]);
 	const [workersCount, setWorkersCount] = useState(0);
+	const store = useStore();
 
 	const [page, setPage] = useState(1);
 	// console.log(useQuery(GET_POSTS_QUERY));
@@ -32,50 +33,91 @@ const MaintainerList = () => {
 	const [searchWorkerCount] = useLazyQuery(SEARCH_WORKER_COUNT);
 
 	useEffect(() => {
-    const getAllList = () => {
-      getCount().then((res) => {
-        setWorkersCount(res.data.getWorkerCount);
-      });
-      getWorkers({ variables: { page: 0, workerPerPage: 6 } }).then((res) => {
-        setWorkersData(res.data.getWorkerPage || []);
-      });
-    }
-    getAllList()
-
-		const handlerWorkersSearch = ({ queryText = "" }) => {
-      if (!queryText) return getAllList();
-      searchWorkerCount({
-				variables: { page: 0, workerPerPage: 6, queryText },
-			})
-				.then((res) => {
-					setWorkersCount(res.data.searchWorkerCount || []);
-				})
-				.catch((err) => {
-					Emitter.emit("showMessage", {
-						message: err.message,
-						severity: "error",
-					});
-				});
-			searchWorker({
-				variables: { page: 0, workerPerPage: 6, queryText },
-			})
-				.then((res) => {
-					setWorkersData(res.data.searchWorkerPage || []);
-				})
-				.catch((err) => {
-					Emitter.emit("showMessage", {
-						message: err.message,
-						severity: "error",
-					});
-				});
+		const getAllList = () => {
+			getCount().then((res) => {
+				setWorkersCount(res.data.getWorkerCount);
+			});
+			getWorkers({
+				variables: {
+					page: 0,
+					workerPerPage: 6,
+					coordinates: [
+						userLocation.longitude,
+						userLocation.latitude,
+					],
+				},
+			}).then((res) => {
+				setWorkersData(res.data.getWorkerPage || []);
+			});
 		};
+		getAllList();
+	
 
-		Emitter.on("searchWorkers", handlerWorkersSearch);
+	const handlerWorkersSearch = ({ queryText = "" }) => {
+		if (!queryText) return getAllList();
+		const userLocationNew = store.getState().userLocation;
+		searchWorkerCount({
+			variables: { page: 0, workerPerPage: 6, queryText },
+		})
+			.then((res) => {
+				setWorkersCount(res.data.searchWorkerCount || []);
+			})
+			.catch((err) => {
+				Emitter.emit("showMessage", {
+					message: err.message,
+					severity: "error",
+				});
+			});
+		searchWorker({
+			variables: {
+				page: 0,
+				workerPerPage: 6,
+				queryText,
+				coordinates: [
+					userLocationNew.longitude,
+					userLocationNew.latitude,
+				],
+			},
+		})
+			.then((res) => {
+				setWorkersData(res.data.searchWorkerPage || []);
+			})
+			.catch((err) => {
+				Emitter.emit("showMessage", {
+					message: err.message,
+					severity: "error",
+				});
+			});
+	};
+	Emitter.on("searchWorkers", handlerWorkersSearch);
 
-		return () => {
-			Emitter.off("searchWorkers", handlerWorkersSearch);
-		};
-	}, []);
+	return () => {
+		Emitter.off("searchWorkers", handlerWorkersSearch);
+	};
+	
+	}, [userLocation])
+
+
+	// useEffect(() => {
+	// 	const getAllList = () => {
+	// 		getCount().then((res) => {
+	// 			setWorkersCount(res.data.getWorkerCount);
+	// 		});
+	// 		getWorkers({
+	// 			variables: {
+	// 				page: 0,
+	// 				workerPerPage: 6,
+	// 				coordinates: [
+	// 					userLocation.longitude,
+	// 					userLocation.latitude,
+	// 				],
+	// 			},
+	// 		}).then((res) => {
+	// 			setWorkersData(res.data.getWorkerPage || []);
+	// 		});
+	// 	};
+	// 	getAllList();
+	// }, []);
 	if (loading || cloading || data == undefined || cdata == undefined) {
 		return <div>Loading...</div>;
 	}
@@ -89,7 +131,15 @@ const MaintainerList = () => {
 		index2 = 0;
 	}
 	const handleChange = (event, value) => {
-		getWorkers({ variables: { page: value - 1, workerPerPage: 6 } });
+		getWorkers({
+			variables: {
+				page: value - 1,
+				workerPerPage: 6,
+				coordinates: [userLocation.longitude, userLocation.latitude],
+			},
+		}).then((res) => {
+			setWorkersData(res.data.getWorkerPage || []);
+		});
 
 		setPage(value);
 	};

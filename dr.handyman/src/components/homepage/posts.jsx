@@ -6,46 +6,54 @@ import { Grid, Pagination } from "@mui/material";
 import React from "react";
 import PostRow from "components/PostRow";
 
-import { GET_POSTS_QUERY, GET_COUNT, SEARCH_POST, SEARCH_POST_COUNT } from "../../GraphQL/Queries";
+import {
+	GET_POSTS_QUERY,
+	GET_COUNT,
+	SEARCH_POST,
+	SEARCH_POST_COUNT,
+} from "../../GraphQL/Queries";
 import { useMutation, useQuery } from "@apollo/client";
-import { Query } from "react-query";
 import { useState, useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
+import { useSelector, useStore } from "react-redux";
 import Emitter from "@/utils/eventEmitter";
 
 const Posts = () => {
-	// const [post, setPost] = useState([]);
 	const [page, setPage] = useState(1);
-	// console.log(useQuery(GET_POSTS_QUERY));
 	const [getPosts, { loading }] = useLazyQuery(GET_POSTS_QUERY, {
-		fetchPolicy: "no-cache"
+		fetchPolicy: "no-cache",
 	});
+	const userLocation = useSelector((state) => state.userLocation);
 	const [postsData, setPostsData] = useState([]);
 	const [postsCount, setPostsCount] = useState(0);
 	const [searchPost] = useLazyQuery(SEARCH_POST);
 	const [searchPostCount] = useLazyQuery(SEARCH_POST_COUNT);
-	const [getCount, { loading: cloading }] =
-		useLazyQuery(GET_COUNT, {
-			fetchPolicy: "no-cache"
-		});
-  
+	const store = useStore();
+	const [getCount, { loading: cloading }] = useLazyQuery(GET_COUNT, {
+		fetchPolicy: "no-cache",
+	});
+
 	// useEffect(() => {
 	//   if (!loading){
 	//   setPost(data.getAllPost);
 	// },[])
 	useEffect(() => {
 		const updatePostInfo = () => {
-			getPosts({ variables: { page: 0, postPerPage: 6 } }).then(res => {
-				setPostsData(res.data.getPostPage)
+			getPosts({ variables: { page: 0, postPerPage: 6, coordinates: [
+				userLocation.longitude,
+				userLocation.latitude,
+			], } }).then((res) => {
+				setPostsData(res.data.getPostPage);
 			});
-			getCount().then(res => {
-				setPostsCount(res.data.getPostCount)
-			});;
-		}
+			getCount().then((res) => {
+				setPostsCount(res.data.getPostCount);
+			});
+		};
 
 		const handlerPostsSearch = ({ queryText = "" }) => {
 			if (!queryText) return updatePostInfo();
-      searchPostCount({
+			const userLocationNew = store.getState().userLocation;
+			searchPostCount({
 				variables: { page: 0, postPerPage: 6, queryText },
 			})
 				.then((res) => {
@@ -58,7 +66,15 @@ const Posts = () => {
 					});
 				});
 			searchPost({
-				variables: { page: 0, postPerPage: 6, queryText },
+				variables: {
+					page: 0,
+					postPerPage: 6,
+					queryText,
+					coordinates: [
+						userLocationNew.longitude,
+						userLocationNew.latitude,
+					],
+				},
 			})
 				.then((res) => {
 					setPostsData(res.data.searchPostPage || []);
@@ -72,14 +88,14 @@ const Posts = () => {
 		};
 
 		updatePostInfo();
-		Emitter.on('updatePostInfo', updatePostInfo)
+		Emitter.on("updatePostInfo", updatePostInfo);
 		Emitter.on("searchPosts", handlerPostsSearch);
 
 		return () => {
-			Emitter.off('updatePostInfo', updatePostInfo)
+			Emitter.off("updatePostInfo", updatePostInfo);
 			Emitter.off("searchPosts", handlerPostsSearch);
-		}
-	}, []);
+		};
+	}, [userLocation]);
 
 	if (loading || cloading) {
 		return (
@@ -106,12 +122,18 @@ const Posts = () => {
 	//  },[])
 
 	const handleChange = (event, value) => {
-		getPosts({ variables: { page: value - 1, postPerPage: 6 } }).then(res => {
-			setPostsData(res.data.getPostPage)
-		});;
-		console.log(page);
+		getPosts({
+			variables: {
+				page: value - 1,
+				postPerPage: 6,
+				coordinates: [userLocation.longitude, userLocation.latitude],
+			},
+		}).then((res) => {
+			setPostsData(res.data.getPostPage);
+		});
 		setPage(value);
 	};
+
 	return (
 		<NavbarLayout>
 			<H3 color="#2C2C2C" mb={2}>
@@ -150,6 +172,9 @@ const Posts = () => {
 				</H5>
 				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
 					Post Time
+				</H5>
+				<H5 color="grey.600"  mx={0.75} textAlign="left">
+					Distance
 				</H5>
 				<H5
 					flex="0 0 0 !important"

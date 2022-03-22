@@ -46,7 +46,6 @@ const Login = () => {
 
 	const handleFormSubmit = async (values) => {
 		const { email, password } = values;
-		console.log(email, password);
 
 		login({
 			variables: {

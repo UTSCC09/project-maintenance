@@ -31,18 +31,20 @@ query {
 `;
 
 export const GET_POSTS_QUERY = gql `
-query GetPostPage($postPerPage: Int!, $page: Int!) {
-  getPostPage(postPerPage: $postPerPage, page: $page) {
+query GetPostPage($postPerPage: Int!, $coordinates: [Float], $page: Int!) {
+  getPostPage(postPerPage: $postPerPage, coordinates: $coordinates, page: $page) {
+    posterEmail
+    _id
     posterUsername
+    acceptorEmail
+    acceptorUsername
     title
     content
+    distance
     type
     state
-    posterEmail
     createdAt
-    _id
-    acceptorUsername
-    acceptorEmail
+    updatedAt
   }
 }
 `;
@@ -54,13 +56,23 @@ query GetPostCount {
 `;
 
 export const GET_WORKER = gql `
-query GetWorkerPage($workerPerPage: Int!, $page: Int!) {
-  getWorkerPage(workerPerPage: $workerPerPage, page: $page) {
+query GetWorkerPage($workerPerPage: Int!, $page: Int!, $coordinates: [Float]) {
+  getWorkerPage(workerPerPage: $workerPerPage, page: $page, coordinates: $coordinates) {
     email
     username
+    password
     type
     phone
     rating
+    distance
+    profilePic {
+      filepath
+      fileGetPath
+      mimetype
+      encoding
+    }
+    permissions
+    createdAt
   }
 }
 `;
@@ -74,7 +86,7 @@ query GetOneWorker($email: String!) {
     type
     phone
     rating
-    location
+    distance
     profilePic {
       filepath
       fileGetPath
@@ -94,34 +106,38 @@ query Query {
 `;
 
 export const GET_POST_DETAIL = gql `
-query WorkerData($id: String!) {
-  getOnePost(_id: $id) {
-    _id
-    posterEmail
+query GetOnePost($id: String!, $coordinates: [Float]) {
+  getOnePost(_id: $id, coordinates: $coordinates) {
+    updatedAt
+    type
+    title
+    state
     posterUsername
+    posterEmail
+    distance
+    createdAt
+    content
     acceptorUsername
     acceptorEmail
-    title
-    content
-    type
-    state,
-    createdAt
+    _id
   }
 }
 `
 export const GET_USER_POST = gql `
-query GetUserPosts($userPostPerPage: Int!, $page: Int!){
-  getUserPostsPage(userPostPerPage: $userPostPerPage, page: $page) {
+query GetUserPostsPage($userPostPerPage: Int!, $coordinates: [Float], $page: Int!) {
+  getUserPostsPage(userPostPerPage: $userPostPerPage, coordinates: $coordinates, page: $page) {
+    _id
     posterEmail
+    posterUsername
+    acceptorEmail
+    acceptorUsername
     title
     content
-    posterUsername
-    acceptorUsername
-    createdAt,
-    type,
-    state,
-    acceptorUsername
-    _id
+    distance
+    type
+    state
+    createdAt
+    updatedAt
   }
 }
 `
@@ -133,8 +149,8 @@ query Query {
 `
 
 export const GET_ACCEPT_USER_POST = gql `
-query GetAcceptedPostsPage($acceptedPostPerPage: Int!, $page: Int!) {
-  getAcceptedPostsPage(acceptedPostPerPage: $acceptedPostPerPage, page: $page) {
+query GetAcceptedPostsPage($acceptedPostPerPage: Int!, $coordinates: [Float], $page: Int!) {
+  getAcceptedPostsPage(acceptedPostPerPage: $acceptedPostPerPage, coordinates: $coordinates, page: $page) {
     _id
     posterEmail
     posterUsername
@@ -142,10 +158,11 @@ query GetAcceptedPostsPage($acceptedPostPerPage: Int!, $page: Int!) {
     acceptorUsername
     title
     content
-    state
+    distance
     type
-    updatedAt
+    state
     createdAt
+    updatedAt
   }
 }
 `
@@ -157,22 +174,22 @@ query GetAcceptedPostsPage {
 `
 
 export const SEARCH_WORKER = gql `
-query SearchWorkerPage($queryText: String!, $page: Int!, $workerPerPage: Int!) {
-  searchWorkerPage(queryText: $queryText, page: $page, workerPerPage: $workerPerPage) {
+query GetPostPage($queryText: String!, $workerPerPage: Int!, $page: Int!, $coordinates: [Float]) {
+  searchWorkerPage(queryText: $queryText, workerPerPage: $workerPerPage, page: $page, coordinates: $coordinates) {
     username
-    type
     rating
+    type
     profilePic {
+      mimetype
       filepath
       fileGetPath
-      mimetype
       encoding
     }
     phone
     permissions
     password
-    location
     email
+    distance
     createdAt
   }
 }
@@ -185,15 +202,15 @@ query Query($queryText: String!) {
 `
 
 export const SEARCH_POST = gql `
-query SearchPostPage($queryText: String!, $page: Int!, $postPerPage: Int!) {
-  searchPostPage(queryText: $queryText, page: $page, postPerPage: $postPerPage) {
+query SearchPostPage($queryText: String!, $page: Int!, $postPerPage: Int!, $coordinates: [Float]) {
+  searchPostPage(queryText: $queryText, page: $page, postPerPage: $postPerPage, coordinates: $coordinates) {
     updatedAt
     type
     title
     state
     posterUsername
-    location
     posterEmail
+    distance
     createdAt
     content
     acceptorUsername
