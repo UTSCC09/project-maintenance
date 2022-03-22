@@ -78,7 +78,7 @@ const postQueryDef = `
     getAcceptedPostCountByEmail(email: String!): Int
     
 	getAllPost: [Post]
-    getPostPage(postPerPage: Int!, page: Int!): [Post]
+    getPostPage(postPerPage: Int!, page: Int!, coordinates: [Float]): [Post]
 
     searchPostPage(queryText: String!, postPerPage: Int!, page: Int!, coordinates: [Float]): [Post]
     searchPostPageCount(queryText: String!): Int
@@ -211,12 +211,13 @@ const postQuery = {
     },
     
     async getPostPage(parent, args, context, info){
-        const { postPerPage, page } = args;
+        const { postPerPage, page, coordinates } = args;
         if (page < 0)
             throw new Error("page number undefined");
         if (postPerPage == 0)
             return [];
-        return await Post.find({}).sort({ 'createdAt': 1 }).skip(page * postPerPage).limit(postPerPage);
+        const posts = await Post.find({}).sort({ 'createdAt': 1 }).skip(page * postPerPage).limit(postPerPage);
+        return addDistances (posts, coordinates);
     },
     async getPostCount(parent, args, context, info){
         return await Post.countDocuments();
