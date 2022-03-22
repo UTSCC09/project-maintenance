@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Divider from '@mui/material/Divider';
@@ -11,11 +11,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import { FixedSizeList } from 'react-window';
 import Box from '@mui/material/Box';
 
-const ContactListRow = ({
-    contact
-  }) => {
-  
-
+function ContactListRow({
+  contact,
+  _typename,
+  _id
+})
+{
   return (
     <ListItem alignItems="flex-start" component="div"   disablePadding> 
       <ListItemButton sx={{
@@ -23,17 +24,17 @@ const ContactListRow = ({
                     '&:hover': {
                         backgroundColor: '#DDF2FF'
             
-                        },
+                        }
                 }}>
       <ListItemAvatar>
           <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
         </ListItemAvatar>
         <ListItemText
-          primary={contact.user_send}
+          primary={contact._id}
           secondary={
            
               
-             contact.newest_message
+           contact._typename
            
           }
         />
@@ -41,5 +42,4 @@ const ContactListRow = ({
     </ListItem>
   );
 };
-
 export default ContactListRow;

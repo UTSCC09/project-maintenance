@@ -10,6 +10,15 @@ export const LOAD_USERS = gql `
   }
 `;
 
+export const LOAD_CURRENT_CONVOS = gql `
+query Query {
+  getCurrentConvos {
+    _id
+    userEmails
+  }
+}
+`
+
 export const GET_USER_DATA = gql `
 query {
   currentUser {

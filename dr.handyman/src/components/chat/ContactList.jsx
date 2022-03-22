@@ -10,57 +10,96 @@ import { borderColor } from '@mui/system';
 import ListItemButton from '@mui/material/ListItemButton';
 import { FixedSizeList } from 'react-window';
 import ContactListHeader from './ContactListHeader';
-import Link from 'next/link'
+import Link from 'next/link';
 import Box from '@mui/material/Box';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ContactListLayout from '../layout/ContactListLayout';
 
-function renderMessageRow(props) {
-  const { index, style } = props;
+import {LOAD_CURRENT_CONVOS} from "/src/GraphQL/Queries";
+import { useLazyQuery } from "@apollo/client";
+import { useState, useEffect } from "react";
+import ContactListRow from "./ContactListRow.jsx";
 
-  return (
-    <ListItem style={style} key={index} alignItems="flex-start" component="div"   disablePadding > 
-      <ListItemButton divider sx={{
-          mt:'10px',
-                    height:'90px',
+
+// function renderMessageRow(props) {
+//   const { key, style, item} = props;
+//   // const [getConvos, { loading, data, error }] = useLazyQuery(LOAD_CURRENT_CONVOS);
+
+//   // //const [convos, setConvos] = useState([]);
+
+  
+//   // useEffect(() => {
+// 	// 		getConvos();
+// 	// 			//setConvos(res.data.getCurrentConvos[0].userEmails[0])
+		
+//   // }, []);
+//   // if (loading || data == undefined) {
+//   //   return <div>Loading...</div>
+//   // }
+//   // console.log(data.getCurrentConvos);
+//   // //setConvos(data.getCurrentConvos)
+
+
+//   return (
+//     <ListItem style={style} key={key} alignItems="flex-start" component="div"   disablePadding > 
+//       <ListItemButton divider sx={{
+//           mt:'10px',
+//                     height:'90px',
                     
-                }}>
+//                 }}>
                     
-      <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-        </ListItemAvatar>
-        
-        <ListItemText
-          primary="Alice"
-          secondary={
-            <React.Fragment>
-              
-              I'll be in your neighborhood doing errands this…
-              <Typography 
-              sx={{ display: 'inline'}}
-              component="span"
-              variant="overline"
-              color="text.primary"
-            >
-              2022-03-11
-            </Typography>
-           
-            </React.Fragment>
-            
-          }
-        />
-       
-      </ListItemButton>
+//       <ListItemAvatar>
+//           <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+//         </ListItemAvatar>
       
-    </ListItem>
+  
+//         <ListItemText
+//           primary={item.userEmails[0]}
+//           secondary={
+//             <React.Fragment>
+              
+//               I'll be in your neighborhood doing errands this…
+//               <Typography 
+//               sx={{ display: 'inline'}}
+//               component="span"
+//               variant="overline"
+//               color="text.primary"
+//             >
+//               2022-03-11
+//             </Typography>
+           
+//             </React.Fragment>
+            
+//           }
+//         />
+
+       
+//       </ListItemButton>
+      
+//     </ListItem>
     
     
     
-  );
-}
+//   );
+// }
 
 
 export default function ContactList() {
+
+  const [getConvos, { loading, data, error }] = useLazyQuery(LOAD_CURRENT_CONVOS);
+
+  //const [convos, setConvos] = useState([]);
+
+  useEffect(() => {
+			getConvos();
+				//setConvos(res.data.getCurrentConvos[0].userEmails[0])
+		
+  }, []);
+  if (loading || data == undefined) {
+    return <div>Loading...</div>
+  }
+  console.log(data.getCurrentConvos);
+
   return (
     <ContactListLayout>
     <Box sx={{ width: '100%', maxWidth: 360, color: 'grey'}}>
@@ -74,22 +113,66 @@ export default function ContactList() {
       </Link>} />
 
       <Divider sx={{ my: 0.5 }} />
-      <FixedSizeList
-        height={350}
-        width={360}
-        itemSize={100}
-        itemCount={20}
-        overscanCount={5}
+      <List
+      
+      
+
+        sx={{maxHeight:'350px',
+        overflow:'auto',
+      
+       width: 360
+       }}
         
         
       >
-        {renderMessageRow}
-        
-      </FixedSizeList>
+        {data.getCurrentConvos.map((item, index) => (
+        <ContactListRow contact={item} key={index}/>
+        ))}
+        {/* {fakeList.map((item, index) => (
+        <ContactListRow contact={item} key={index}/>
+        ))} */}
+      </List>
       
     </Box>
     </ContactListLayout>
   );
 }
 
+const fakeList = [
+
+  {userEmails: ['u1email', 'u2email'],
+  _typename:'mesage',
+  _id:'id'
+},
+{userEmails: ['u1email', 'u2email'],
+  _typename:'mesage',
+  _id:'id'
+},
+{userEmails: ['u1email', 'u2email'],
+  _typename:'mesage',
+  _id:'id'
+},
+{userEmails: ['u1email', 'u2email'],
+  _typename:'mesage',
+  _id:'id'
+},
+{userEmails: ['u1email', 'u2email'],
+  _typename:'mesage',
+  _id:'id'
+},
+{userEmails: ['u1email', 'u2email'],
+  _typename:'mesage',
+  _id:'id'
+},
+{userEmails: ['u1email', 'u2email'],
+  _typename:'mesage',
+  _id:'id'
+},
+{userEmails: ['u1email', 'u2email'],
+  _typename:'mesage',
+  _id:'id'
+}
+  
+  
+];
 

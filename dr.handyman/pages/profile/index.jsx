@@ -18,7 +18,7 @@ const ProfilePage = (props) => {
 	const userData = useSelector((state) => state.userData);
 	let userProfileImage = "/assets/u1.png";
 
-	if (userData.profilePic && userData.profilePic.filepath) {
+	if (userData.profilePic && userData.profilePic.fileGetPath) {
 		// userProfileImage = `https://www.drhandyman.me:4000/pictures/${userData.email}`;
 		userProfileImage = userData.profilePic.fileGetPath;
 	}

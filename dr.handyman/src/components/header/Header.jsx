@@ -34,7 +34,8 @@ import { getLocation } from '../../utils'
 import Emitter from '@/utils/eventEmitter';
 import SvgIcon from '@mui/material/SvgIcon';
 
- 
+
+
 // styled component
 export const HeaderWrapper = styled(Box)(({ theme }) => ({
 	position: "relative",
@@ -223,7 +224,7 @@ const Header = ({ isFixed, className }) => {
 						},
 					}}
 				>
-					<Link href="/">
+					<Link href="/" >
 						<a>
 							<img
 								height={50}

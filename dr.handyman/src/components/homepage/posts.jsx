@@ -43,7 +43,7 @@ const Posts = () => {
 			});;
 		}
 
-		const handlerPostsSearch = ({ queryText = "" }) => {
+		const handlerPostsSearch = ({ queryText = "", coordinates = null}) => {
 			if (!queryText) return updatePostInfo();
       searchPostCount({
 				variables: { page: 0, postPerPage: 6, queryText },
@@ -58,7 +58,7 @@ const Posts = () => {
 					});
 				});
 			searchPost({
-				variables: { page: 0, postPerPage: 6, queryText },
+				variables: { page: 0, postPerPage: 6, queryText, coordinates },
 			})
 				.then((res) => {
 					setPostsData(res.data.searchPostPage || []);
