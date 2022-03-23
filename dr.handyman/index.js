@@ -61,9 +61,16 @@ require('dotenv').config();
   const { graphqlUploadExpress } = require('graphql-upload');
   const PORT = process.env.PORT;
 
+  var privateKey = fs.readFileSync( 'api.drhandyman.me.key' );
+  var certificate = fs.readFileSync( 'default.crt' );
+  var config = {
+          key: privateKey,
+          cert: certificate
+  };
+
   const SESSION_SECRET = process.env.SECRET;
   const app = express();
-  const httpServer = http.createServer(app);
+  const httpServer = https.createServer(config, app);
 
   const sessionMid = session({
     genid: (req) => uuid(),
