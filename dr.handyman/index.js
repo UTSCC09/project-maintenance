@@ -74,7 +74,7 @@ require('dotenv').config();
       maxAge: 360000,
       secure: true,
       httpOnly: true,
-      sameSite: true,
+      sameSite: 'none',
     }
   });
   app.use(sessionMid);
