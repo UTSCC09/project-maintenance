@@ -247,8 +247,8 @@ io.on("connection", (socket) => {
       await server.start();
       const cors = {
         credentials: true,
-        // origin: '*',
-         origin: ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001']
+         origin: '*',
+        // origin: ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001']
       };
       server.applyMiddleware({ app, cors });
   }

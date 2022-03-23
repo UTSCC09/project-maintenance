@@ -38,4 +38,8 @@ services:
       - REDIS=XnWsIUd2TZ4PFZBApx603S1WGBSCZK9R
       - SECRET=some secret
       - PORT=3000
-     
+
+networks:
+  default:
+    external: false
+    name: nginx-proxy     
