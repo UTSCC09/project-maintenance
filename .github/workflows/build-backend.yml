@@ -63,4 +63,4 @@ jobs:
                         echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u $ACTOR --password-stdin
                         docker rm $(docker stop $(docker ps -a -q --filter ancestor=ghcr.io/utscc09/handymanbackend --format="{{.ID}}"))
                         docker pull ghcr.io/utscc09/handymanbackend
-                        docker run -e PORT=3000 -e MONGO='mongodb+srv://Chris:chris@dr-handyman.7i3hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority' -e REDIS='XnWsIUd2TZ4PFZBApx603S1WGBSCZK9R' -e SECRET='some secret' --rm -p 3000:3000 -v $(pwd)/dr.handyman/files:/usr/src/app/dr.handyman/files ghcr.io/utscc09/handymanbackend
+                        docker run -d -e PORT=3000 -e MONGO='mongodb+srv://Chris:chris@dr-handyman.7i3hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority' -e REDIS='XnWsIUd2TZ4PFZBApx603S1WGBSCZK9R' -e SECRET='some secret' --rm -p 3000:3000 -v $(pwd)/dr.handyman/files:/usr/src/app/dr.handyman/files ghcr.io/utscc09/handymanbackend
