@@ -63,4 +63,5 @@ jobs:
                         echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u $ACTOR --password-stdin
                         docker rm $(docker stop $(docker ps -a -q --filter ancestor=ghcr.io/utscc09/handymanbackend --format="{{.ID}}"))
                         docker pull ghcr.io/utscc09/handymanbackend
+                        docker run --rm -p 3000:3000 -v $(pwd)/dr.handyman/files:/usr/src/app/dr.handyman/files ghcr.io/utscc09/handymanbackend
                         
