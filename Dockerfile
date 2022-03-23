@@ -13,8 +13,7 @@ COPY ./dr.handyman/package.json ./
 RUN npm install
 
 # Bundle app source
-COPY ./dr.handyman/ .
-RUN ls -la ./*
+COPY ./dr.handyman/. ./
 
 
 EXPOSE 3000
