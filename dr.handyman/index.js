@@ -73,7 +73,7 @@ require('dotenv').config();
     cookie: {
       maxAge: 360000,
       secure: true,
-      httpOnly: false,
+      httpOnly: true,
       sameSite: 'none',
     }
   });
