@@ -3,4 +3,7 @@
 !**/dr.handyman/files/pictures
 **/dr.handyman/files/pictures/*
 !**/dr.handyman/files/pictures/default
+**/acme
+**/certs
+**/vhost
 .env
