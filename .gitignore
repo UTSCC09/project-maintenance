@@ -1,3 +1,6 @@
 **/node_modules
-**/files
+**/dr.handyman/files/*
+!**/dr.handyman/files/pictures
+**/dr.handyman/files/pictures/*
+!**/dr.handyman/files/pictures/default
 .env
