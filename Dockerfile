@@ -13,9 +13,8 @@ COPY ./dr.handyman/package.json ./
 RUN npm install
 
 # Bundle app source
-FROM ubuntu
 COPY ./dr.handyman/ .
-RUN ls -la .*
+RUN ls -la ./*
 
 
 EXPOSE 3000
