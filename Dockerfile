@@ -14,6 +14,8 @@ RUN npm install
 
 # Bundle app source
 COPY ./dr.handyman .
+COPY ./dr.handyman/files .
+COPY ./drhandyman/files/pictures ./files
 
 EXPOSE 3000
 CMD [ "node", "index.js" ]
