@@ -20,7 +20,7 @@ const ProfilePage = (props) => {
 	let userProfileImage = "/assets/user.png";
 
 	if (userData.profilePic && userData.profilePic.fileGetPath) {
-		 userProfileImage = `https://www.drhandyman.me:4000/pictures/${userData.email}`;
+		 userProfileImage = `https://api.drhandyman.me/pictures/${userData.email}`;
 		//userProfileImage = userData.profilePic.fileGetPath;
 	}
   console.log(userData);

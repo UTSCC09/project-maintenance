@@ -60,7 +60,7 @@ const Maintainer = ({
       </Box>
 
       <FlexBox pl="30px" pr={1} justifyContent="space-between">
-        <Avatar src={`https://www.drhandyman.me:4000/pictures/${email}`} sx={{
+        <Avatar src={`https://api.drhandyman.me/pictures/${email}`} sx={{
         height: 64,
         width: 64,
         mt: '-32px',

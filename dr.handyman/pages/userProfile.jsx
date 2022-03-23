@@ -100,7 +100,7 @@ const UserProfile = (props) => {
 								}}
 							>
 								<Avatar
-									src={`https://www.drhandyman.me:4000/pictures/${workerDetail.email}`}
+									src={`https://api.drhandyman.me/pictures/${workerDetail.email}`}
 									sx={{
 										height: 64,
 										width: 64,

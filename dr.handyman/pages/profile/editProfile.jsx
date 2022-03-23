@@ -35,8 +35,8 @@ const ProfileEdit = () => {
 	let userProfileImage = "/assets/user.png";
 	console.log(userData)
 	if (userData.profilePic) {
-		userProfileImage = userData.profilePic.fileGetPath;
-		// userProfileImage = `https://www.drhandyman.me:4000/pictures/${userData.email}`;
+		// userProfileImage = userData.profilePic.fileGetPath;
+		userProfileImage = `https://api.drhandyman.me/pictures/${userData.email}`;
 	}
 	if (waitForUserProfileAvatarFile) {
 		userProfileImage = window.URL.createObjectURL(waitForUserProfileAvatarFile)
@@ -54,7 +54,7 @@ const ProfileEdit = () => {
 		formData.append("0", waitForUserProfileAvatarFile);
 
 		return axios({
-			url: "https://www.drhandyman.me:4000/graphql",
+			url: "https://api.drhandyman.me/graphql",
 			method: "POST",
 			withCredentials: true,
 			data: formData,
@@ -167,7 +167,7 @@ const ProfileEdit = () => {
 				<Card sx={{ p: 4, bgcolor: "#FFF9EC" }}>
 					<FlexBox alignItems="flex-end" mb={3}>
 						<Avatar
-							src={`https://www.drhandyman.me:4000/pictures/${userData.email}`}
+							src={`https://api.drhandyman.me/pictures/${userData.email}`}
 							sx={{
 								height: 64,
 								width: 64,

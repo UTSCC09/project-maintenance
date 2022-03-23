@@ -192,7 +192,7 @@ const Header = ({ isFixed, className }) => {
 				onClick={handleClick}
 			>
 				<Avatar
-					src={`https://www.drhandyman.me:4000/pictures/${userData.email}`}
+					src={`https://api.drhandyman.me/pictures/${userData.email}`}
 					sx={{
 						height: 50,
 						width: 50,
