@@ -74,7 +74,7 @@ require('dotenv').config();
       maxAge: 360000,
       secure: true,
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: true,
     }
   });
   app.use(sessionMid);
@@ -247,8 +247,8 @@ io.on("connection", (socket) => {
       await server.start();
       const cors = {
         credentials: true,
-         origin: '*',
-        // origin: ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001']
+        origin: ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001',
+	'https://www.drhandyman.me']
       };
       server.applyMiddleware({ app, cors });
   }
