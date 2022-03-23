@@ -61,6 +61,6 @@ jobs:
                         ACTOR=${{ github.actor }}
                         ACTOR=$(echo $ACTOR | tr '[A-Z]' '[a-z]')
                         echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u $ACTOR --password-stdin
-                        cd ~/hmBackend
+                        cd ~/nginx-docker
                         docker-compose pull
                         docker-compose up -d --build --force-recreate
