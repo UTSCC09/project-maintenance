@@ -246,6 +246,7 @@ io.on("connection", (socket) => {
     });
       await server.start();
       const cors = {
+	domain: 'https://api.drhandyman.me
         credentials: true,
         origin: ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001',
 	'https://www.drhandyman.me']
