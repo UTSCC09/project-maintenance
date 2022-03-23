@@ -17,13 +17,13 @@ import { useSelector } from "react-redux";
 const ProfilePage = (props) => {
 	const userData = useSelector((state) => state.userData);
 // <<<<<<< HEAD
-// 	let userProfileImage = "/assets/u1.png";
+	let userProfileImage = "/assets/user.png";
 
-// 	if (userData.profilePic && userData.profilePic.fileGetPath) {
-// 		// userProfileImage = `https://www.drhandyman.me:4000/pictures/${userData.email}`;
-// 		userProfileImage = userData.profilePic.fileGetPath;
-// 	}
-//   console.log(userData);
+	if (userData.profilePic && userData.profilePic.fileGetPath) {
+		 userProfileImage = `https://www.drhandyman.me:4000/pictures/${userData.email}`;
+		//userProfileImage = userData.profilePic.fileGetPath;
+	}
+  console.log(userData);
 // =======
 	return (
 		<AppLayout>
@@ -59,7 +59,7 @@ const ProfilePage = (props) => {
 								}}
 							>
 								<Avatar
-									src="/assets/u1.png"
+									src={userProfileImage}
 									sx={{
 										height: 64,
 										width: 64,

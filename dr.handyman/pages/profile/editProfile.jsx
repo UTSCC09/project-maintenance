@@ -32,7 +32,7 @@ const ProfileEdit = () => {
 	const [fetchUserData] = useLazyQuery(GET_USER_DATA);
 	const [waitForUserProfileAvatarFile, setWaitForUserProfileAvatarFile] = useState(null)
 
-	let userProfileImage = "/assets/u1.png";
+	let userProfileImage = "/assets/user.png";
 	console.log(userData)
 	if (userData.profilePic) {
 		userProfileImage = userData.profilePic.fileGetPath;
