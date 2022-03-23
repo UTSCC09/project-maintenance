@@ -17,7 +17,7 @@ import Emitter from '@/utils/eventEmitter';
 const link = new createHttpLink({
 	// uri: "http://www.drhandyman.me:4000/graphql"
 	// uri: "https://localhost:3000/graphql",
-	 uri: "https://www.drhandyman.me:4000/graphql",
+	 uri: "https://api.drhandyman.me/graphql",
 	credentials: "include",
 	opts: {
 		credentials: "include",

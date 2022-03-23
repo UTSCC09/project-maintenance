@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  
+  frontend:
+    image: handymanfrontend
+    container_name: handymanfrontend
+    restart: always
+    expose:
+      - 80
+    environment:
+      - VIRTUAL_HOST=www.drhandyman.me
+      - LETSENCRYPT_HOST=www.drhandyman.me
+
+networks:
+  default:
+    external:
+      name: nginx-proxy      

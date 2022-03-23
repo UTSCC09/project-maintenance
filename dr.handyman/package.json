@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev -p 3001",
-        "build": "next build",
+        "build": "next build && next export",
         "build:local": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next build",
         "start": "next start",
         "size": "node --max_old_space_size=4096",
