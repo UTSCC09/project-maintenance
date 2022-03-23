@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router'
 import Emitter from '@/utils/eventEmitter';
 
-const link = new createHttpLink({
+const link = new HttpLink({
 	// uri: "http://www.drhandyman.me:4000/graphql"
 	// uri: "https://localhost:3000/graphql",
 	 uri: "https://api.drhandyman.me/graphql",
