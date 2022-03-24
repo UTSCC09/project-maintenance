@@ -14,8 +14,8 @@ RUN npm install
 
 # Bundle app source
 COPY ./dr.handyman/. ./
-COPY ../nginx-docker/certs/default.crt ./
-COPY ../nginx-docker/certs/api.drhandyman.me.key ./
+ARG CERTKEY ${CERTKEY}
+ARG CERT ${CERT}
 
 EXPOSE 3000
 CMD [ "node", "index.js" ]
