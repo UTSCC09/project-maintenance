@@ -60,8 +60,6 @@ require('dotenv').config();
   const session = require('express-session');
   const { graphqlUploadExpress } = require('graphql-upload');
   const PORT = process.env.PORT;
-
-
   var config = {
           key: process.env.CERTKEY,
           cert: process.env.CERT
