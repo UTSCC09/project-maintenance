@@ -12,8 +12,7 @@ on:
 
 env:
   IMAGE_NAME: handymanbackend
-  CERT: ${{ secrets.CERTKEY }}
-  CERTKEY: ${{ secrets.CERT }}
+
 jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
