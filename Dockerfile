@@ -14,8 +14,11 @@ RUN npm install
 
 # Bundle app source
 COPY ./dr.handyman/. ./
-ARG CERTKEY ${CERTKEY}
-ARG CERT ${CERT}
+ARG CERTKEY
+ENV CERTKEY ${CERTKEY}
+
+ARG CERT
+ENV CERT ${CERT}
 
 EXPOSE 3000
 CMD [ "node", "index.js" ]
