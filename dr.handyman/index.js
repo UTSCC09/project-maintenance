@@ -72,6 +72,7 @@ require('dotenv').config();
     saveUninitialized: false,
     cookie: {
       maxAge: 360000,
+      secure: true,
     }
   });
   app.use(sessionMid);
