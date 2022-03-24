@@ -79,8 +79,8 @@ var certificate = fs.readFileSync( 'server.crt' );
     saveUninitialized: false,
     cookie: {
       maxAge: 360000,
-      secure: true,
-      httpOnly: true,
+      secure: false,
+      httpOnly: false,
       sameSite: 'none',
     }
   });
@@ -253,7 +253,7 @@ io.on("connection", (socket) => {
     });
       await server.start();
       const cors = {
-        credentials: true,
+	credentials: true,
         origin: ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001',
 	'https://www.drhandyman.me']
       };
