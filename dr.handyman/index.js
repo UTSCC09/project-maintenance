@@ -61,8 +61,8 @@ require('dotenv').config();
   const { graphqlUploadExpress } = require('graphql-upload');
   const PORT = process.env.PORT;
   
-  var privateKey = fs.readFileSync( '/app/server.key' );
-  var certificate = fs.readFileSync( '/app/server.crt' );
+  var privateKey = fs.readFileSync( '/usr/src/app/server.key' );
+  var certificate = fs.readFileSync( '/usr/src/app/server.crt' );
   var config = {
           key: privateKey,
           cert: certificate
