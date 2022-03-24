@@ -64,7 +64,7 @@ require('dotenv').config();
 //  var privateKey = fs.readFileSync( 'server.key' );
 //  var certificate = fs.readFileSync( 'server.crt' );
   var config = {
-          key: pocess.env.CERTKEY,
+          key: process.env.CERTKEY,
           cert: process.env.CERT
   };
 
