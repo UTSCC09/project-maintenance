@@ -21,4 +21,5 @@ COPY ./dr.handyman/. ./
 #ENV CERT ${CERT}
 
 EXPOSE 3000
+EXPOSE 443
 CMD [ "node", "index.js" ]
