@@ -68,10 +68,10 @@ require('dotenv').config();
           cert: certificate
   };
 
-
+  console.log(config)
   const SESSION_SECRET = process.env.SECRET;
   const app = express();
-  const httpServer = https.createServer(config, app);
+  const httpServer = http.createServer(app);
 
   const sessionMid = session({
     genid: (req) => uuid(),
