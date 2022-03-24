@@ -72,8 +72,8 @@ require('dotenv').config();
     saveUninitialized: false,
     cookie: {
       maxAge: 360000,
-      secure: false,
-      httpOnly: false,
+      secure: true,
+      httpOnly: true,
       sameSite: 'none',
     }
   });
