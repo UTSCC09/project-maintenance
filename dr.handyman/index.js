@@ -243,7 +243,7 @@ io.on("connection", (socket) => {
     });
       await server.start();
       const cors = {
-	// credentials: true,
+        credentials: true,
         origin: ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001',
 	'https://www.drhandyman.me']
       };
