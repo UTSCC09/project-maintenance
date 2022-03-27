@@ -14,43 +14,18 @@ import Paper from "@mui/material/Paper";
 import FlexBox from "components/FlexBox";
 import { format } from "date-fns";
 import { Avatar, Button, Card, Grid } from "@mui/material";
-import UserProfileLayout from "components/layout/UserProfileLayout";
+import UserProfileLayout from "components/layout/userProfileLayout";
 import { useLazyQuery } from "@apollo/client";
 import { GET_ONE_WORKER } from "../src/GraphQL/Queries";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from 'react'
 import Emitter from '@/utils/eventEmitter';
-import {CREATE_CONVO_MUTATION} from "../src/GraphQL/Mutations"
-import { useMutation } from "@apollo/client";
-
 
 const UserProfile = (props) => {
 	const userData = useSelector((state) => state.userData);
 	const [getWorkerDetail] = useLazyQuery(GET_ONE_WORKER, {
 		fetchPolicy: 'network-only'
 	});
-
-	const [createConvo] = useMutation(CREATE_CONVO_MUTATION);
-
-
-
-	const handleOnClick = () => {
-		console.log("jere");
-		createConvo({
-			variables: {
-				email: workerDetail.email,
-
-			},
-		})
-			.catch((err) => {
-				Emitter.emit('showMessage', {
-					message: err.message,
-					severity: "error"
-				})
-				console.log(err);
-			});
-	}
-		
 	const [workerDetail, setWorkerDetail] = useState({});
   console.log(workerDetail);
 
@@ -138,7 +113,7 @@ const UserProfile = (props) => {
 									</Medium>
 									<span>{workerDetail.phone}</span>
 								</FlexBox>
-								<Link href={"/chat"} onClick={handleOnClick}>
+								<Link href={"/chat"}>
 									<Typography
 										textAlign="center"
 										color="grey.600"
@@ -149,7 +124,7 @@ const UserProfile = (props) => {
 											},
 										}}
 									>
-										<IconButton onClick={handleOnClick}>
+										<IconButton>
 											<ChatBubbleOutlineIcon
 												fontSize="small"
 												color="inherit"

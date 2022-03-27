@@ -1,32 +1,32 @@
 import queryString from "query-string";
 
 export const formatTime = (timeStr) => {
-    return timeStr ?
-        `${new Date(+timeStr).toLocaleDateString("fr-FR")} ${new Date(
+	return timeStr
+		? `${new Date(+timeStr).toLocaleDateString()} ${new Date(
 				+timeStr
-		  ).toLocaleTimeString("fr-FR")}` :
-        null;
+		  ).toLocaleTimeString()}`
+		: null;
 };
 
 export const getUrlQuery = () => {
-    return queryString.parse(window.location.search);
+	return queryString.parse(window.location.search);
 };
 
 export const getLocation = () => {
-    return new Promise((resolve, reject) => {
-        const options = {
-            enableHighAccuracy: true,
-            maximumAge: 1000,
-        };
+	return new Promise((resolve, reject) => {
+		const options = {
+			enableHighAccuracy: true,
+			maximumAge: 1000,
+		};
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (data) => {
-                    resolve(data);
-                },
-                reject,
-                options
-            );
-        }
-    });
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				(data) => {
+					resolve(data);
+				},
+				reject,
+				options
+			);
+		}
+	});
 };

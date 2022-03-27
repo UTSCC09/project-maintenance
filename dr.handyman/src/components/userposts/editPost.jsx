@@ -163,7 +163,6 @@ const EditPost = ({ closeDialog, post = {} }) => {
 				</Button>
 				<Button
 					variant="contained"
-					
 					fullWidth
 					onClick={closeDialog}
 					sx={{

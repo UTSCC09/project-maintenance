@@ -38,14 +38,9 @@ const Maintainer = ({
           fontSize: '18px',
           mt: '3px'
         }} />
-         
-          {distance !== null && <Span color="secondary" ml={1.5}>
-					{(distance).toFixed(2) || "N/A"} KM
-				</Span>}
-
-			{ distance === null && <Span color="secondary" ml={1.5}>
-					{Math.ceil(distance) || "N/A"} KM
-				</Span>}
+          <Span color="secondary" ml={1.5}>
+            {Math.ceil(distance) || "N/A"} KM
+          </Span>
         </FlexBox>
 
         <FlexBox>

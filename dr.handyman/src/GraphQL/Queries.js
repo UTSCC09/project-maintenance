@@ -10,15 +10,6 @@ export const LOAD_USERS = gql `
   }
 `;
 
-export const LOAD_CURRENT_CONVOS = gql `
-query Query {
-  getCurrentConvos {
-    _id
-    userEmails
-  }
-}
-`
-
 export const GET_USER_DATA = gql `
 query {
   currentUser {
@@ -232,5 +223,39 @@ query SearchPostPage($queryText: String!, $page: Int!, $postPerPage: Int!, $coor
 export const SEARCH_POST_COUNT = gql `
 query Query($queryText: String!) {
   searchPostPageCount(queryText: $queryText)
+}
+`
+
+export const LOAD_CURRENT_CONVOS = gql `
+query Query {
+  getCurrentConvos {
+    _id
+    userEmails
+  }
+}
+`
+export const GET_CURRENT_CONVOS_DES = gql`
+query GetCurrentConvosWithDescription {
+  getCurrentConvosWithDescription {
+    username2
+    username1
+    conversation {
+      userEmails
+      _id
+    }
+  }
+}
+`
+export const GET_LATEST_MESSAGE = gql`
+query GetLatestMessage($id: String!) {
+  getLatestMessage(_id: $id) {
+    _id
+    conversationId
+    email
+    content
+    createdAt
+    username
+    updatedAt
+  }
 }
 `

@@ -176,14 +176,6 @@ const categories = [
 		label: "Posts",
 		value: 2,
 	},
-  {
-		label: "Posts near me",
-		value: 3,
-	},
-  {
-		label: "Workers near me",
-		value: 4,
-	}
 ];
 
 export default SearchBox;

@@ -178,7 +178,7 @@ const UserPosts = ({ type = "all" }) => {
 				}}
 				elevation={0}
 			>
-				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left" >
+				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
 					Title
 				</H5>
 
@@ -209,12 +209,11 @@ const UserPosts = ({ type = "all" }) => {
 				<H5
 					flex="0 0 0 !important"
 					color="grey.600"
-					px={2.75}
-					py={2.5}
+					px={7.75}
+					py={0.5}
 					my={0}
 				></H5>
 			</PostRow>
-      
 			{postData.map((item, ind) => (
 				<UserPost post={item} key={ind} type={type} />
 			))}
@@ -242,5 +241,72 @@ const UserPosts = ({ type = "all" }) => {
 	);
 };
 
-
+const postsList = [
+	{
+		title: "Cat",
+		user: "Alice",
+		postUrl: "/posts/53244445",
+		content: "this is the content",
+		time: "2022-03-21",
+		userUrl: "/users/500000",
+		type: "Find a Contractor",
+		state: "Accepted",
+		userAccept: "Bob",
+	},
+	{
+		title: "Cat",
+		user: "Alice",
+		postUrl: "/posts/53244445",
+		content: "this is the content",
+		time: "2022-03-21",
+		userUrl: "/users/500000",
+		type: "Find a Contractor",
+		state: "Accepted",
+		userAccept: "Bob",
+	},
+	{
+		title: "Cat",
+		user: "Alice",
+		postUrl: "/posts/53244445",
+		content: "this is the content",
+		time: "2022-03-21",
+		userUrl: "/users/500000",
+		type: "Find a Contractor",
+		state: "Not Accepted",
+		userAccept: "N/A",
+	},
+	{
+		title: "Cat",
+		user: "Alice",
+		postUrl: "/posts/53244445",
+		content: "this is the content",
+		time: "2022-03-21",
+		userUrl: "/users/500000",
+		type: "Find a Handyman",
+		state: "Not Accepted",
+		userAccept: "N/A",
+	},
+	{
+		title: "Cat",
+		user: "Alice",
+		postUrl: "/posts/53244445",
+		content: "this is the content",
+		time: "2022-03-21",
+		userUrl: "/users/500000",
+		type: "Find a Handyman",
+		state: "Not Accepted",
+		userAccept: "N/A",
+	},
+	{
+		title: "Cat",
+		user: "Alice",
+		postUrl: "/posts/53244445",
+		content: "this is the content",
+		time: "2022-03-21",
+		userUrl: "/user/500000",
+		type: "Find a Handyman",
+		state: "Not Accepted",
+		userAccept: "N/A",
+	},
+];
 export default UserPosts;
