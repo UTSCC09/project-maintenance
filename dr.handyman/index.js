@@ -72,7 +72,7 @@ require('dotenv').config();
     saveUninitialized: false,
     cookie: {
       maxAge: 360000,
-      sameSite: true
+      sameSite: 'lax'
     }
   });
   app.use(sessionMid);
