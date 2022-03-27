@@ -90,6 +90,9 @@ const resolvers = {
             if (context.email == null)
                 throw new Error("Unauthorized");
             else{
+                setTimeout(async () => context.pubsub.publish(args.conversationId, {
+                    getChat: await Message.find({ conversationId: args.conversationId })
+                }), 0);
                 return context.pubsub.asyncIterator(args.conversationId);
             }
             }
