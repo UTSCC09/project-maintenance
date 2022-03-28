@@ -3839,7 +3839,7 @@
   dependencies:
     "tslib" "^2.1.0"
 
-"graphql@^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0", "graphql@^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0", "graphql@^0.11.3 || ^0.12.3 || ^0.13.0 || ^14.0.0 || ^15.0.0", "graphql@^0.12.0 || ^0.13.0 || ^14.0.0", "graphql@^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0", "graphql@^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0", "graphql@^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0", "graphql@^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0", "graphql@^14.0.0 || ^15.0.0 || ^16.0.0", "graphql@^14.2.1 || ^15.0.0", "graphql@^14.5.0 || ^15.0.0", "graphql@>=0.10.0", "graphql@14.0.2 - 14.2.0 || ^14.3.1 || ^15.0.0":
+"graphql@^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0", "graphql@^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0", "graphql@^0.11.3 || ^0.12.3 || ^0.13.0 || ^14.0.0 || ^15.0.0", "graphql@^0.12.0 || ^0.13.0 || ^14.0.0", "graphql@^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0", "graphql@^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0", "graphql@^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0", "graphql@^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0", "graphql@^14.0.0 || ^15.0.0 || ^16.0.0", "graphql@^14.2.1 || ^15.0.0", "graphql@^14.5.0 || ^15.0.0", "graphql@^15.7.2 || ^16.0.0", "graphql@14.0.2 - 14.2.0 || ^14.3.1 || ^15.0.0":
   "integrity" "sha512-l0xWZpoPKpppFzMfvVyFmp9vLN7w/ZZJPefUicMCepfJeQ8sMcztloGYY9DfjVPo6tIUDzU5Hw3MUbIjj9AVVA=="
   "resolved" "https://registry.npmjs.org/graphql/-/graphql-14.7.0.tgz"
   "version" "14.7.0"
@@ -6261,10 +6261,10 @@
   "resolved" "https://registry.npmjs.org/stylis/-/stylis-4.0.13.tgz"
   "version" "4.0.13"
 
-"subscriptions-transport-ws@^0.9.0", "subscriptions-transport-ws@^0.9.0 || ^0.11.0":
-  "integrity" "sha512-dxdemxFFB0ppCLg10FTtRqH/31FNRL1y1BQv8209MK5I4CwALb7iihQg+7p65lFcIl8MHatINWBLOqpgU4Kyyw=="
-  "resolved" "https://registry.npmjs.org/subscriptions-transport-ws/-/subscriptions-transport-ws-0.9.19.tgz"
-  "version" "0.9.19"
+"subscriptions-transport-ws@^0.11.0", "subscriptions-transport-ws@^0.9.0", "subscriptions-transport-ws@^0.9.0 || ^0.11.0":
+  "integrity" "sha512-8D4C6DIH5tGiAIpp5I0wD/xRlNiZAPGHygzCe7VzyzUoxHtawzjNAY9SUTXU05/EY2NMY9/9GF0ycizkXr1CWQ=="
+  "resolved" "https://registry.npmjs.org/subscriptions-transport-ws/-/subscriptions-transport-ws-0.11.0.tgz"
+  "version" "0.11.0"
   dependencies:
     "backo2" "^1.0.2"
     "eventemitter3" "^3.1.0"

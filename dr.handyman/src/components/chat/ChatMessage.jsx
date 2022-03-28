@@ -9,6 +9,7 @@ import { GET_CHAT_SUBSCRIBE } from "@/GraphQL/Subscribes";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
+import { formatTime } from "../../utils";
 
 const convId2MsgList = {};
 
@@ -67,7 +68,6 @@ const ChatMessage = () => {
 
 	const addEmoji = (data) => {
 		setMessageContent(pre => pre.concat(data.native))
-		console.log("emoji", data);
 		setEmojiShow(false);
 	};
 	const submitMsg = () => {
@@ -114,6 +114,11 @@ const ChatMessage = () => {
 		// })
 	}, [conversation]);
 
+	let user_send = currentConvUserInfo.username2;
+	if (userData.username == currentConvUserInfo.username2){ 
+		user_send = currentConvUserInfo.username1;
+	}
+
 	if (!currentConvUserInfo.conversation) return null;
 
 	return (
@@ -141,9 +146,10 @@ const ChatMessage = () => {
 						backgroundColor: "#8abcd1",
 						height: "50px",
 						boxSizing: "border-box",
+						fontSize:"18px"
 					}}
 				>
-					{currentConvUserInfo.username1}
+					{user_send}
 				</Box>
 				<Box
 					sx={{
@@ -157,6 +163,8 @@ const ChatMessage = () => {
 					ref={messageAreaRef}
 				>
 					{messageList.map((item, index) => {
+						console.log(item)
+						console.log(formatTime(item.createdAt));
 						return (
 							<Box
 								sx={{
@@ -189,6 +197,7 @@ const ChatMessage = () => {
 									}}
 								>
 									{item.content}
+									
 								</Box>
 							</Box>
 						);
@@ -223,8 +232,8 @@ const ChatMessage = () => {
 						onClick={submitMsg}
 						sx={{
 							position: "absolute",
-							right: "5px",
-							bottom: "5px",
+							right: "15px",
+							bottom: "15px",
 							zIndex: 100,
 						}}
 					></Chip>

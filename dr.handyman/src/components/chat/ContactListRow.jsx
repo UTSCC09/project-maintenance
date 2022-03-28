@@ -5,30 +5,30 @@ import Divider from "@mui/material/Divider";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
-import { borderColor } from "@mui/system";
+import { borderColor, display } from "@mui/system";
 import ListItemButton from "@mui/material/ListItemButton";
 import { FixedSizeList } from "react-window";
 import Box from "@mui/material/Box";
 import { useDispatch, useSelector } from "react-redux";
-import { Stack } from "@mui/material";
+import { Stack,Grid } from "@mui/material";
 import { SET_CURRENT_CONV_USER_INFO } from "@/store/constants";
 import { GET_LATEST_MESSAGE } from "@/GraphQL/Queries";
-import { CREATE_CONVERSATION } from "@/GraphQL/Mutations";
 import { useMutation, useLazyQuery, useSubscription } from "@apollo/client";
 import Emitter from "@/utils/eventEmitter";
 import { SERVER_URL } from "@/constant.js";
+import { formatTime } from "../../utils";
+import { Span } from "../Typography";
 
 function ContactListRow({ detail }) {
 	const currentConvUserInfo = useSelector(
 		(state) => state.currentConvUserInfo
 	);
 	const activeConversation = currentConvUserInfo.conversation || {};
-	console.log("currentConvUserInfo", currentConvUserInfo);
 	const [getLatestMessage] = useLazyQuery(GET_LATEST_MESSAGE);
-	const [createNewConv] = useMutation(CREATE_CONVERSATION);
 	const dispatch = useDispatch();
 	const { conversation = {} } = detail;
 	const [latestMessage, setLastMessage] = useState("");
+	const [latestMessageTime, setLastMessageTime] = useState("");
 	const avatar = `https:/${SERVER_URL}/pictures/${
 		conversation.userEmails && conversation.userEmails[0]
 	}`;
@@ -40,22 +40,14 @@ function ContactListRow({ detail }) {
 				currentConvUserInfo: detail,
 			},
 		});
-		createNewConv({
-			variables: {
-				email: conversation.userEmails && conversation.userEmails[0],
-			},
-		})
-			.then((res) => {
-				console.log(res, "createNewConv");
-			})
-			.catch((err) => {
-				Emitter.emit("showMessage", {
-					message: err.message,
-					severity: "error",
-				});
-			});
 	};
 
+
+	const userData = useSelector((state) => state.userData);
+    let user_send = detail.username2;
+	if (userData.username == detail.username2){ 
+		user_send = detail.username1;
+	}
 	useEffect(() => {
 		const updateAndRenderMessage = (id) => {
 			getLatestMessage({
@@ -66,6 +58,7 @@ function ContactListRow({ detail }) {
 				.then((res) => {
 					if (res.data && res.data.getLatestMessage) {
 						setLastMessage(res.data.getLatestMessage.content);
+						setLastMessageTime(formatTime(res.data.getLatestMessage.createdAt));
 					}
 				})
 				.catch((err) => {
@@ -87,7 +80,7 @@ function ContactListRow({ detail }) {
 			Emitter.off("updateLatestMessage", updateLatestMessage);
 		};
 	}, [conversation]);
-
+    
 	return (
 		<ListItem
 			alignItems="flex-start"
@@ -101,14 +94,14 @@ function ContactListRow({ detail }) {
 						(activeConversation.userEmails &&
 							activeConversation.userEmails[0]) ===
 							(conversation.userEmails &&
-								conversation.userEmails[0]) && "#ccccd6",
+								conversation.userEmails[0]) && "#DDF2FF",
 					"&:hover": {
 						backgroundColor: "#DDF2FF",
 					},
 				}}
 			>
 				<ListItemAvatar>
-					<Avatar alt="Remy Sharp" src={avatar} />
+					<Avatar alt={user_send} src={avatar} />
 				</ListItemAvatar>
 				<Stack>
 					<ListItem
@@ -117,16 +110,36 @@ function ContactListRow({ detail }) {
 							fontSize: "20px",
 						}}
 					>
-						{detail.username1}
+						{user_send}
 					</ListItem>
 					<ListItem
-						sx={{
-							color: "#aaa",
-							fontSize: "12px",
-						}}
+						
 					>
-						{latestMessage}
-					</ListItem>
+						
+						<Span width="100%" sx={{
+							color: "#aaa",
+							fontSize: "16px",
+							
+						}}
+						>
+							{latestMessage}
+							
+						</Span>
+						</ListItem>
+						<Span ml="135px"  sx={{
+							color: "#aaaa",
+							fontSize: "12px",
+							
+							
+						}}
+						
+						>
+							{latestMessageTime}
+							
+						</Span>
+
+						
+					
 				</Stack>
 			</ListItemButton>
 		</ListItem>

@@ -1,5 +1,5 @@
 export const SERVER_URL =
-    'localhost:3000';
-// 'api.drhandyman.me';
-//"www.drhandyman.me:4000/graphql"
-//"api.drhandyman.me/graphql"
+  'localhost:3000';
+  // 'api.drhandyman.me';
+  // "https://www.drhandyman.me:4000/graphql"
+	//"https://api.drhandyman.me/graphql"

@@ -90,7 +90,7 @@ export default function ContactList() {
 		return <div>Loading...</div>;
 	}
 
-
+	console.log('data', data)
 	return (
 		<ContactListLayout>
 			<Box sx={{ width: "100%", maxWidth: 360, color: "grey" }}>

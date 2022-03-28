@@ -8,7 +8,7 @@ const ChatLayout = ({ children }) => (
 	<Container
 		sx={{
 			my: "40px",
-			ml: "20px",
+			ml: "100px",
 		}}
 	>
 		<Grid container spacing={3}>
@@ -28,7 +28,7 @@ const ChatLayout = ({ children }) => (
 				item
 				sx={{
 					display: {
-						xs: "8",
+						xs: "4",
 						sm: "none",
 						md: "block",
 					},
