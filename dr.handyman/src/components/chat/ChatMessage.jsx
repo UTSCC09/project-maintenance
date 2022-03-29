@@ -9,6 +9,7 @@ import { GET_CHAT_SUBSCRIBE } from "@/GraphQL/Subscribes";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
+import PhoneIcon from '@mui/icons-material/Phone'
 import { formatTime } from "../../utils";
 import { Span } from "../Typography";
 import ChatVideo from "../chat/ChatVideo";
@@ -21,6 +22,7 @@ const ChatMessage = () => {
 	const emojiRef = useRef(null);
 	const messageAreaRef = useRef(null);
 	const [emojiShow, setEmojiShow] = useState(false);
+	const [videoShow, setVideoShow] = useState(false);
 	const currentConvUserInfo = useSelector(
 		(state) => state.currentConvUserInfo
 	);
@@ -70,6 +72,10 @@ const ChatMessage = () => {
 		e.stopPropagation();
 		setEmojiShow(!emojiShow);
 	};
+	const toggleShowVideo = (e) => {
+		e.stopPropagation();
+		setVideoShow(!videoShow);
+	}
 
 	const addEmoji = (data) => {
 		setMessageContent((pre) => pre.concat(data.native));
@@ -276,6 +282,21 @@ const ChatMessage = () => {
 						}}
 						onClick={toggleShowEmoji}
 					></EmojiEmotionsIcon>
+					<PhoneIcon
+					sx={{
+						position: "absolute",
+						top: "-30px",
+						left: "50px",
+						cursor: "pointer",
+						color: "#9ab4cd",
+						fontSize: "26px",
+						":hover": {
+							color: "#ceb64a",
+						},
+					}}
+					onClick={toggleShowVideo}>
+
+					</PhoneIcon>
 				</Box>
 			</Container>
 			<Box
@@ -291,7 +312,14 @@ const ChatMessage = () => {
 					<Picker onSelect={addEmoji} set="facebook" ref={emojiRef} />
 				)}
 			</Box>
-			<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
+			<Box
+				onClick={(e) => e.stopPropagation()}
+			>
+				{videoShow && (
+					<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
+				)}
+			</Box>
+			
 
 		</Container>
 	);
