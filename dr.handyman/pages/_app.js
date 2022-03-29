@@ -85,6 +85,7 @@ export default function App({ Component, pageProps }) {
 							},
 						});
 					}
+					state.socket.emit("login", res.data.currentUser.email);
 				}).catch((err) => {
 					if (err.message.indexOf('Not Authorised') !== -1) {
 						const url = document.location.pathname;

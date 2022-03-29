@@ -9,7 +9,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard"
 import Peer from "simple-peer"
 import io from "socket.io-client"
 
-const socket = io.connect('https://localhost:4000/');
+// const socket = io.connect('https://localhost:4000/');
 function ChatVideo({callerEmail}) {
 	const [ me, setMe ] = useState("")
 	const [ stream, setStream ] = useState()
@@ -25,7 +25,8 @@ function ChatVideo({callerEmail}) {
 	const connectionRef= useRef()
 
     const userData = useSelector((state) => state.userData);
-	if (!userData || !myVideo)
+	const socket = useSelector((state) => state.socket);
+	if (!userData || !myVideo || !socket)
 		return (<div>loading</div>)
 
 	useEffect(() => {
@@ -37,7 +38,7 @@ function ChatVideo({callerEmail}) {
 		socket.on("me", (id) => {
 			setMe(id)
 		})
-		socket.emit("login", userData.email);
+		// socket.emit("login", userData.email);
 
 		socket.on("callUser", (data) => {
 			setReceivingCall(true)
@@ -61,7 +62,6 @@ function ChatVideo({callerEmail}) {
 			stream: stream
 		})
 		connectionRef.current.on("signal", (data) => {
-			console.log(1)
 			socket.emit("callEmail", {
 				email,
 				signalData: data,

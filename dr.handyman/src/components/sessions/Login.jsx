@@ -10,7 +10,7 @@ import { useFormik } from "formik";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import * as yup from "yup";
-
+import { useSelector } from "react-redux";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { Box, Card, Divider, IconButton, Button } from "@mui/material";
@@ -37,7 +37,7 @@ const Login = () => {
 	const [passwordVisibility, setPasswordVisibility] = useState(false);
 	const router = useRouter();
 	const dispatch = useDispatch();
-
+	const socket = useSelector((state) => state.socket);
 	const [login] = useMutation(CREATE_USER_MUTATION);
 
 	const togglePasswordVisibility = useCallback(() => {
@@ -59,7 +59,11 @@ const Login = () => {
 					response.data.login &&
 					response.data.login.user) ||
 				{};
-			if (response.data.login) userData.isLogin = true;
+			if (response.data.login) 
+				{
+					userData.isLogin = true;
+					socket.emit("login", email);
+				}
 			dispatch({
 				type: UPDATE_USER_DATA,
 				payload: {
