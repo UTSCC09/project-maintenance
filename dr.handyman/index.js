@@ -138,31 +138,33 @@ const io = require("socket.io")(httpServer, {
 // user need to send their email on login
 // each user has list of sockets
 // if one user openned multiple pages, only one page will be alerted
+// var socketList = io.sockets.server.eio.clients;
+// if (socketList[user.socketid] === undefined){
 const users = {}
 io.on("connection", (socket) => {
   socket.emit("me", socket.id)
-  socket.on('login', function(data){
-    console.log(data);
-    if (data.email in users)
-      users[data.email].push(socket.id);
-    else
-      users[data.email] = [socket.id];
-    
+
+  socket.on('login', function(email){
+    console.log(email);
+    if (email != null)
+      users[email] = socket.id; 
   })
+  socket.on('callEmail', async (data) => {
+    if (data.email in users && io.sockets.sockets.get(users[data.email]) !== undefined){
+      // const user = await User.find({email: data.email});
+      io.to(users[data.email]).emit("incomingCall", {signal: data.signalData, fromId: socket.id, username: data.username})
+    }else{
+      console.log("not online")
+      socket.emit("user not active");
+    }
+  })
+
+  socket.on("answer", async (data) => {
+    io.to(data.toId).emit("answered", data.signal);
+  })
+
   socket.on("disconnect", () => {
     socket.broadcast.emit("callEnded");
-    for (const email in users) {
-      if (users.hasOwnProperty(email)) {
-        const index = users[email].indexOf(socket.id);
-        if (index > -1) {
-          users[email].splice(index, 1);
-          if (users[email]== 0) 
-            delete users[email];   
-          break;
-        }
-      }
-    }
-      
   })
 
   socket.on("callUser", (data) => {
@@ -170,6 +172,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("answerCall", (data) => {
+    
     io.to(data.to).emit("callAccepted", data.signal)
   })
 })
