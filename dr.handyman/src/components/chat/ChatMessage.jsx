@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Container, TextField, Chip } from "@mui/material";
+import { Box, Container, TextField, Chip,Dialog } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { CREATE_MESSAGE } from "@/GraphQL/Mutations";
 import { GET_LATEST_MESSAGE } from "@/GraphQL/Queries";
@@ -12,6 +12,7 @@ import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import { formatTime } from "../../utils";
 import { Span } from "../Typography";
 import ChatVideo from "../chat/ChatVideo";
+import CallIcon from '@mui/icons-material/Call';
 const convId2MsgList = {};
 
 const ChatMessage = () => {
@@ -21,6 +22,7 @@ const ChatMessage = () => {
 	const emojiRef = useRef(null);
 	const messageAreaRef = useRef(null);
 	const [emojiShow, setEmojiShow] = useState(false);
+	const [videoShow, setvideoShow] = useState(false);
 	const currentConvUserInfo = useSelector(
 		(state) => state.currentConvUserInfo
 	);
@@ -47,6 +49,7 @@ const ChatMessage = () => {
 			false
 		);
 	}, []);
+
 
 	const userData = useSelector((state) => state.userData);
 	useSubscription(GET_CHAT_SUBSCRIBE, {
@@ -75,6 +78,13 @@ const ChatMessage = () => {
 		setMessageContent((pre) => pre.concat(data.native));
 		setEmojiShow(false);
 	};
+
+	const toggleVideo = () => {
+		//<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
+
+		setvideoShow(!videoShow);
+	};
+
 	const submitMsg = () => {
 		createNewMessage({
 			variables: {
@@ -245,9 +255,11 @@ const ChatMessage = () => {
 						rows={5}
 						value={messageContent}
 						onChange={(e) => setMessageContent(e.target.value)}
+						
 						sx={{
 							width: "100%",
-							borderRadius: "10px",
+							border:'none',
+							// borderRadius: "10px",
 						}}
 					/>
 					<Chip
@@ -262,6 +274,7 @@ const ChatMessage = () => {
 							zIndex: 100,
 						}}
 					></Chip>
+					
 					<EmojiEmotionsIcon
 						sx={{
 							position: "absolute",
@@ -276,6 +289,20 @@ const ChatMessage = () => {
 						}}
 						onClick={toggleShowEmoji}
 					></EmojiEmotionsIcon>
+					<CallIcon
+						sx={{
+							position: "absolute",
+							top: "-30px",
+							left: "35px",
+							cursor: "pointer",
+							color: "#9ab4cd",
+							fontSize: "26px",
+							":hover": {
+								color: "#ceb64a",
+							},
+						}}
+						onClick={toggleVideo}
+					></CallIcon>
 				</Box>
 			</Container>
 			<Box
@@ -291,7 +318,17 @@ const ChatMessage = () => {
 					<Picker onSelect={addEmoji} set="facebook" ref={emojiRef} />
 				)}
 			</Box>
-			<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
+						{/* <ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo> */}
+
+			<Dialog
+					open={videoShow}
+					
+					scroll="body"
+					onClose={toggleVideo}
+				>
+					<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
+
+				</Dialog>
 
 		</Container>
 	);
