@@ -110,7 +110,6 @@ function ChatVideo({callerEmail}) {
 	
 	return (
 		<div>
-			<h1 style={{ textAlign: "center", color: '#fff' }}>Zoomish</h1>
 		<div className="container">
 			<div className="video-container">
 				<div className="video">
@@ -119,7 +118,7 @@ function ChatVideo({callerEmail}) {
 				<div className="video">
 					{callAccepted && !callEnded ?
 					<video playsInline ref={userVideo} autoPlay style={{ width: "300px"}} />:
-					null}
+					<div style={{ height: "100px", width: "300px", backgroundColor: "black", color: "white"}} >Waiting for connection</div>}
 				</div>
 			</div>
 			<div className="myId">
