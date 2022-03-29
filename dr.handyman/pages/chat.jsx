@@ -16,13 +16,13 @@ import {
 	Typography,
 	Container,
 } from "@mui/material";
-import ChatBox from "../src/components/chat/ChatBox";
+
 
 const ChatPage = (props) => {
 	return (
 		<AppLayout>
 			<ChatLayout>
-				<ChatBox />
+				
 			</ChatLayout>
 		</AppLayout>
 	);

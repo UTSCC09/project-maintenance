@@ -15,52 +15,77 @@ import FlexBox from "components/FlexBox";
 import { format } from "date-fns";
 import { Avatar, Button, Card, Grid } from "@mui/material";
 import UserProfileLayout from "components/layout/userProfileLayout";
-import { useLazyQuery } from "@apollo/client";
 import { GET_ONE_WORKER } from "../src/GraphQL/Queries";
 import { useSelector } from "react-redux";
-import { useEffect, useState } from 'react'
-import Emitter from '@/utils/eventEmitter';
+import { useEffect, useState } from "react";
+import Emitter from "@/utils/eventEmitter";
+import { CREATE_CONVERSATION } from "@/GraphQL/Mutations";
+import { useMutation, useLazyQuery, useSubscription } from "@apollo/client";
+import { useRouter } from "next/router";
 
 const UserProfile = (props) => {
+	const router = useRouter();
 	const userData = useSelector((state) => state.userData);
+	const [createNewConv] = useMutation(CREATE_CONVERSATION);
 	const [getWorkerDetail] = useLazyQuery(GET_ONE_WORKER, {
-		fetchPolicy: 'network-only'
+		fetchPolicy: "network-only",
 	});
 	const [workerDetail, setWorkerDetail] = useState({});
-  console.log(workerDetail);
+	const createNewChat = () => {
+		createNewConv({
+			variables: {
+				email: workerDetail.email,
+			},
+		})
+			.then((res) => {
+				router.push('/chat')
+			})
+			.catch((err) => {
+				Emitter.emit("showMessage", {
+					message: err.message,
+					severity: "error",
+				});
+			});
+	}
+	console.log(workerDetail);
 
 	useEffect(() => {
 		const urlQuery = getUrlQuery();
 		const getWorkerInfoFc = () => {
 			getWorkerDetail({
 				variables: {
-					email: urlQuery.email
+					email: urlQuery.email,
 				},
-			}).then(res => {
-				if (res.data && res.data.getOneWorker) {
-					setWorkerDetail(res.data.getOneWorker);
-				} else {
-					Emitter.emit('showMessage', {
-						message: res.error,
-						severity: "error"
-					})
-				}
-			}).catch((err) => {
-				console.log(err.message)
-				Emitter.emit('showMessage', {
-					message: err.message,
-					severity: "error"
-				})
 			})
-		}
+				.then((res) => {
+					if (res.data && res.data.getOneWorker) {
+						setWorkerDetail(res.data.getOneWorker);
+					} else {
+						Emitter.emit("showMessage", {
+							message: res.error,
+							severity: "error",
+						});
+					}
+				})
+				.catch((err) => {
+					console.log(err.message);
+					Emitter.emit("showMessage", {
+						message: err.message,
+						severity: "error",
+					});
+				});
+		};
 
 		getWorkerInfoFc();
-	}, [])
+	}, []);
 
 	return (
 		<AppLayout>
 			<UserProfileLayout>
-				<DashboardPageHeader ml="20 " title={workerDetail.username + " '" + 's profile'} />
+				<DashboardPageHeader
+					ml="20 "
+					title={workerDetail.username + " '" + "s profile"}
+				/>
 
 				<Box mb={4}>
 					<Grid container spacing={3}>
@@ -89,7 +114,9 @@ const UserProfile = (props) => {
 										alignItems="center"
 									>
 										<div>
-											<H3 my="0px">{workerDetail.username}</H3>
+											<H3 my="0px">
+												{workerDetail.username}
+											</H3>
 										</div>
 									</FlexBox>
 								</Box>
@@ -113,31 +140,33 @@ const UserProfile = (props) => {
 									</Medium>
 									<span>{workerDetail.phone}</span>
 								</FlexBox>
-								<Link href={"/chat"}>
-									<Typography
-										textAlign="center"
-										color="grey.600"
-										sx={{
-											display: {
-												xs: "none",
-												md: "block",
-											},
-										}}
-									>
-										<IconButton>
-											<ChatBubbleOutlineIcon
-												fontSize="small"
-												color="inherit"
-											/>
-										</IconButton>
-									</Typography>
-								</Link>
+								<Typography
+									textAlign="center"
+									color="grey.600"
+									onClick={createNewChat}
+									sx={{
+										display: {
+											xs: "none",
+											md: "block",
+										},
+									}}
+								>
+									<IconButton>
+										<ChatBubbleOutlineIcon
+											fontSize="small"
+											color="inherit"
+										/>
+									</IconButton>
+								</Typography>
 							</Card>
 						</Grid>
 					</Grid>
 				</Box>
 
-				<DashboardPageHeader title={"Comments on " + workerDetail.username} mt={5}/>
+				<DashboardPageHeader
+					title={"Comments on " + workerDetail.username}
+					mt={5}
+				/>
 				<Comments />
 			</UserProfileLayout>
 		</AppLayout>
