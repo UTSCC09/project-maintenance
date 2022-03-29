@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CREATE_MESSAGE } from "@/GraphQL/Mutations";
 import { GET_LATEST_MESSAGE } from "@/GraphQL/Queries";
 import { useMutation, useLazyQuery, useSubscription } from "@apollo/client";
+import ChatVideo from "../chat/ChatVideo";
 import Emitter from "@/utils/eventEmitter";
 import { GET_CHAT_SUBSCRIBE } from "@/GraphQL/Subscribes";
 import "emoji-mart/css/emoji-mart.css";
@@ -121,6 +122,7 @@ const ChatMessage = () => {
 			sx={{
 				position: "relative",
 				padding: "0px!important",
+				display: 'flex'
 			}}
 		>
 			<Container
@@ -255,6 +257,7 @@ const ChatMessage = () => {
 			>
 				{emojiShow && <Picker onSelect={addEmoji} set="facebook" ref={emojiRef}/>}
 			</Box>
+			<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
 		</Container>
 	);
 };
