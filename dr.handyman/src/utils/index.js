@@ -1,13 +1,14 @@
 import queryString from "query-string";
 
 export const formatTime = (timeStr) => {
+    const numberReg = /^\d+$/;
+    const targetTimeStr = numberReg.test(timeStr) ? +timeStr : timeStr;
     return timeStr ?
-        `${new Date(+timeStr).toLocaleDateString("fr-FR")} ${new Date(
-				+timeStr
+        `${new Date(targetTimeStr).toLocaleDateString("fr-FR")} ${new Date(
+				targetTimeStr
 		  ).toLocaleTimeString("fr-FR")}` :
         null;
 };
-
 export const getUrlQuery = () => {
     return queryString.parse(window.location.search);
 };

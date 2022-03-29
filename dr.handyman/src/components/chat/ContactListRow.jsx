@@ -48,6 +48,11 @@ function ContactListRow({ detail }) {
 	if (userData.username == detail.username2){ 
 		user_send = detail.username1;
 	}
+
+    let shortMessage = latestMessage
+	if (latestMessage.length >= 25) {
+		shortMessage = latestMessage.substring(0,25)+'...';
+	}
 	useEffect(() => {
 		const updateAndRenderMessage = (id) => {
 			getLatestMessage({
@@ -119,10 +124,14 @@ function ContactListRow({ detail }) {
 						<Span width="100%" sx={{
 							color: "#aaa",
 							fontSize: "16px",
+							display: "inline-block",
+								width: "240px",
+								textOverflow: "ellipsis",
+								overflow: "hidden"
 							
 						}}
 						>
-							{latestMessage}
+							{shortMessage}
 							
 						</Span>
 						</ListItem>

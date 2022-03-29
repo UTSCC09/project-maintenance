@@ -4,14 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { CREATE_MESSAGE } from "@/GraphQL/Mutations";
 import { GET_LATEST_MESSAGE } from "@/GraphQL/Queries";
 import { useMutation, useLazyQuery, useSubscription } from "@apollo/client";
-import ChatVideo from "../chat/ChatVideo";
 import Emitter from "@/utils/eventEmitter";
 import { GET_CHAT_SUBSCRIBE } from "@/GraphQL/Subscribes";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import { formatTime } from "../../utils";
-
+import { Span } from "../Typography";
+import ChatVideo from "../chat/ChatVideo";
 const convId2MsgList = {};
 
 const ChatMessage = () => {
@@ -24,6 +24,7 @@ const ChatMessage = () => {
 	const currentConvUserInfo = useSelector(
 		(state) => state.currentConvUserInfo
 	);
+	const { conversation = {} } = currentConvUserInfo;
 
 	useEffect(() => {
 		setMessageList(convId2MsgList[conversation._id] || []);
@@ -36,15 +37,18 @@ const ChatMessage = () => {
 	}, [currentConvUserInfo]);
 
 	useEffect(() => {
-		window.addEventListener('click', (e) => {
-			if (e.target !== emojiRef.current) {
-				setEmojiShow(false);
-			}
-		}, false)
-	}, [])
+		window.addEventListener(
+			"click",
+			(e) => {
+				if (e.target !== emojiRef.current) {
+					setEmojiShow(false);
+				}
+			},
+			false
+		);
+	}, []);
 
 	const userData = useSelector((state) => state.userData);
-	const conversation = currentConvUserInfo.conversation || {};
 	useSubscription(GET_CHAT_SUBSCRIBE, {
 		variables: {
 			conversationId: conversation._id,
@@ -55,7 +59,7 @@ const ChatMessage = () => {
 				subscriptionData &&
 				subscriptionData.data &&
 				subscriptionData.data.getChat;
-			console.log(chatList, 'chatList');
+			console.log(chatList, "chatList");
 			convId2MsgList[conversation._id] = chatList || [];
 			setMessageList(chatList);
 			messageAreaRef.current.scrollTop =
@@ -68,7 +72,7 @@ const ChatMessage = () => {
 	};
 
 	const addEmoji = (data) => {
-		setMessageContent(pre => pre.concat(data.native))
+		setMessageContent((pre) => pre.concat(data.native));
 		setEmojiShow(false);
 	};
 	const submitMsg = () => {
@@ -88,6 +92,7 @@ const ChatMessage = () => {
 					pre.concat({
 						content: messageContent,
 						email: userData.email,
+						createdAt: new Date().getTime(),
 					})
 				);
 				setMessageContent("");
@@ -116,7 +121,7 @@ const ChatMessage = () => {
 	}, [conversation]);
 
 	let user_send = currentConvUserInfo.username2;
-	if (userData.username == currentConvUserInfo.username2){ 
+	if (userData.username == currentConvUserInfo.username2) {
 		user_send = currentConvUserInfo.username1;
 	}
 
@@ -127,7 +132,6 @@ const ChatMessage = () => {
 			sx={{
 				position: "relative",
 				padding: "0px!important",
-				display: 'flex'
 			}}
 		>
 			<Container
@@ -148,7 +152,7 @@ const ChatMessage = () => {
 						backgroundColor: "#8abcd1",
 						height: "50px",
 						boxSizing: "border-box",
-						fontSize:"18px"
+						fontSize: "18px",
 					}}
 				>
 					{user_send}
@@ -165,13 +169,14 @@ const ChatMessage = () => {
 					ref={messageAreaRef}
 				>
 					{messageList.map((item, index) => {
-						console.log(item)
+						console.log(item);
 						console.log(formatTime(item.createdAt));
 						return (
 							<Box
 								sx={{
 									width: "100%",
 									display: "flex",
+									position: "relative",
 									justifyContent:
 										item.email === userData.email
 											? "right"
@@ -199,8 +204,26 @@ const ChatMessage = () => {
 									}}
 								>
 									{item.content}
-									
 								</Box>
+								<Span
+									ml="135px"
+									sx={{
+										color: "#aaaa",
+										fontSize: "12px",
+										position: "absolute",
+										right:
+											item.email === userData.email
+												? "10px"
+												: "auto",
+										left:
+											item.email === userData.email
+												? "auto"
+												: "10px",
+										bottom: "-20px",
+									}}
+								>
+									{formatTime(item.createdAt)}
+								</Span>
 							</Box>
 						);
 					})}
@@ -262,11 +285,14 @@ const ChatMessage = () => {
 					bottom: "-280px",
 					zIndex: 100,
 				}}
-				onClick={e => e.stopPropagation()}
+				onClick={(e) => e.stopPropagation()}
 			>
-				{emojiShow && <Picker onSelect={addEmoji} set="facebook" ref={emojiRef}/>}
+				{emojiShow && (
+					<Picker onSelect={addEmoji} set="facebook" ref={emojiRef} />
+				)}
 			</Box>
 			<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
+
 		</Container>
 	);
 };
