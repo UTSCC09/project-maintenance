@@ -160,20 +160,32 @@ io.on("connection", (socket) => {
   })
 
   socket.on("answer", async (data) => {
-    io.to(data.toId).emit("answered", data.signal);
+    io.to(data.toId).emit("answered", { signal: data.signal, id: socket.id , username: data.toUsername});
   })
 
-  socket.on("disconnect", () => {
-    socket.broadcast.emit("callEnded");
+  socket.on("stopVideo", async (id) => {
+    io.to(id).emit("stopVideo", {});
+  })
+  
+  socket.on("startVideo", async (id) => {
+    io.to(id).emit("startVideo", {});
   })
 
-  socket.on("callUser", (data) => {
-    io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
+  socket.on("callEnded", (id)=>{
+    io.to(id).emit("callEnded", {});
   })
 
-  socket.on("answerCall", (data) => {
-    
-    io.to(data.to).emit("callAccepted", data.signal)
+  socket.on("reject", (id) => {
+      io.to(id).emit("reject", {})
+  })
+  socket.on("cancel", (email) => {
+    if (email in users && io.sockets.sockets.get(users[email]) !== undefined){
+      // const user = await User.find({email: data.email});
+      io.to(users[email]).emit("cancel", {});
+    }else{
+      console.log("not online")
+      socket.emit("user not active");
+    }
   })
 })
 // Initialize and start the HTTPS server
