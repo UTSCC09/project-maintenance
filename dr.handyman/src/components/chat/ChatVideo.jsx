@@ -6,6 +6,8 @@ import PhoneIcon from "@mui/icons-material/Phone"
 import React, { useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux";
 import { CopyToClipboard } from "react-copy-to-clipboard"
+import { UPDATE_CALLING_USER } from "../../store/constants";
+import { useDispatch } from "react-redux";
 import Peer from "simple-peer"
 import io from "socket.io-client"
 
@@ -23,7 +25,7 @@ function ChatVideo({callerEmail}) {
 	const myVideo = useRef()
 	const userVideo = useRef()
 	const connectionRef= useRef()
-
+	const dispatch = useDispatch();
     const userData = useSelector((state) => state.userData);
 	const socket = useSelector((state) => state.socket);
 	if (!userData || !myVideo || !socket)
@@ -34,20 +36,14 @@ function ChatVideo({callerEmail}) {
 			setStream(stream)
 				myVideo.current.srcObject = stream
 		})
-
-		socket.on("me", (id) => {
-			setMe(id)
-		})
-		// socket.emit("login", userData.email);
-
-		socket.on("callUser", (data) => {
-			setReceivingCall(true)
-			setCaller(data.fromId)
-			setName(data.name)
-			setCallerSignal(data.signal)
-		})
+		socket.removeAllListeners("answered");
 		socket.on("incomingCall", (data) => {
 			setReceivingCall(true)
+			console.log("ok");
+			dispatch({
+				type: UPDATE_CALLING_USER,
+				payload: callerEmail
+			})
 			setCaller(data.fromId)
 			setName(data.username)
 			setCallerSignal(data.signal)
@@ -118,7 +114,7 @@ function ChatVideo({callerEmail}) {
 				<div className="video">
 					{callAccepted && !callEnded ?
 					<video playsInline ref={userVideo} autoPlay style={{ width: "300px"}} />:
-					<div style={{ height: "100px", width: "300px", backgroundColor: "black", color: "white"}} >Waiting for connection</div>}
+					<div style={{ height: "100px", width: "300px", backgroundColor: "black", color: "white"}} >{callerEmail}</div>}
 				</div>
 			</div>
 			<div className="myId">

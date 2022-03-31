@@ -11,6 +11,7 @@ import { Provider } from "react-redux";
 import { GET_USER_DATA } from "../src/GraphQL/Queries";
 import { UPDATE_USER_DATA, TRIGGER_MESSAGE } from '../src/store/constants'
 import Message from 'components/message';
+import Video from 'components/video'
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router'
 import Emitter from '@/utils/eventEmitter';
@@ -143,6 +144,7 @@ export default function App({ Component, pageProps }) {
 			<Provider store={store}>
 				<Component {...pageProps} />
         <Message></Message>
+		<Video></Video>
 			</Provider>
 		</ApolloProvider>
 	);

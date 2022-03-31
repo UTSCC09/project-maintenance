@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Box, Container, TextField, Chip,Dialog } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
+import { UPDATE_CALLING_USER } from "../../store/constants";
 import { CREATE_MESSAGE } from "@/GraphQL/Mutations";
 import { GET_LATEST_MESSAGE } from "@/GraphQL/Queries";
 import { useMutation, useLazyQuery, useSubscription } from "@apollo/client";
@@ -24,6 +25,7 @@ const ChatMessage = () => {
 	const messageAreaRef = useRef(null);
 	const [emojiShow, setEmojiShow] = useState(false);
 	const [videoShow, setvideoShow] = useState(false);
+	const dispatch = useDispatch();
 	const currentConvUserInfo = useSelector(
 		(state) => state.currentConvUserInfo
 	);
@@ -80,10 +82,12 @@ const ChatMessage = () => {
 		setEmojiShow(false);
 	};
 
-	const toggleVideo = () => {
-		//<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
-
-		setvideoShow(!videoShow);
+	const toggleVideo = (email) => {
+		if (email)
+			dispatch ({
+				type: UPDATE_CALLING_USER,
+				payload: email
+			})
 	};
 
 	const submitMsg = () => {
@@ -303,7 +307,7 @@ const ChatMessage = () => {
 								color: "#ceb64a",
 							},
 						}}
-						onClick={toggleVideo}
+						onClick={() => {toggleVideo(currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0])}}
 					></CallIcon>
 				</Box>
 			</Container>
@@ -320,15 +324,15 @@ const ChatMessage = () => {
 					<Picker onSelect={addEmoji} set="facebook" ref={emojiRef} />
 				)}
 			</Box>
-			<Dialog
+			{/* <Dialog
 					open={videoShow}
 					
 					scroll="body"
 					onClose={toggleVideo}
 				>
-					<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
+					<ChatVideo callerEmail={}></ChatVideo>
 
-				</Dialog>
+				</Dialog> */}
 
 		</Container>
 	);

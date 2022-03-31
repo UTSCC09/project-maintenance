@@ -16,7 +16,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { Box, Card, Divider, IconButton, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useDispatch } from "react-redux";
-import { UPDATE_USER_DATA } from "../../store/constants";
+import { UPDATE_USER_DATA, UPDATE_CALLING_USER } from "../../store/constants";
 import Emitter from '@/utils/eventEmitter';
 
 const StyledCard = styled(({ children, passwordVisibility, ...rest }) => (
