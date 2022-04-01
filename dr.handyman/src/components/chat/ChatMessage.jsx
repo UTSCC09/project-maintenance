@@ -13,7 +13,6 @@ import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import PhoneIcon from '@mui/icons-material/Phone'
 import { formatTime } from "../../utils";
 import { Span } from "../Typography";
-import ChatVideo from "../chat/ChatVideo";
 import CallIcon from '@mui/icons-material/Call';
 const convId2MsgList = {};
 

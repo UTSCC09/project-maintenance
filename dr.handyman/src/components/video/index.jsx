@@ -1,6 +1,5 @@
 import { useSelector } from "react-redux";
 import { Dialog } from "@mui/material";
-import ChatVideo from "../chat/ChatVideo";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { UPDATE_CALLING_USER } from "../../store/constants";
@@ -9,6 +8,9 @@ import Button from "@mui/material/Button"
 import IconButton from "@mui/material/IconButton"
 import PhoneIcon from "@mui/icons-material/Phone"
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import MicIcon from '@mui/icons-material/Mic';
 import Peer from "simple-peer"
 
 export default () => {
@@ -23,16 +25,24 @@ export default () => {
     const [ otherSignal, setOtherSignal ] = useState()
     const [ stream, setStream ] = useState()
     
-    const [ OtherStopped, setOtherStopped ] = useState(false);
-    const [ meStopped, setMeStopped ] = useState(false);
+    const [ otherStopped, setOtherStopped ] = useState(true);
+    const [ meStopped, setMeStopped ] = useState(true);
+    const [ meMuted, setMeMuted ] = useState(true);
+    const [ otherMuted, setOtherMuted ] = useState(true);
     const myVideo = useRef()
 	const userVideo = useRef()
     const connectionRef= useRef()
 
     const dispatch = useDispatch();
     const closeVideo = () => {
-
+        if (myVideo && myVideo.current && myVideo.current.srcObject && myVideo.current.srcObject.getVideoTracks().length == 1)
+        {
+            myVideo.current.srcObject.getVideoTracks()[0].enabled = false;
+            myVideo.current.srcObject.getAudioTracks()[0].enabled = false;
+        }
 		setvideoShow(false);
+        setOtherStopped(false);
+        setMeStopped(false)
         setReceivingCall(false);
         setMakingCall(false);
         setCallAccepted(false);
@@ -48,6 +58,10 @@ export default () => {
             {
                 connectionRef.current.destroy();
                 connectionRef.current = null;
+            }
+        if (makingCall)
+            {
+                socket.emit("cancel", callingUser);
             }
         
         dispatch({
@@ -96,12 +110,20 @@ export default () => {
             leaveCall();
         })
         socket.on("stopVideo", () => {
-            userVideo.current.pause();
+            userVideo.current.srcObject.getVideoTracks()[0].enabled = false;
             setOtherStopped(true);
         })
         socket.on("startVideo", ()=>{
-            userVideo.current.play();
+            userVideo.current.srcObject.getVideoTracks()[0].enabled = true;
             setOtherStopped(false);
+        })
+        socket.on("mute", () => {
+            userVideo.current.srcObject.getAudioTracks()[0].enabled = false;
+            setOtherMuted(true);
+        })
+        socket.on("unmute", ()=>{
+            userVideo.current.srcObject.getAudioTracks()[0].enabled = true;
+            setOtherMuted(false);
         })
         socket.on("callEnded", () => {
             console.log("other ended");
@@ -111,6 +133,8 @@ export default () => {
 
     const callEmail = (email) => {
         navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+            stream.getAudioTracks()[0].enabled = false;
+            stream.getVideoTracks()[0].enabled = false;
             setMakingCall(true);
             setStream(stream)
             myVideo.current.srcObject = stream
@@ -137,12 +161,16 @@ export default () => {
                 setOtherId(data.id);
                 setOtherName(data.username);
             })
+        }).catch(() => {
+            leaveCall();
         })
 		
 	}
 
     const answer =() =>  {
         navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+            stream.getAudioTracks()[0].enabled = false;
+            stream.getVideoTracks()[0].enabled = false;
             setStream(stream)
             myVideo.current.srcObject = stream
             connectionRef.current = null
@@ -160,6 +188,8 @@ export default () => {
                 
             })
             connectionRef.current.signal(otherSignal)
+        }).catch(() => {
+            leaveCall();
         })
 		
 	}
@@ -170,16 +200,33 @@ export default () => {
 
     const stopVideo = () => {
         if (!meStopped){
-            myVideo.current.pause();
+            myVideo.current.srcObject.getVideoTracks()[0].enabled = false;
             socket.emit("stopVideo", otherId);
             setMeStopped(true);
-        }else{
-            myVideo.current.play();
-            socket.emit("startVideo", otherId);
-            setMeStopped(false);
         }
     }
 
+    const startVideo = () => {
+        if (meStopped){
+            myVideo.current.srcObject.getVideoTracks()[0].enabled = true;
+            setMeStopped(false);
+            socket.emit("startVideo", otherId);
+        }
+    }
+    const stopAudio = () => {
+        if (!meMuted){
+            myVideo.current.srcObject.getAudioTracks()[0].enabled = false;
+            socket.emit("mute", otherId);
+            setMeMuted(true);
+        }
+    }
+    const startAudio = () => {
+        if (meMuted){
+            myVideo.current.srcObject.getAudioTracks()[0].enabled = true;
+            setMeMuted(false);
+            socket.emit("unmute", otherId);
+        }
+    }
     const leaveCall = () => {
         closeVideo();
 	}
@@ -191,9 +238,9 @@ export default () => {
             <div className="myId">
                 {!recievingEnd && !receivingCall ? (
                     <div>
-                    <IconButton color="primary" aria-label="call" onClick={() => callEmail(callingUser)}>
+                    {!callAccepted && <IconButton color="primary" aria-label="call" onClick={() => callEmail(callingUser)}>
                         <PhoneIcon fontSize="large" />
-                    </IconButton>
+                    </IconButton>}
                     {makingCall && <Button variant="contained" color="primary" onClick={cancel}>
 						Cancel
 					</Button>}
@@ -215,7 +262,7 @@ export default () => {
 			</div>
             <div>
                 {userData.username}
-                <video playsInline muted ref={myVideo} autoPlay style={{ width: "300px" }} />
+                {<video playsInline muted ref={myVideo} autoPlay style={{ width: "300px" }} />}
                 
                 {callAccepted ? 
                     (<div>
@@ -224,7 +271,8 @@ export default () => {
                         <Button variant="contained" color="secondary" onClick={leaveCall}>
                                     End Call
                         </Button>
-                        <VideocamOffIcon onClick={stopVideo}></VideocamOffIcon>
+                        {meStopped ? <VideocamOffIcon onClick={startVideo}></VideocamOffIcon> : <VideocamIcon onClick={stopVideo}></VideocamIcon>}
+                        {meMuted ? <MicOffIcon onClick={startAudio}></MicOffIcon> : <MicIcon onClick={stopAudio}></MicIcon>}
                     </div>
                         
                     ) : null}
