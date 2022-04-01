@@ -171,6 +171,14 @@ io.on("connection", (socket) => {
     io.to(id).emit("startVideo", {});
   })
 
+  socket.on("mute", async (id) => {
+    io.to(id).emit("mute", {});
+  })
+
+  socket.on("unmute", async (id) => {
+    io.to(id).emit("unmute", {});
+  })
+
   socket.on("callEnded", (id)=>{
     io.to(id).emit("callEnded", {});
   })
