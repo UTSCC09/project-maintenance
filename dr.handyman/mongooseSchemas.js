@@ -116,6 +116,7 @@ const ConversationSchema = new Schema({
         required: true
     },
 });
+
 const MessageSchema = new Schema({
     conversationId: {
         type: String,
@@ -135,14 +136,64 @@ const MessageSchema = new Schema({
     },
 }, { timestamps: true });
 
+const AppointmentSchema = new Schema({
+    description: {
+        type: String,
+        required: true
+    },
+    workerEmail: {
+        type: String,
+        require: true
+    },
+    userEmail: {
+        type: String,
+        required: true
+    },
+    startTime: {
+        type: Date,
+        required: true
+    },
+    endTime: {
+        type: Date,
+        required: true
+    }
+}, { timestamps: true });
+
+const CommentSchema = new Schema({
+    content: {
+        type: String,
+        required: true
+    },
+    appointmentId: {
+        type: String,
+        required: true
+    },
+    workerEmail: {
+        type: String,
+        required: true
+    },
+    userEmail: {
+        type: String,
+        required: true
+    },
+    rating: {
+        type: Number,
+        require: true
+    }
+}, { timestamps: true });
+
 const Conversation = mongoose.model('Conversation', ConversationSchema);
 const Message = mongoose.model('Message', MessageSchema);
 const Post = mongoose.model('Post', PostSchema);
 const User = mongoose.model('User', UserSchema);
+const Appointment = mongoose.model('Appointment', AppointmentSchema);
+const Comment = mongoose.model('Comment', CommentSchema);
 
 module.exports = {
     User,
     Post,
     Conversation,
     Message,
+    Appointment,
+    Comment,
 };

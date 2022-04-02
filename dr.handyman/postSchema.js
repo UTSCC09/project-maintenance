@@ -1,7 +1,5 @@
 /*jshint esversion: 9 */
 
-const mongoose  = require('mongoose');
-const { Schema } = mongoose;
 const { Post } = require('./mongooseSchemas');
 
 var rad = function(x) {
@@ -129,7 +127,7 @@ const postMut = {
     async setPost(parent, args, context, info){
         const post = await Post.findOne({_id: args._id});
         if (post == null || post.posterEmail != context.getUser().email)
-            throw new Error("Cannot unacquire post");
+            throw new Error("Cannot Edit post");
         const { title, content } = args;
         const res = await Post.updateOne({ _id: args._id },
                                          { title: title == null ? post.title : title,

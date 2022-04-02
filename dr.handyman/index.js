@@ -18,6 +18,8 @@
     Post,
     Conversation,
     Message,
+    Appointment,
+    Comment,
   } = require('./graphqlSchema');
 // Schema and authorization imports
 
@@ -301,5 +303,7 @@ module.exports = {
     Post,
     Conversation,
     Message,
+    Appointment,
+    Comment
 };
 // Initialize and start the HTTPS server

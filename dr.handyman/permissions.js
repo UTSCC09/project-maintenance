@@ -1,7 +1,8 @@
 /*jshint esversion: 8 */
 
-const { and, or, rule, shield } = require('graphql-shield');
-
+const { chain, rule, shield } = require('graphql-shield');
+const { commentRules } = require('./commentSchema');
+const { appointmentRules } = require('./appointmentSchema');
 function checkPermission(user, permission) {
     if (user && user.permissions){
         return user.permissions.includes(permission);
@@ -10,7 +11,15 @@ function checkPermission(user, permission) {
 }
 
 const isAuthenticated = rule()((parent, args, context) => {
-    return context.isAuthenticated();
+    if (!context.isAuthenticated())
+        return new Error("Not Authorized");
+    return true;
+});
+
+const isWorker = rule()((parent, args, context) => {
+    if (context.getUser().type != "worker")
+        return new Error("Not a worker");
+    return true;
 });
 
 const permissions = shield({
@@ -22,6 +31,7 @@ const permissions = shield({
         getAcceptedPostsPage: isAuthenticated,
         getUserPostCount: isAuthenticated,
         getAcceptedPostCount: isAuthenticated
+
     },
     Mutation: {
         setPost: isAuthenticated,
@@ -34,9 +44,17 @@ const permissions = shield({
         createMessage: isAuthenticated,
         setUser: isAuthenticated,
         deletePost: isAuthenticated,
+
+        addAppointment: chain(isAuthenticated, isWorker, appointmentRules.AppointmentRule),
+        deleteAppointment: chain(isAuthenticated, isWorker, appointmentRules.isAppointedWorker, appointmentRules.AppointmentDeleteRule),
+        editAppointment: chain(isAuthenticated, isWorker, appointmentRules.AppointmentRule),
+
+        addComment: chain(isAuthenticated, commentRules.addCommmentRule),
+        deleteComment: chain(isAuthenticated, commentRules.isOwnCommenter),
+        editComment: chain(isAuthenticated, commentRules.isOwnCommenter),
     },
 }, 
-    {allowExternalErrors: true}
+    {allowExternalErrors: true, debug: true}
 );
 module.exports = {
     permissions

@@ -1,6 +1,5 @@
 /*jshint esversion: 9 */
 
-const mongoose  = require('mongoose');
 const { Conversation, Message, User } = require('./mongooseSchemas');
 const { UserInputError } = require('apollo-server'); 
 // https://stackoverflow.com/questions/14040562/how-to-search-in-array-of-object-in-mongodb

@@ -1,8 +1,6 @@
 /*jshint esversion: 8 */
 
-const mongoose  = require('mongoose');
-const { Message, Post, User } = require('./mongooseSchemas');
-const { Schema } = mongoose;
+const { Message, Post, User, Comment } = require('./mongooseSchemas');
 
 var rad = function(x) {
     return x * Math.PI / 180;
@@ -38,11 +36,26 @@ function addDistances (inputList, coordinates)
     return inputList;
 }
 
+async function addCommentCount (inputList)
+{
+    // let newComments = []
+    await Promise.all(inputList.map(async (worker) => {
+    try {
+        const count = await Comment.countDocuments({workerEmail: worker.email})
+        worker.commentCount = count;
+        return worker;
+    } catch (error) {
+        console.log('error'+ error);
+    }
+    }))
+    return inputList // return without waiting for process of 
+}
+
 const userDefs = `
 input UserInput {
     type: String
     phone: Int
-    rating: Int
+    rating: Float
     permissions: [String]
 }
 type User {
@@ -51,9 +64,10 @@ type User {
     password: String
     type: String
     phone: String
-    rating: Int
+    rating: Float
     location: [Float!]
     distance: Float
+    commentCount: Int
     profilePic: File
     permissions: [String]
     createdAt: String
@@ -86,7 +100,7 @@ const userQuery = {
         if (workerPerPage == 0)
             return [];
         const workers =  await User.find({ type: "worker" }).sort({ 'createdAt': 1 }).skip(page * workerPerPage).limit(workerPerPage);
-        return addDistances (workers, coordinates);
+        return addCommentCount(addDistances (workers, coordinates));
     },
     async getWorkerCount(parent, args, context, info){
         return await User.countDocuments({ type: "worker" });
@@ -103,7 +117,8 @@ const userQuery = {
             && typeof args.coordinates[0] === "number" && typeof args.coordinates[1] === "number"){
                 worker["distance"] = getDistance(args.coordinates, worker.location.coordinates) / 1000;
             }
-        return worker;
+        const newWorker = await addCommentCount([worker]);
+        return newWorker[0];
     },
     async getOneUser(parent, args, context, info){
         const user = await User.findOne({email: args.email});
@@ -119,7 +134,7 @@ const userQuery = {
             return [];
         const workers = await User.find({$and: [{ $text: {$search: queryText } }, 
                                        { type: "worker" }]}).sort({ score: {$meta: "textScore" } }).skip(page * workerPerPage).limit(workerPerPage);
-        return addDistances(workers, coordinates);
+        return addCommentCount(addDistances(workers, coordinates));
     },
     async searchWorkerPageCount(parent, args, content, info){
         return await User.countDocuments({$and: [{ $text: {$search: args.queryText } }, 

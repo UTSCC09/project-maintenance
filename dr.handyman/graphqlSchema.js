@@ -10,14 +10,15 @@ const { postMutDef, postDefs, Post, postMut, postQuery, postQueryDef } = require
 const { workerDataMutDef, workerDataDefs, WorkerData, workerDataMut } = require('./workerDataSchema');
 const { chatMutDef, chatQueryDef, chatDefs, Conversation, Message, chatMut, chatQuery } = require('./chatSchema');
 const { fileUploadDef, fileUploadMut, fileUploadMutDef, fileUploadQueryDef, fileUploadScalar } = require('./userProfilePicUpload');
-
+const { Appointment, appointmentDefs, appointmentMutDef, appointmentQueryDef, appointmentQuery, appointmentMut} = require('./appointmentSchema');
+const { Comment, commentDefs, commentMutDef, commentQueryDef, commentMut, commentQuery} = require('./commentSchema');
 async function addUser (parent, args, context, info) {
     const { email, password, username, phone } = args;
     const userObj = new User({
         email, password, username,
         type: "user",
         phone,
-        rating: 0,
+        rating: 5,
         permissions: []
     });
     return userObj.save()
@@ -40,6 +41,8 @@ const typeDefs = gql(`
     postDefs + 
     chatDefs +
     fileUploadDef +
+    appointmentDefs +
+    commentDefs +
     `
 
     # Query types
@@ -51,6 +54,8 @@ const typeDefs = gql(`
         postQueryDef +
         fileUploadQueryDef +
         userQueryDef +
+        appointmentQueryDef +
+        commentQueryDef +
         `
     }
 
@@ -64,6 +69,8 @@ const typeDefs = gql(`
         postMutDef + 
         chatMutDef +
         fileUploadMutDef +
+        appointmentMutDef +
+        commentMutDef +
         `
     }
 
@@ -137,12 +144,8 @@ const resolvers = {
     },
 };
 
-resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut, userMut, postMut, chatMut, fileUploadMut);
-resolvers.Query = Object.assign({}, resolvers.Query, chatQuery, postQuery, userQuery);
-// resolvers = Object.assign({}, resolvers, );
-// resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut);
-// resolvers.Mutation = Object.assign({}, resolvers.Mutation, postMut);
-// resolvers.Mutation = Object.assign({}, resolvers.Mutation, chatMut);
+resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut, userMut, postMut, chatMut, fileUploadMut, appointmentMut, commentMut);
+resolvers.Query = Object.assign({}, resolvers.Query, chatQuery, postQuery, userQuery, appointmentQuery, commentQuery);
 
 const schema = applyMiddleware(
     makeExecutableSchema({
@@ -159,4 +162,6 @@ module.exports = {
     Post,
     Conversation,
     Message,
+    Appointment,
+    Comment
 };
