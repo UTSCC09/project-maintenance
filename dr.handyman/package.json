@@ -29,6 +29,7 @@
         "@mui/lab": "^5.0.0-alpha.51",
         "@mui/material": "^5.0.4",
         "@mui/styles": "^5.0.2",
+        "@paypal/react-paypal-js": "^7.6.0",
         "apollo": "^2.33.9",
         "axios": "^0.24.0",
         "axios-mock-adapter": "^1.20.0",

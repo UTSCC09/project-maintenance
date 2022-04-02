@@ -14,7 +14,7 @@ import Paper from "@mui/material/Paper";
 import FlexBox from "components/FlexBox";
 import { format } from "date-fns";
 import { Avatar, Button, Card, Grid } from "@mui/material";
-import UserProfileLayout from "components/layout/userProfileLayout";
+import UserProfileLayout from "components/layout/UserProfileLayout";
 import { GET_ONE_WORKER } from "../src/GraphQL/Queries";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -22,6 +22,7 @@ import Emitter from "@/utils/eventEmitter";
 import { CREATE_CONVERSATION } from "@/GraphQL/Mutations";
 import { useMutation, useLazyQuery, useSubscription } from "@apollo/client";
 import { useRouter } from "next/router";
+import Checkout from "components/paypal/checkout";
 
 const UserProfile = (props) => {
 	const router = useRouter();
@@ -31,6 +32,9 @@ const UserProfile = (props) => {
 		fetchPolicy: "network-only",
 	});
 	const [workerDetail, setWorkerDetail] = useState({});
+
+	const [input, setInput] = useState('')
+
 	const createNewChat = () => {
 		createNewConv({
 			variables: {
@@ -129,6 +133,17 @@ const UserProfile = (props) => {
 										Email
 									</Medium>
 									<span>{workerDetail.email}</span>
+								</FlexBox>
+								<FlexBox flexDirection="column" p={1} mr={8}>
+									<Medium
+										color="grey.600"
+										mb={0.5}
+										textAlign="left"
+									>
+										Tips[in development]
+									</Medium>
+									<input type="text" value={input} onInput={e => setInput(e.target.value)}/>
+									<Checkout tips={input} email={workerDetail.email}></Checkout>
 								</FlexBox>
 								<FlexBox flexDirection="column" p={1} mr={8}>
 									<Medium
