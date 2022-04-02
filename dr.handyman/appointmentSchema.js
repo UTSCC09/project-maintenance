@@ -138,9 +138,9 @@ const appointmentRules = {
 
     }),
     
-    isAppointedWorker: rule()( async (parent, {_id}, context) => {
+    isAppointed: rule()( async (parent, {_id}, context) => {
         const appointment = await Appointment.findOne({ _id });
-        if (appointment == null || appointment.workerEmail != context.getUser().email)
+        if (appointment == null || (appointment.workerEmail != context.getUser().email && appointment.userEmail != context.getUser().email))
             return new Error('Appointment no longer exist or not authorized');
         return true;
     }),
