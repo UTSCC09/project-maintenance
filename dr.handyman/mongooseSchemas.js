@@ -31,13 +31,12 @@ const UserSchema = new Schema({
         type: {
             type: String,
             enum: ['Point'], // 'location.type' must be 'Point'
-            required: false,
-        },
-        coordinates: {
+            required: true
+          },
+          coordinates: {
             type: [Number],
-            required: false,
-        }, 
-        
+            required: true
+          }
     },
     profilePic: {
         filepath: {

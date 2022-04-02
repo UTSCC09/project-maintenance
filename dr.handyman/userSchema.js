@@ -88,8 +88,8 @@ const userQueryDef = `
     getWorkerCount: Int
     getWorkerPage(workerPerPage: Int!, page: Int!, coordinates: [Float]): [User]
 
-    searchWorkerPage(queryText: String!, workerPerPage: Int!, page: Int!, coordinates: [Float]): [User]
-    searchWorkerPageCount(queryText: String!): Int
+    searchWorkerPage(queryText: String!, workerPerPage: Int!, page: Int!, coordinates: [Float], sortByDist: Boolean): [User]
+    searchWorkerPageCount(queryText: String!, sortByDist: Boolean): Int
 `;
 
 const userQuery = {
@@ -127,18 +127,47 @@ const userQuery = {
         return user;
     },
     async searchWorkerPage(parent, args, content, info){
-        const { queryText, workerPerPage, page, coordinates } = args;
+        const { queryText, workerPerPage, page, coordinates, sortByDist } = args;
         if (page < 0)
             throw new Error("page number undefined");
         if (workerPerPage == 0)
             return [];
-        const workers = await User.find({$and: [{ $text: {$search: queryText } }, 
-                                       { type: "worker" }]}).sort({ score: {$meta: "textScore" } }).skip(page * workerPerPage).limit(workerPerPage);
-        return addCommentCount(addDistances(workers, coordinates));
+        if (sortByDist && coordinates != null && coordinates != undefined && coordinates.length == 2
+            && typeof coordinates[0] === "number" && typeof coordinates[1] === "number")
+            {
+                const workers = await User.find({$and: [{
+                    location:
+                      { $near:
+                         {
+                           $geometry: { type: "Point",  coordinates: [ coordinates[0], coordinates[1] ] },
+                         }
+                      }
+                  }, { type: "worker" }]}).skip(page * workerPerPage).limit(workerPerPage);
+                return addDistances(workers, coordinates);
+            }
+        if (queryText == "")
+            {
+                const workers = await User.find({ type: "worker" }).sort({ 'createdAt': -1 }).skip(page * workerPerPage).limit(workerPerPage);
+                return addCommentCount(addDistances(workers, coordinates));
+            }
+        else {
+            const workers = await User.find({$and: [{ $text: {$search: queryText } }, 
+                { type: "worker" }]}).sort({ score: {$meta: "textScore" } }).skip(page * workerPerPage).limit(workerPerPage);
+            return addCommentCount(addDistances(workers, coordinates));
+        }
+        
     },
     async searchWorkerPageCount(parent, args, content, info){
-        return await User.countDocuments({$and: [{ $text: {$search: args.queryText } }, 
-            { type: "worker" }]});
+        if (!args.sortByDist && args.queryText != "")
+            {
+                return await User.countDocuments({$and: [{ $text: {$search: args.queryText } }, 
+                    { type: "worker" }]});
+            }
+        else
+            {
+                return await User.countDocuments({ type: "worker" });
+            }
+        
     }
 
 };

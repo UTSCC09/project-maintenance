@@ -19,7 +19,8 @@ async function addUser (parent, args, context, info) {
         type: "user",
         phone,
         rating: 5,
-        permissions: []
+        permissions: [],
+        location: {coordiantes: [0,0], type: 'Point'},
     });
     return userObj.save()
         .then (result => {
