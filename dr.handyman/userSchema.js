@@ -99,7 +99,7 @@ const userQuery = {
             throw new Error("page number undefined");
         if (workerPerPage == 0)
             return [];
-        const workers =  await User.find({ type: "worker" }).sort({ 'createdAt': 1 }).skip(page * workerPerPage).limit(workerPerPage);
+        const workers =  await User.find({ type: "worker" }).sort({ 'createdAt': -1 }).skip(page * workerPerPage).limit(workerPerPage);
         return addCommentCount(addDistances (workers, coordinates));
     },
     async getWorkerCount(parent, args, context, info){

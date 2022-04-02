@@ -79,7 +79,7 @@ const commentQuery = {
             throw new Error("page number undefined");
         if (commentPerPage == 0)
             return [];
-        const comments = await Comment.find({workerEmail: email}).sort({ 'updatedAt': 1 }).skip(page * commentPerPage).limit(commentPerPage);
+        const comments = await Comment.find({workerEmail: email}).sort({ 'updatedAt': -1 }).skip(page * commentPerPage).limit(commentPerPage);
         return comments;
     },
 
@@ -88,7 +88,7 @@ const commentQuery = {
             throw new Error("page number undefined");
         if (commentPerPage == 0)
             return [];
-        const comments = await Comment.find({userEmail: email}).sort({ 'updatedAt': 1 }).skip(page * commentPerPage).limit(commentPerPage);
+        const comments = await Comment.find({userEmail: email}).sort({ 'updatedAt': -1 }).skip(page * commentPerPage).limit(commentPerPage);
         return comments;
     },
 

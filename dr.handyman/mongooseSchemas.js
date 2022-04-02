@@ -31,12 +31,13 @@ const UserSchema = new Schema({
         type: {
             type: String,
             enum: ['Point'], // 'location.type' must be 'Point'
-            required: false
-          },
-          coordinates: {
+            required: false,
+        },
+        coordinates: {
             type: [Number],
-            required: false
-          }
+            required: false,
+        }, 
+        
     },
     profilePic: {
         filepath: {
@@ -115,7 +116,7 @@ const ConversationSchema = new Schema({
         type: [String],
         required: true
     },
-});
+}, { timestamps: true });
 
 const MessageSchema = new Schema({
     conversationId: {
@@ -182,12 +183,15 @@ const CommentSchema = new Schema({
     }
 }, { timestamps: true });
 
+UserSchema.index( { location: "2dsphere" });
+PostSchema.index( { location: "2dsphere" } );
 const Conversation = mongoose.model('Conversation', ConversationSchema);
 const Message = mongoose.model('Message', MessageSchema);
 const Post = mongoose.model('Post', PostSchema);
 const User = mongoose.model('User', UserSchema);
 const Appointment = mongoose.model('Appointment', AppointmentSchema);
 const Comment = mongoose.model('Comment', CommentSchema);
+
 
 module.exports = {
     User,

@@ -78,8 +78,8 @@ const postQueryDef = `
 	getAllPost: [Post]
     getPostPage(postPerPage: Int!, page: Int!, coordinates: [Float]): [Post]
 
-    searchPostPage(queryText: String!, postPerPage: Int!, page: Int!, coordinates: [Float]): [Post]
-    searchPostPageCount(queryText: String!): Int
+    searchPostPage(queryText: String!, postPerPage: Int!, page: Int!, coordinates: [Float], sortByDist: Boolean): [Post]
+    searchPostPageCount(queryText: String!, sortByDist: Boolean): Int
 `;
 
 const postMut = {
@@ -165,7 +165,7 @@ const postQuery = {
             throw new Error("page number undefined");
         if (userPostPerPage == 0)
             return [];
-        const posts = await Post.find({posterEmail: context.getUser().email}).sort({ 'createdAt': 1 }).skip(page * userPostPerPage).limit(userPostPerPage);
+        const posts = await Post.find({posterEmail: context.getUser().email}).sort({ 'createdAt': -1 }).skip(page * userPostPerPage).limit(userPostPerPage);
         return addDistances (posts, coordinates);
     },
     async getUserPostsPageByEmail(parent, args, context, info){
@@ -174,7 +174,7 @@ const postQuery = {
             throw new Error("page number undefined");
         if (userPostPerPage == 0)
             return [];
-        const posts = await Post.find({posterEmail: email}).sort({ 'createdAt': 1 }).skip(page * userPostPerPage).limit(userPostPerPage);
+        const posts = await Post.find({posterEmail: email}).sort({ 'createdAt': -1 }).skip(page * userPostPerPage).limit(userPostPerPage);
         return addDistances (posts, coordinates);
     },
     async getAcceptedPostsPage(parent, args, context, info){
@@ -183,7 +183,7 @@ const postQuery = {
             throw new Error("page number undefined");
         if (acceptedPostPerPage == 0)
             return [];
-        const posts = await Post.find({acceptorEmail: context.getUser().email}).sort({ 'createdAt': 1 }).skip(page * acceptedPostPerPage).limit(acceptedPostPerPage);
+        const posts = await Post.find({acceptorEmail: context.getUser().email}).sort({ 'createdAt': -1 }).skip(page * acceptedPostPerPage).limit(acceptedPostPerPage);
         return addDistances (posts, coordinates);
     },
     async getAcceptedPostsPageByEmail(parent, args, context, info){
@@ -192,7 +192,7 @@ const postQuery = {
             throw new Error("page number undefined");
         if (acceptedPostPerPage == 0)
             return [];
-        const posts =  await Post.find({acceptorEmail: email}).sort({ 'createdAt': 1 }).skip(page * acceptedPostPerPage).limit(acceptedPostPerPage);
+        const posts =  await Post.find({acceptorEmail: email}).sort({ 'createdAt': -1 }).skip(page * acceptedPostPerPage).limit(acceptedPostPerPage);
         return addDistances (posts, coordinates);
     },
     async getUserPostCount(parent, args, context, info){
@@ -228,16 +228,50 @@ const postQuery = {
     },
 
     async searchPostPage(parent, args, content, info){
-        const { queryText, postPerPage, page, coordinates } = args;
+        const { queryText, postPerPage, page, coordinates, sortByDist } = args;
         if (page < 0)
             throw new Error("page number undefined");
         if (postPerPage == 0)
             return [];
-        const posts = await Post.find({ $text: {$search: queryText } }).sort({ score: {$meta: "textScore" } }).skip(page * postPerPage).limit(postPerPage);
-        return addDistances(posts, coordinates);
+        if (sortByDist && coordinates != null && coordinates != undefined && coordinates.length == 2
+            && typeof coordinates[0] === "number" && typeof coordinates[1] === "number")
+            {
+                const posts = await Post.find({
+                    location:
+                      { $near:
+                         {
+                           $geometry: { type: "Point",  coordinates: [ coordinates[0], coordinates[1] ] },
+                         }
+                      }
+                  }).skip(page * postPerPage).limit(postPerPage);
+                return addDistances(posts, coordinates);
+            }
+        else{
+            if (queryText == "")
+                {
+                    const posts = await Post.find({}).sort({ 'createdAt': -1 }).skip(page * postPerPage).limit(postPerPage)
+                    return addDistances(posts, coordinates);
+                }
+            else
+                {
+                    const posts = await Post.find({ $text: {$search: queryText } }).sort({ score: {$meta: "textScore" } }).skip(page * postPerPage).limit(postPerPage);
+                    return addDistances(posts, coordinates);
+                }
+            
+        }
+        
+        
     },
     async searchPostPageCount(parent, args, content, info){
-        return await Post.countDocuments({ $text: {$search: args.queryText }});
+        if (!args.sortByDist && args.queryText != "")
+            {
+                return await Post.countDocuments({ $text: {$search: args.queryText }});
+            }
+        else
+            {
+                return await Post.countDocuments({});
+            }
+        
     }
 }
 

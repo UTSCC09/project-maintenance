@@ -65,6 +65,7 @@ const chatMut = {
             content: content,
         });
         await messageObj.save();
+        await Conversation.updateOne({_id}, {_id: _id});
         context.pubsub.publish(_id, {
             getChat: await Message.find({ conversationId: _id })
         });
@@ -81,10 +82,10 @@ const chatQuery = {
         return conv;
     },
     async getCurrentConvos(parent, args, context, info){
-        return await Conversation.find({userEmails: context.getUser().email});
+        return await Conversation.find({userEmails: context.getUser().email}).sort({ 'updatedAt': -1 });
     },
     async getCurrentConvosWithDescription(parent, args, context, info){
-        const conversations = await Conversation.find({userEmails: context.getUser().email});
+        const conversations = await Conversation.find({userEmails: context.getUser().email}).sort({ 'updatedAt': -1 });
         const convDescriptions = [];
         await Promise.all(conversations.map(async (elem) => {
             const user1 = await User.findOne({email: elem.userEmails[0]});
