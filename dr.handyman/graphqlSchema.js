@@ -20,7 +20,7 @@ async function addUser (parent, args, context, info) {
         phone,
         rating: 5,
         permissions: [],
-        location: {coordiantes: [0,0], type: 'Point'},
+        location: {coordinates: [0,0], type: 'Point'},
     });
     return userObj.save()
         .then (result => {
@@ -127,7 +127,7 @@ const resolvers = {
                     bcrypt.hash(password, salt, async (err, hash) => {
                         if (err) reject(Error('hash failed'));
                         const newUser = await addUser(null, {email, username, password: hash, phone}, null, null);
-                        await context.login(newUser);
+                        // await context.login(newUser);
                         resolve({ user: newUser });
                     });
                 });
