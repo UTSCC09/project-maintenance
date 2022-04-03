@@ -129,7 +129,7 @@ const appointmentRules = {
         return true
     }),
 
-    AppointmentEditRule: rule()( async (parent, {description, userEmail, startTime, endTime}, context) => {
+    AppointmentEditRule: rule()( async (parent, {_id, description, userEmail, startTime, endTime}, context) => {
         if (userEmail)
             {
                 const user = await User.findOne({email: userEmail});
@@ -146,6 +146,7 @@ const appointmentRules = {
         
         const conflictAppointment = await Appointment.findOne({$and: [
             {workerEmail: context.getUser().email},
+            {_id: {$not: _id}},
             {$or: [
             {$and: [{startTime: {$gte: startTime}}, {startTime: {$lt: endTime}}]},
             {$and: [{endTime: {$gt: startTime}}, {endTime: {$lte: endTime}}]},
