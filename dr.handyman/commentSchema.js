@@ -10,7 +10,6 @@ const commentDefs = `
         workerEmail: String
         userEmail: String
         rating: Int
-        isCommented: Boolean
         createdAt: String
         updatedAt: String
     }

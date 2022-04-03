@@ -2,12 +2,28 @@
 const { Appointment, User, Comment } = require('./mongooseSchemas');
 const { rule } = require('graphql-shield');
 
+async function addIsCommented (inputList)
+{
+    // let newComments = []
+    await Promise.all(inputList.map(async (appointment) => {
+    try {
+        const count = await Comment.countDocuments({appointmentId: appointment._id})
+        appointment.isCommented = count != 0;
+        return appointment;
+    } catch (error) {
+        console.log('error'+ error);
+    }
+    }))
+    return inputList // return without waiting for process of 
+}
+
 const appointmentDefs = `
     type Appointment {
         _id: String
         description: String
         workerEmail: String
         userEmail: String
+        isCommented: Boolean
         startTime: String
         endTime: String
     }
@@ -37,7 +53,7 @@ const appointmentQuery = {
         const appointments = await Appointment.find({ $and: [{ $or: [ { userEmail: email }, 
                                                                { workerEmail: email } ] },
                                                         {endTime: { $lte: curDate.getTime() }}]}).sort({ 'startTime': -1 }).skip(page * appointmentPerPage).limit(appointmentPerPage);
-        return appointments;
+        return addIsCommented (appointments);
     },
 
     async getAppointmentUpComingPage(parent, {email, appointmentPerPage, page}, context, info){
