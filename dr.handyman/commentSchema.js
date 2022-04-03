@@ -10,6 +10,7 @@ const commentDefs = `
         workerEmail: String
         userEmail: String
         rating: Int
+        isCommented: Boolean
         createdAt: String
         updatedAt: String
     }
@@ -18,7 +19,7 @@ const commentDefs = `
 const commentMutDef = `
     addComment(appointmentId: String!, workerEmail: String!, rating: Int!, content: String!): Comment
     deleteComment(_id: String!): Boolean
-    editComment(_id: String!, rating: Int, content: String): Boolean
+    editComment(_id: String!, rating: Int, content: String): Comment
 `;
 
 const commentQueryDef = `
