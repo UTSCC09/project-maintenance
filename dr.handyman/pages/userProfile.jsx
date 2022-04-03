@@ -134,7 +134,7 @@ const UserProfile = (props) => {
 									</Medium>
 									<span>{workerDetail.email}</span>
 								</FlexBox>
-								<FlexBox flexDirection="column" p={1} mr={8}>
+								{/* <FlexBox flexDirection="column" p={1} mr={8}>
 									<Medium
 										color="grey.600"
 										mb={0.5}
@@ -144,7 +144,7 @@ const UserProfile = (props) => {
 									</Medium>
 									<input type="text" value={input} onInput={e => setInput(e.target.value)}/>
 									<Checkout tips={input} email={workerDetail.email}></Checkout>
-								</FlexBox>
+								</FlexBox> */}
 								<FlexBox flexDirection="column" p={1} mr={8}>
 									<Medium
 										color="grey.600"

@@ -11,6 +11,14 @@ import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import MicIcon from '@mui/icons-material/Mic';
+import CloseIcon from '@mui/icons-material/Close';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import Typography from '@mui/material/Typography';
+import CardMedia from '@mui/material/CardMedia';
+import DialogContent from '@mui/material/DialogContent'
+import Box from '@mui/material/Box';
 import Peer from "simple-peer"
 
 export default () => {
@@ -34,15 +42,19 @@ export default () => {
     const connectionRef= useRef()
 
     const dispatch = useDispatch();
-    const closeVideo = () => {
+    const closeVideo = (event, reason) => {
+        if (reason && reason == "backdropClick") 
+            return;
         if (myVideo && myVideo.current && myVideo.current.srcObject && myVideo.current.srcObject.getVideoTracks().length == 1)
         {
             myVideo.current.srcObject.getVideoTracks()[0].enabled = false;
             myVideo.current.srcObject.getAudioTracks()[0].enabled = false;
         }
 		setvideoShow(false);
-        setOtherStopped(false);
-        setMeStopped(false)
+        setOtherStopped(true);
+        setMeStopped(true)
+        setOtherMuted(true);
+        setMeMuted(true);
         setReceivingCall(false);
         setMakingCall(false);
         setCallAccepted(false);
@@ -230,11 +242,76 @@ export default () => {
     const leaveCall = () => {
         closeVideo();
 	}
+
 	return (
 		<Dialog 
         scroll="body"
         open={videoShow}
-        onClose={closeVideo}>
+        onClose={closeVideo}
+        fullWidth={true}
+        maxWidth="lg"
+        
+        >
+            <CloseIcon 
+            onClick={closeVideo}
+            fontSize={'large'}
+            sx={{position:"relative",
+                float: "right",
+                }}
+            >
+                
+            </CloseIcon>
+            
+            
+            <Card
+            sx={{margin: '5px',}}>
+                <CardContent
+                sx={{display: "flex", flexDirection: "row", position: "relative",width: "100%"}}>
+                    <Box
+                    sx={{
+                        position: 'relative',
+                        bottom: 0,
+                        left: 0,
+                        width: '100%',
+                        bgcolor: 'rgba(0, 0, 0, 0.54)',
+                        color: 'white',
+                        padding: '10px',
+                        margin: '5px',
+                    }}
+                    >
+                        <Typography variant="h5">{userData.username}</Typography>
+                        {<video playsInline muted ref={myVideo} autoPlay style={{ position: "relative", width: "100%" }} />}
+                    </Box>
+                    <Box
+                    sx={{
+                        position: 'relative',
+                        bottom: 0,
+                        left: 0,
+                        width: '100%',
+                        bgcolor: 'rgba(0, 0, 0, 0.54)',
+                        color: 'white',
+                        padding: '10px',
+                        margin: '5px',
+                    }}
+                    >
+                        {otherName && <Typography variant="h5">{otherName}</Typography>}
+                        {<video playsInline ref={userVideo} autoPlay style={{ position: "relative", width: "100%" }} />}
+                    </Box>
+                    
+                </CardContent>
+                
+            </Card>
+            {callAccepted ? 
+            (<div>
+                
+                <Button variant="contained" color="secondary" onClick={leaveCall}>
+                            End Call
+                </Button>
+                {meStopped ? <VideocamOffIcon fontSize={'large'} onClick={startVideo}></VideocamOffIcon> : <VideocamIcon fontSize={'large'} onClick={stopVideo}></VideocamIcon>}
+                {meMuted ? <MicOffIcon fontSize={'large'} onClick={startAudio}></MicOffIcon> : <MicIcon fontSize={'large'} onClick={stopAudio}></MicIcon>}
+            </div>
+                
+            ) : null}
             <div className="myId">
                 {!recievingEnd && !receivingCall ? (
                     <div>
@@ -242,41 +319,26 @@ export default () => {
                         <PhoneIcon fontSize="large" />
                     </IconButton>}
                     {makingCall && <Button variant="contained" color="primary" onClick={cancel}>
-						Cancel
-					</Button>}
+                        Cancel
+                    </Button>}
                     </div>
                 ) : null}
-			</div>
-            <div>
-				{receivingCall && !callAccepted ? (
-					<div className="caller">
-						<h1 >{otherName} is calling...</h1>
-						<Button variant="contained" color="primary" onClick={answer}>
-							Answer
-						</Button>
-                        <Button variant="contained" color="primary" onClick={leaveCall}>
-							Decline
-						</Button>
-					</div>
-				) : null}
-			</div>
-            <div>
-                {userData.username}
-                {<video playsInline muted ref={myVideo} autoPlay style={{ width: "300px" }} />}
-                
-                {callAccepted ? 
-                    (<div>
-                        {otherName}
-                        {stream && <video playsInline ref={userVideo} autoPlay style={{ width: "300px"}} />}
-                        <Button variant="contained" color="secondary" onClick={leaveCall}>
-                                    End Call
-                        </Button>
-                        {meStopped ? <VideocamOffIcon onClick={startVideo}></VideocamOffIcon> : <VideocamIcon onClick={stopVideo}></VideocamIcon>}
-                        {meMuted ? <MicOffIcon onClick={startAudio}></MicOffIcon> : <MicIcon onClick={stopAudio}></MicIcon>}
-                    </div>
-                        
-                    ) : null}
             </div>
+            <div>
+                {receivingCall && !callAccepted ? (
+                    <div className="caller">
+                        <h1 >{otherName} is calling...</h1>
+                        <Button variant="contained" color="primary" onClick={answer}>
+                            Answer
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={leaveCall}>
+                            Decline
+                        </Button>
+                    </div>
+                ) : null}
+            </div>
+                
+            
         </Dialog>
 	);
 };
