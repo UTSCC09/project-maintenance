@@ -16,7 +16,7 @@ const appointmentDefs = `
 const appointmentMutDef = `
     addAppointment(description: String!, userEmail: String!, startTime: Float!, endTime: Float!): Appointment
     deleteAppointment(_id: String!): Boolean
-    editAppointment(_id: String!, description: String, userEmail: String, startTime: Float, endTime: Float): Boolean
+    editAppointment(_id: String!, description: String, userEmail: String, startTime: Float, endTime: Float): Appointment
 `;
 
 const appointmentQueryDef = `
@@ -99,7 +99,12 @@ const appointmentMut = {
                                             userEmail: userEmail == null ? appointment.userEmail : userEmail,
                                             startTime: startTime == null ? appointment.startTime : new Date(startTime),
                                             endTime: endTime == null ? appointment.endTime : new Date(endTime),});
-        return res.acknowledged;
+        if (!res.acknowledged)
+            return new Error("Update Failed");
+        const updatedAppointment = await Appointment.findOne({ _id });
+        if (!updatedAppointment)
+            return new Error("Appointment does not exist anymore")
+        return updatedAppointment;
     }
 };
 

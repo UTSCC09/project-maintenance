@@ -69,7 +69,12 @@ const commentMut = {
         const res = await Comment.updateOne({ _id },
                                          { rating: rating == null ? comment.rating : rating,
                                             content: content == null ? comment.content : content});
-        return res.acknowledged;
+        if (!res.acknowledged)
+            return new Error("Update Failed");
+        const updatedComment = await Comment.findOne({ _id });
+        if (!updatedComment)
+            return new Error("Comment does not exist anymore")
+        return updatedComment;
     }
 };
 

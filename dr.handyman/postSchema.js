@@ -57,7 +57,7 @@ const postMutDef = `
     addPost(title: String!, content: String!, coordinates: [Float!], type: Int!): Post
     acquirePost(_id: String!): Boolean
     unacquirePost(_id: String!): Boolean
-    setPost(_id: String!, title: String!, content: String!): Boolean
+    setPost(_id: String!, title: String!, content: String!): Post
     deletePost(_id: String!): Boolean
 `;
 
@@ -132,7 +132,12 @@ const postMut = {
         const res = await Post.updateOne({ _id: args._id },
                                          { title: title == null ? post.title : title,
                                            content: content == null ? post.content : content,});
-        return res.acknowledged;
+        if (!res.acknowledged)
+            return new Error("Update Failed");
+        const updatedPost = await Post.findOne({_id: args._id});
+        if (!updatedPost)
+            return new Error("Post does not exist anymore")
+        return updatedPost;
     },
     async deletePost(parent, args, context, info){
         const post = await Post.findOne({_id: args._id});
