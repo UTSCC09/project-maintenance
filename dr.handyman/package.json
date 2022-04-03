@@ -19,6 +19,8 @@
   "dependencies": {
     "@axelspringer/graphql-google-pubsub": "^2.1.0",
     "@graphql-tools/schema": "^8.3.2",
+    "@sentry/node": "^6.19.3",
+    "@sentry/tracing": "^6.19.3",
     "apollo-server": "^3.6.3",
     "apollo-server-core": "^3.6.4",
     "apollo-server-express": "^3.6.3",
