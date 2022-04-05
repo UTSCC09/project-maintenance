@@ -1,80 +1,54 @@
-/*jshint esversion: 8 */
+/*jshint esversion: 9 */
 
 const { Message, Post, User, Comment } = require('./mongooseSchemas');
+const { addDistances, getDistance } = require('./algorithms/distance');
 
-var rad = function(x) {
-    return x * Math.PI / 180;
-};
-  
-var getDistance = function(p1, p2) {
-    // 1 is lat, 0 is long
-    var R = 6378137; // Earth’s mean radius in meter
-    var dLat = rad(p2[1] - p1[1]);
-    var dLong = rad(p2[0] - p1[0]);
-    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(rad(p1[1])) * Math.cos(rad(p2[1])) *
-        Math.sin(dLong / 2) * Math.sin(dLong / 2);
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    var d = R * c;
-    return d; // returns the distance in meter
-};
-
-function addDistances (inputList, coordinates)
+/**
+ * Add comment counts to the list of worker objects.
+ * @param {Array} inputList list of workers.
+ * @returns newly mapped inputList with each their comment count.
+ */
+async function addCommentCount (inputList)
 {
-    if (coordinates != null && coordinates != undefined && coordinates.length == 2
-        && typeof coordinates[0] === "number" && typeof coordinates[1] === "number"){
-            inputList.forEach((elem) => {
-                elem["distance"] = getDistance(coordinates, elem.location.coordinates) / 1000;
-            })
-            
+    await Promise.all(inputList.map(async (worker) => {
+        try {
+            const count = await Comment.countDocuments({workerEmail: worker.email})
+            worker.commentCount = count;
+            return worker;
+        } catch (error) {
+            throw new Error("Comment count append failed");
         }
-    else{
-        inputList.forEach((elem) => {
-            elem["distance"] = null;
-        })
-    }
+    }));
     return inputList;
 }
 
-async function addCommentCount (inputList)
-{
-    // let newComments = []
-    await Promise.all(inputList.map(async (worker) => {
-    try {
-        const count = await Comment.countDocuments({workerEmail: worker.email})
-        worker.commentCount = count;
-        return worker;
-    } catch (error) {
-        console.log('error'+ error);
-    }
-    }))
-    return inputList // return without waiting for process of 
-}
-
 const userDefs = `
-input UserInput {
-    type: String
-    phone: Int
-    rating: Float
-    permissions: [String]
+    input UserInput {
+        type: String
+        phone: Int
+        rating: Float
+    }
+    
+    """
+    User object conntaining basic user information.
+    """
+    type User {
+        email: String
+        username: String
+        password: String
+        type: String
+        phone: String
+        rating: Float
+        location: [Float!]
+        distance: Float
+        commentCount: Int
+        profilePic: File
+        createdAt: String
+    }
+    type Del {
+        count: Int
 }
-type User {
-    email: String
-    username: String
-    password: String
-    type: String
-    phone: String
-    rating: Float
-    location: [Float!]
-    distance: Float
-    commentCount: Int
-    profilePic: File
-    permissions: [String]
-    createdAt: String
-}
-type Del {
-    count: Int
-}`;
+`;
 
 const userMutDef = `
     deleteUser(email: String): Del

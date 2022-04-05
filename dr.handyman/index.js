@@ -1,4 +1,4 @@
-/*jshint esversion: 8 */
+/*jshint esversion: 9 */
 
 // Apollo Graphql Imports
   const { WebSocketServer } = require('ws');
@@ -13,7 +13,6 @@
 // Schema and authorization imports
   const { 
     schema,
-    WorkerData,
     User,
     Post,
     Conversation,
@@ -170,9 +169,7 @@ const io = require("socket.io")(httpServer, {
 // user need to send their email on login
 // each user has list of sockets
 // if one user openned multiple pages, only one page will be alerted
-// var socketList = io.sockets.server.eio.clients;
-// if (socketList[user.socketid] === undefined){
-const users = {}
+const users = {};
 io.on("connection", (socket) => {
   socket.emit("me", socket.id)
 
@@ -227,7 +224,8 @@ io.on("connection", (socket) => {
       socket.emit("user not active");
     }
   })
-})
+});
+
 // Initialize and start the HTTPS server
   async function startServer() {
       // Creating the WebSocket server
@@ -318,7 +316,6 @@ io.on("connection", (socket) => {
 
 
   // The `listen` method launches a web server.
-
   httpServer.listen(PORT, function (err) {
       if (err) console.log(err);
       else console.log("HTTPS server on https://localhost:%s", PORT);
@@ -328,7 +325,6 @@ io.on("connection", (socket) => {
   
 
 module.exports = {
-    WorkerData,
     User,
     Post,
     Conversation,

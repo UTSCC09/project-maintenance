@@ -9,16 +9,16 @@ const commentDefs = `
         appointmentId: String 
         workerEmail: String
         userEmail: String
-        rating: Int
+        rating: Float
         createdAt: String
         updatedAt: String
     }
 `;
 
 const commentMutDef = `
-    addComment(appointmentId: String!, workerEmail: String!, rating: Int!, content: String!): Comment
+    addComment(appointmentId: String!, workerEmail: String!, rating: Float!, content: String!): Comment
     deleteComment(_id: String!): Boolean
-    editComment(_id: String!, rating: Int, content: String): Comment
+    editComment(_id: String!, rating: Float, content: String): Comment
 `;
 
 const commentQueryDef = `

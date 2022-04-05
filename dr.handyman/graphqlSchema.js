@@ -7,7 +7,6 @@ const { makeExecutableSchema }  = require('@graphql-tools/schema');
 const { permissions } = require('./permissions');
 const { userMutDef, userQueryDef, userDefs, User, userMut, userQuery } = require('./userSchema');
 const { postMutDef, postDefs, Post, postMut, postQuery, postQueryDef } = require('./postSchema');
-const { workerDataMutDef, workerDataDefs, WorkerData, workerDataMut } = require('./workerDataSchema');
 const { chatMutDef, chatQueryDef, chatDefs, Conversation, Message, chatMut, chatQuery } = require('./chatSchema');
 const { fileUploadDef, fileUploadMut, fileUploadMutDef, fileUploadQueryDef, fileUploadScalar } = require('./userProfilePicUpload');
 const { Appointment, appointmentDefs, appointmentMutDef, appointmentQueryDef, appointmentQuery, appointmentMut} = require('./appointmentSchema');
@@ -37,7 +36,6 @@ const typeDefs = gql(`
         user: User
     }
     ` + 
-    workerDataDefs + 
     userDefs + 
     postDefs + 
     chatDefs +
@@ -48,7 +46,6 @@ const typeDefs = gql(`
 
     # Query types
     type Query {
-        WorkerData: [WorkerData]
         User: [User]
         currentUser: User` + 
         chatQueryDef +
@@ -65,7 +62,6 @@ const typeDefs = gql(`
         login(email: String!, password: String!): AuthPayload
         signup(username: String!, email: String!, password: String!, phone: String!): AuthPayload
         logout: Boolean`+ 
-        workerDataMutDef + 
         userMutDef + 
         postMutDef + 
         chatMutDef +
@@ -140,12 +136,11 @@ const resolvers = {
         User: async () => {
             return await User.find();
         },
-        WorkerData: () => WorkerData,
         currentUser: (parent, args, context) => context.getUser(),
     },
 };
 
-resolvers.Mutation = Object.assign({}, resolvers.Mutation, workerDataMut, userMut, postMut, chatMut, fileUploadMut, appointmentMut, commentMut);
+resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut, postMut, chatMut, fileUploadMut, appointmentMut, commentMut);
 resolvers.Query = Object.assign({}, resolvers.Query, chatQuery, postQuery, userQuery, appointmentQuery, commentQuery);
 
 const schema = applyMiddleware(
@@ -158,7 +153,6 @@ const schema = applyMiddleware(
 
 module.exports = {
     schema,
-    WorkerData,
     User,
     Post,
     Conversation,
