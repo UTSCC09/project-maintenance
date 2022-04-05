@@ -81,14 +81,6 @@ const typeDefs = gql(`
 const resolvers = {
     Upload: fileUploadScalar.Upload,
     Subscription: {
-        newUser: {
-            subscribe: (parent, args, context) => {
-            if (context.email == null)
-                throw new Error("Unauthorized");
-            else
-                return context.pubsub.asyncIterator("NEW_USER");
-            }
-        },
         getChat: {
             subscribe: (parent, args, context) => {  
             if (context.email == null)
@@ -133,9 +125,6 @@ const resolvers = {
     },
 
     Query: {
-        User: async () => {
-            return await User.find();
-        },
         currentUser: (parent, args, context) => context.getUser(),
     },
 };

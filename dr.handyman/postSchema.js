@@ -69,13 +69,11 @@ const postMut = {
                 return { ...result._doc };
             })
             .catch (err => {
-                console.error(err);
+                throw new Error("Post addition failed");
             });
     },
     async acquirePost(parent, args, context, info){
-        const post = await Post.findOne({_id: args._id});
-        if (post == null || post.acceptorEmail != "" || post.posterEmail == context.getUser().email)
-            throw new Error("Cannot acquire post");
+        
         const res = await Post.updateOne({ _id: args._id },
                                          {acceptorEmail: context.getUser().email,
                                           acceptorUsername: context.getUser().username,
@@ -83,9 +81,7 @@ const postMut = {
         return res.acknowledged;
     },
     async unacquirePost(parent, args, context, info){
-        const post = await Post.findOne({_id: args._id});
-        if (post == null || post.acceptorEmail != context.getUser().email)
-            throw new Error("Cannot unacquire post");
+
         const res = await Post.updateOne({ _id: args._id },
                                          {acceptorEmail: "",
                                           acceptorUsername: "",
@@ -94,8 +90,8 @@ const postMut = {
     },
     async setPost(parent, args, context, info){
         const post = await Post.findOne({_id: args._id});
-        if (post == null || post.posterEmail != context.getUser().email)
-            throw new Error("Cannot Edit post");
+        if (post == null)
+            throw new Error("Post does not exist");
         const { title, content } = args;
         const res = await Post.updateOne({ _id: args._id },
                                          { title: title == null ? post.title : title,
@@ -108,9 +104,7 @@ const postMut = {
         return updatedPost;
     },
     async deletePost(parent, args, context, info){
-        const post = await Post.findOne({_id: args._id});
-        if (post == null || post.posterEmail != context.getUser().email)
-            throw new Error('Post no longer exist or not authorized');
+        
         return Post.deleteOne({_id: args._id}).then(result => {
                 return  result.deletedCount;
             })

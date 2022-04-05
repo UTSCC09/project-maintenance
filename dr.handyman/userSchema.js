@@ -53,7 +53,7 @@ const userDefs = `
 const userMutDef = `
     deleteUser(email: String): Del
     setUser(username: String!, phone: String!): User
-    setWorker(coordinates: [Float!]): User
+    setWorker(coordinates: [Float!]): Boolean
 `;
 
 const userQueryDef = `

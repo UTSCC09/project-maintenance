@@ -4,6 +4,7 @@ const { chain, rule, shield, deny } = require('graphql-shield');
 const { commentRules } = require('./schemaRules/commentRules');
 const { appointmentRules } = require('./schemaRules/appointmentRules');
 const { userRules } = require('./schemaRules/userRules');
+const { postRules } = require('./schemaRules/postRules');
 
 const isAuthenticated = rule()((parent, args, context) => {
     if (!context.isAuthenticated())
@@ -35,16 +36,16 @@ const permissions = shield({
 
     },
     Mutation: {
-        setPost: isAuthenticated,
-        acquirePost: isAuthenticated,
-        unacquirePost: isAuthenticated,
-        
-        addPost: isAuthenticated,
+
         profilePicUpload: isAuthenticated,
         createConvo: isAuthenticated,
         createMessage: isAuthenticated,
-        
-        deletePost: isAuthenticated,
+
+        setPost: chain(isAuthenticated, postRules.isOwner),
+        acquirePost: chain(isAuthenticated, postRules.notAcquired),
+        unacquirePost: chain(isAuthenticated, postRules.isAcquiree),
+        addPost: chain(isAuthenticated, postRules.addPostRules),
+        deletePost: chain(isAuthenticated, postRules.isOwner),
         
         deleteUser: deny,
         setUser: isAuthenticated,
