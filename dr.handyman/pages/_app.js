@@ -11,6 +11,7 @@ import { Provider } from "react-redux";
 import { GET_USER_DATA } from "../src/GraphQL/Queries";
 import { UPDATE_USER_DATA, TRIGGER_MESSAGE } from '../src/store/constants'
 import Message from 'components/message';
+import Video from 'components/video'
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router'
 import Emitter from '@/utils/eventEmitter';
@@ -18,7 +19,7 @@ import { SubscriptionClient } from 'subscriptions-transport-ws'
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from '@apollo/client/utilities';
 import { SERVER_URL } from '@/constant.js'
-
+import io from "socket.io-client"
 const wsLink = process.browser ? new WebSocketLink(
   new SubscriptionClient(`wss://${SERVER_URL}/graphql`),
 ) : null;
@@ -86,6 +87,7 @@ export default function App({ Component, pageProps }) {
 							},
 						});
 					}
+					state.socket.emit("login", res.data.currentUser.email);
 				}).catch((err) => {
 					if (err.message.indexOf('Not Authorised') !== -1) {
 						const url = document.location.pathname;
@@ -143,6 +145,7 @@ export default function App({ Component, pageProps }) {
 			<Provider store={store}>
 				<Component {...pageProps} />
         <Message></Message>
+		<Video></Video>
 			</Provider>
 		</ApolloProvider>
 	);
