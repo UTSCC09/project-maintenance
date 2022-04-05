@@ -1,14 +1,9 @@
 /*jshint esversion: 8 */
 
-const { chain, rule, shield } = require('graphql-shield');
-const { commentRules } = require('./commentSchema');
-const { appointmentRules } = require('./appointmentSchema');
-function checkPermission(user, permission) {
-    if (user && user.permissions){
-        return user.permissions.includes(permission);
-    }
-    return false;
-}
+const { chain, rule, shield, deny } = require('graphql-shield');
+const { commentRules } = require('./schemaRules/commentRules');
+const { appointmentRules } = require('./schemaRules/appointmentRules');
+const { userRules } = require('./schemaRules/userRules');
 
 const isAuthenticated = rule()((parent, args, context) => {
     if (!context.isAuthenticated())
@@ -19,6 +14,12 @@ const isAuthenticated = rule()((parent, args, context) => {
 const isWorker = rule()((parent, args, context) => {
     if (context.getUser().type != "worker")
         return new Error("Not a worker");
+    return true;
+});
+
+const isNotWorker = rule()((parent, args, context) => {
+    if (context.getUser().type == "worker")
+        return new Error("Already a worker");
     return true;
 });
 
@@ -37,13 +38,17 @@ const permissions = shield({
         setPost: isAuthenticated,
         acquirePost: isAuthenticated,
         unacquirePost: isAuthenticated,
-        setWorker: isAuthenticated,
+        
         addPost: isAuthenticated,
         profilePicUpload: isAuthenticated,
         createConvo: isAuthenticated,
         createMessage: isAuthenticated,
-        setUser: isAuthenticated,
+        
         deletePost: isAuthenticated,
+        
+        deleteUser: deny,
+        setUser: isAuthenticated,
+        setWorker: chain(isAuthenticated, isNotWorker),
 
         addAppointment: chain(isAuthenticated, isWorker, appointmentRules.AppointmentRule),
         deleteAppointment: chain(isAuthenticated, isWorker, appointmentRules.isAppointed, appointmentRules.AppointmentDeleteRule),
