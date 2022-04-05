@@ -19,6 +19,8 @@ import { GET_CURRENT_CONVOS_DES } from "/src/GraphQL/Queries";
 import { useLazyQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import ContactListRow from "./ContactListRow.jsx";
+import { useRouter } from "next/router";
+
 
 // function renderMessageRow(props) {
 //   const { key, style, item} = props;
@@ -77,20 +79,37 @@ import ContactListRow from "./ContactListRow.jsx";
 // }
 
 export default function ContactList() {
+	const router = useRouter();
 	const [getConvos, { loading, data, error }] =
 		useLazyQuery(GET_CURRENT_CONVOS_DES);
+	let [convosList, setConvosList] = useState([])
+	console.log(convosList && convosList.map(item => item.time).join(','), convosList )
 
 	//const [convos, setConvos] = useState([]);
 
 	useEffect(() => {
-		getConvos();
+		getConvos().then(res => {
+			if (res.data) {
+				let convos = (res.data.getCurrentConvosWithDescription || []).slice();
+				convos.sort((a, b) =>  +b.time - +a.time);
+				setConvosList(convos);
+			}
+		});
 		//setConvos(res.data.getCurrentConvos[0].userEmails[0])
 	}, []);
 	if (loading || data == undefined) {
 		return <div>Loading...</div>;
 	}
 
-	console.log('data', data)
+	const setLastMessageTimeFromChild = (time, id) => {
+		const index = convosList.findIndex(item => item.conversation && item.conversation._id === id)
+		convosList[index] = Object.assign({}, convosList[index], { time });
+		const beforeSortItemsStr = convosList.map(item => item.conversation._id).join(',');
+		convosList.sort((a, b) =>  +b.time - +a.time);
+		const afterSortItemsStr = convosList.map(item => item.conversation._id).join(',');
+		(beforeSortItemsStr !== afterSortItemsStr) && setConvosList(convosList.slice());
+	}
+
 	return (
 		<ContactListLayout>
 			<Box sx={{ width: "100%", maxWidth: 360, color: "grey" }}>
@@ -117,8 +136,8 @@ export default function ContactList() {
 						width: 360,
 					}}
 				>
-					{data.getCurrentConvosWithDescription?.map((item, index) => (
-						<ContactListRow detail={item} key={index}/>
+					{convosList?.map((item, index) => (
+						<ContactListRow detail={item} key={(item.conversation && item.conversation._id) || index} setLastMessageTimeFromChild={(time) => setLastMessageTimeFromChild(time, item.conversation && item.conversation._id)}/>
 					))}
 					{/* {fakeList.map((item, index) => (
         <ContactListRow contact={item} key={index}/>

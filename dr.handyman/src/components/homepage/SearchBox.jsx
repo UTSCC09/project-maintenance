@@ -3,16 +3,25 @@ import { H3, Span, H5, H4 } from "components/Typography";
 import FlexBox from "components/FlexBox";
 import Menu from "components/Menu";
 import Link from "next/link";
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowDownOutlined from "@mui/icons-material/KeyboardArrowDownOutlined";
 import SearchOutlined from "@mui/icons-material/SearchOutlined";
-import { Box, Card, MenuItem, TextField, InputBase,Divider,Paper} from "@mui/material";
+import {
+	Box,
+	Card,
+	MenuItem,
+	TextField,
+	InputBase,
+	Divider,
+	Paper,
+} from "@mui/material";
 import TouchRipple from "@mui/material/ButtonBase";
 import { styled } from "@mui/material/styles";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Emitter from "@/utils/eventEmitter";
+import { useRouter } from "next/router";
 
 export const SearchOutlinedIcon = styled(SearchOutlined)(({ theme }) => ({
 	color: theme.palette.grey[600],
@@ -42,6 +51,7 @@ const SearchBox = () => {
 	const [resultList, setResultList] = useState([]);
 	const parentRef = useRef();
 	const [searchText, setSearchText] = useState("");
+	const router = useRouter();
 
 	const handleCategoryChange = (cat) => () => {
 		setCategory(cat);
@@ -52,15 +62,27 @@ const SearchBox = () => {
 	};
 
 	const startSearch = () => {
-		if (category === 0 || category === 1) {
+		if (category === 0 || category === 1 || category === 4) {
 			Emitter.emit("searchWorkers", {
-				queryText: searchText
-			})
-		}
-		if (category === 0 || category === 2) {
-			Emitter.emit("searchPosts", {
-				queryText: searchText
+				queryText: searchText,
+				sortByDist: category === 4,
 			});
+
+			if (category !== 1 || category !== 4) {
+				Emitter.emit("clearPosts");
+			}
+		}
+		if (category === 0 || category === 2 || category === 3) {
+			Emitter.emit("searchPosts", {
+				queryText: searchText,
+				sortByDist: category === 3,
+			});
+			if (category !== 2 || category !== 3) {
+				Emitter.emit("clearWorkers");
+			}
+		}
+		if (location.pathname !== '/') {
+			router.push('/');
 		}
 	};
 
@@ -82,8 +104,9 @@ const SearchBox = () => {
 					color="grey.700"
 					component={TouchRipple}
 				>
-					<Box mr={2.5}
-					fontSize={16}>{categories[category].label}</Box>
+					<Box mr={2.5} fontSize={16}>
+						{categories[category].label}
+					</Box>
 					<KeyboardArrowDownOutlined
 						fontSize="18px"
 						color="inherit"
@@ -92,7 +115,10 @@ const SearchBox = () => {
 			}
 		>
 			{categories.map((item) => (
-				<MenuItem key={item.value} onClick={handleCategoryChange(item.value)}>
+				<MenuItem
+					key={item.value}
+					onClick={handleCategoryChange(item.value)}
+				>
 					{item.label}
 				</MenuItem>
 			))}
@@ -108,11 +134,10 @@ const SearchBox = () => {
 			{...{
 				ref: parentRef,
 			}}
-			
 		>
 			<TextField
 				variant="outlined"
-				placeholder="Searching anything ..."
+				placeholder="Searching..."
 				fullWidth
 				onChange={(e) => setSearchText(event.target.value)}
 				InputProps={{
@@ -126,13 +151,18 @@ const SearchBox = () => {
 							border: 1,
 						},
 					},
-					startAdornment: <IconButton type="submit" sx={{ p: '10px' }} aria-label="search"  onClick={startSearch}>
-										<SearchIcon />
-				  					</IconButton>,
+					startAdornment: (
+						<IconButton
+							type="submit"
+							sx={{ p: "10px" }}
+							aria-label="search"
+							onClick={startSearch}
+						>
+							<SearchIcon />
+						</IconButton>
+					),
 					endAdornment: categoryDropdown,
-					
 				}}
-				
 			/>
 			{/* <LoadingButton  variant="contained" onClick={startSearch}>Search</LoadingButton> */}
 
@@ -156,10 +186,7 @@ const SearchBox = () => {
 					))}
 				</SearchResultCard>
 			)}
-			
-	
 		</Box>
-	
 	);
 };
 
@@ -169,12 +196,20 @@ const categories = [
 		value: 0,
 	},
 	{
-		label: "Mantainers",
+		label: "Handymans",
 		value: 1,
 	},
 	{
 		label: "Posts",
 		value: 2,
+	},
+	{
+		label: "Posts near me",
+		value: 3,
+	},
+	{
+		label: "Handymans near me",
+		value: 4,
 	},
 ];
 

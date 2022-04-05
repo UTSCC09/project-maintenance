@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Box, Container, TextField, Chip,Dialog } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { UPDATE_CALLING_USER } from "../../store/constants";
 import { CREATE_MESSAGE } from "@/GraphQL/Mutations";
 import { GET_LATEST_MESSAGE } from "@/GraphQL/Queries";
 import { useMutation, useLazyQuery, useSubscription } from "@apollo/client";
@@ -10,9 +9,9 @@ import { GET_CHAT_SUBSCRIBE } from "@/GraphQL/Subscribes";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
-import PhoneIcon from '@mui/icons-material/Phone'
 import { formatTime } from "../../utils";
 import { Span } from "../Typography";
+import ChatVideo from "../chat/ChatVideo";
 import CallIcon from '@mui/icons-material/Call';
 const convId2MsgList = {};
 
@@ -24,7 +23,6 @@ const ChatMessage = () => {
 	const messageAreaRef = useRef(null);
 	const [emojiShow, setEmojiShow] = useState(false);
 	const [videoShow, setvideoShow] = useState(false);
-	const dispatch = useDispatch();
 	const currentConvUserInfo = useSelector(
 		(state) => state.currentConvUserInfo
 	);
@@ -81,12 +79,10 @@ const ChatMessage = () => {
 		setEmojiShow(false);
 	};
 
-	const toggleVideo = (email) => {
-		if (email)
-			dispatch ({
-				type: UPDATE_CALLING_USER,
-				payload: email
-			})
+	const toggleVideo = () => {
+		//<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
+
+		setvideoShow(!videoShow);
 	};
 
 	const submitMsg = () => {
@@ -293,7 +289,6 @@ const ChatMessage = () => {
 						}}
 						onClick={toggleShowEmoji}
 					></EmojiEmotionsIcon>
-
 					<CallIcon
 						sx={{
 							position: "absolute",
@@ -306,7 +301,7 @@ const ChatMessage = () => {
 								color: "#ceb64a",
 							},
 						}}
-						onClick={() => {toggleVideo(currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0])}}
+						onClick={toggleVideo}
 					></CallIcon>
 				</Box>
 			</Container>
@@ -323,15 +318,17 @@ const ChatMessage = () => {
 					<Picker onSelect={addEmoji} set="facebook" ref={emojiRef} />
 				)}
 			</Box>
-			{/* <Dialog
+						{/* <ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo> */}
+
+			<Dialog
 					open={videoShow}
 					
 					scroll="body"
 					onClose={toggleVideo}
 				>
-					<ChatVideo callerEmail={}></ChatVideo>
+					<ChatVideo callerEmail={currentConvUserInfo.conversation.userEmails[0] == userData.email ? currentConvUserInfo.conversation.userEmails[1] : currentConvUserInfo.conversation.userEmails[0]}></ChatVideo>
 
-				</Dialog> */}
+				</Dialog>
 
 		</Container>
 	);

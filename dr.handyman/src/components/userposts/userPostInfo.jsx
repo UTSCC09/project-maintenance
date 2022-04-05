@@ -161,7 +161,7 @@ const UserPostInfo = ({ post, closeDialog, type }) => {
 						</Medium>
 					)}
 
-					<Medium
+					{post.distance === null ? (<Medium
 						fontSize="16px"
 						color="grey.800"
 						textAlign="center"
@@ -169,7 +169,18 @@ const UserPostInfo = ({ post, closeDialog, type }) => {
 						display="block"
 					>
 						Distance: {Math.ceil(post.distance) || "N/A"} KM
-					</Medium>
+					</Medium>): (<Medium
+						fontSize="16px"
+						color="grey.800"
+						textAlign="center"
+						mb={4.5}
+						display="block"
+					>
+						Distance: {(post.distance).toFixed(2) || "N/A"} KM
+						
+					</Medium>)
+					
+				}
 
 					{type === "accept" ? (
 						<LoadingButton

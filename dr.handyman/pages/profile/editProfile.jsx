@@ -23,6 +23,7 @@ import { useRouter } from "next/router";
 import { GET_USER_DATA } from "../../src/GraphQL/Queries";
 import Emitter from "@/utils/eventEmitter";
 import axios from "axios";
+import { IMAGE_URL, SERVER_URL } from '/src/constant.js'
 
 const ProfileEdit = () => {
 	const [modifyUser] = useMutation(SET_USER);
@@ -33,12 +34,11 @@ const ProfileEdit = () => {
 	const [waitForUserProfileAvatarFile, setWaitForUserProfileAvatarFile] =
 		useState(null);
 
-	let userProfileImage = "/assets/u1.png";
-	console.log(userData);
-	if (userData.profilePic) {
-		userProfileImage = userData.profilePic.fileGetPath;
-		// userProfileImage = `https://www.drhandyman.me:4000/pictures/${userData.email}`;
-	}
+	let userProfileImage = `${IMAGE_URL}/${userData.email}`;
+	// if (userData.profilePic && userData.profilePic.fileGetPath) {
+	// 	userProfileImage = userData.profilePic.fileGetPath || `${IMAGE_URL}/${userData.email}`;
+	// }
+
 	if (waitForUserProfileAvatarFile) {
 		userProfileImage = window.URL.createObjectURL(
 			waitForUserProfileAvatarFile
@@ -57,7 +57,7 @@ const ProfileEdit = () => {
 		formData.append("0", waitForUserProfileAvatarFile);
 
 		return axios({
-			url: "https://www.drhandyman.me:4000/graphql",
+			url: `https://${SERVER_URL}/graphql`,
 			method: "POST",
 			withCredentials: true,
 			data: formData,
