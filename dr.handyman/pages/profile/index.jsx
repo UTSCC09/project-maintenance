@@ -7,22 +7,22 @@ import { Box } from "@mui/system";
 import { H3, H5, Small, Medium } from "components/Typography";
 
 import { styled } from "@mui/material/styles";
-
+import { IMAGE_URL } from "/src/constant.js";
 import Paper from "@mui/material/Paper";
 import FlexBox from "components/FlexBox";
 import { format } from "date-fns";
 import { Avatar, Button, Card, Grid, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
 const ProfilePage = (props) => {
 	const userData = useSelector((state) => state.userData);
-	let userProfileImage = "/assets/u1.png";
+	const [userProfileImage, setUserProfileImage] = useState("");
 
-	if (userData.profilePic && userData.profilePic.filepath) {
-		// userProfileImage = `https://www.drhandyman.me:4000/pictures/${userData.email}`;
-		userProfileImage = userData.profilePic.fileGetPath;
-	}
-  console.log(userData);
+	useEffect(() => {
+		if (!userData.email) return;
+		setUserProfileImage(`${IMAGE_URL}/${userData.email}?t=${new Date().getTime()}`);
+	}, [userData]);
 	return (
 		<AppLayout>
 			<ProfileDashboardLayout>
@@ -56,14 +56,16 @@ const ProfilePage = (props) => {
 									bgcolor: "#F7E1A9070",
 								}}
 							>
-								<Avatar
-									src={`https://www.drhandyman.me:4000/pictures/${userData.email}`}
-									sx={{
-										height: 64,
-										width: 64,
-										bgcolor: "#FFFFFF",
-									}}
-								/>
+								{userProfileImage && (
+									<Avatar
+										src={userProfileImage}
+										sx={{
+											height: 64,
+											width: 64,
+											bgcolor: "#FFFFFF",
+										}}
+									/>
+								)}
 								<Box ml={1.5} flex="1 1 0">
 									<FlexBox
 										flexWrap="wrap"
@@ -71,7 +73,9 @@ const ProfilePage = (props) => {
 										alignItems="center"
 									>
 										<div>
-											<H3 my="0px">{userData.username}</H3>
+											<H3 my="0px">
+												{userData.username}
+											</H3>
 										</div>
 									</FlexBox>
 								</Box>

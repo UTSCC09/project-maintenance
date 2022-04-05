@@ -6,7 +6,6 @@ import ContactList from "../chat/ContactList";
 import ContractMessage from "../chat/ChatMessage";
 const ChatLayout = ({ children }) => (
 	<Container
-	maxWidth={false}
 		sx={{
 			my: "40px",
 			ml: "100px",
@@ -36,17 +35,6 @@ const ChatLayout = ({ children }) => (
 				}}
 			>
 				<ContractMessage></ContractMessage>
-			</Grid>
-			<Grid
-				item
-				sx={{
-					display: {
-						xs: "12",
-						sm: "none",
-						md: "block",
-					},
-				}}
-			>
 			</Grid>
 		</Grid>
 	</Container>

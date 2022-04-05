@@ -38,6 +38,7 @@ const Login = () => {
 	const router = useRouter();
 	const dispatch = useDispatch();
 	const socket = useSelector((state) => state.socket);
+
 	const [login] = useMutation(CREATE_USER_MUTATION);
 
 	const togglePasswordVisibility = useCallback(() => {

@@ -60,7 +60,7 @@ const MaintainerList = () => {
 			variables: { page: 0, workerPerPage: 6, queryText },
 		})
 			.then((res) => {
-				setWorkersCount(res.data.searchWorkerCount || []);
+				setWorkersCount(res.data.searchWorkerCount || 0);
 			})
 			.catch((err) => {
 				Emitter.emit("showMessage", {
@@ -90,7 +90,10 @@ const MaintainerList = () => {
 			});
 	};
 	Emitter.on("searchWorkers", handlerWorkersSearch);
-
+	Emitter.on("clearWorkers", () => {
+		setWorkersData([]);
+		setWorkersCount(0)
+	});
 	return () => {
 		Emitter.off("searchWorkers", handlerWorkersSearch);
 	};

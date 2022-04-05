@@ -23,6 +23,7 @@ import io from "socket.io-client"
 const wsLink = process.browser ? new WebSocketLink(
   new SubscriptionClient(`wss://${SERVER_URL}/graphql`),
 ) : null;
+
 const httpLink = new createHttpLink({
 	uri: `https://${SERVER_URL}/graphql`,
 	credentials: "include",

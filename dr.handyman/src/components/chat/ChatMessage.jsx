@@ -11,6 +11,7 @@ import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import PhoneIcon from '@mui/icons-material/Phone'
+import { Span } from "../Typography";
 import { formatTime } from "../../utils";
 import { Span } from "../Typography";
 import CallIcon from '@mui/icons-material/Call';
@@ -87,7 +88,7 @@ const ChatMessage = () => {
 				type: UPDATE_CALLING_USER,
 				payload: email
 			})
-	};
+		}
 
 	const submitMsg = () => {
 		createNewMessage({
@@ -293,7 +294,6 @@ const ChatMessage = () => {
 						}}
 						onClick={toggleShowEmoji}
 					></EmojiEmotionsIcon>
-
 					<CallIcon
 						sx={{
 							position: "absolute",
@@ -323,15 +323,6 @@ const ChatMessage = () => {
 					<Picker onSelect={addEmoji} set="facebook" ref={emojiRef} />
 				)}
 			</Box>
-			{/* <Dialog
-					open={videoShow}
-					
-					scroll="body"
-					onClose={toggleVideo}
-				>
-					<ChatVideo callerEmail={}></ChatVideo>
-
-				</Dialog> */}
 
 		</Container>
 	);

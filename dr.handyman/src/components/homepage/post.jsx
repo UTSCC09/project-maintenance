@@ -87,9 +87,13 @@ const Post = ({ post }) => {
         <Typography className="pre" m={0.75} textAlign="left">
 					{formatTime(post.createdAt)}
 				</Typography>
-				<Typography className="pre" m={0.75} textAlign="left">
+				{post.distance !== null && <Typography className="pre" ml={2.75} textAlign="left">
+					{(post.distance).toFixed(2) || "N/A"} KM
+				</Typography>}
+
+			{ post.distance === null && <Typography className="pre" ml={2.75} textAlign="left">
 					{Math.ceil(post.distance) || "N/A"} KM
-				</Typography>
+				</Typography>}
 
 				<Link
 					href={`/PostInformation?id=${post._id}`}
