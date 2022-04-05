@@ -1,7 +1,7 @@
 import { createStore } from "redux";
 import { produce } from "immer";
-import { UPDATE_USER_DATA, TRIGGER_MESSAGE, UPDATE_USER_POSITION, SET_CURRENT_CONV_USER_INFO, UPDATE_CALLING_USER } from "./constants";
-import io from "socket.io-client"
+import { UPDATE_USER_DATA, TRIGGER_MESSAGE, UPDATE_USER_POSITION, SET_CURRENT_CONV_USER_INFO } from "./constants";
+
 const initialData = {
 	userData: {},
 	globalMessage: {
@@ -11,9 +11,7 @@ const initialData = {
 		show: false,
 	},
 	userLocation: {},
-	currentConvUserInfo: {},
-	socket:  io.connect('https://localhost:4000/'),
-	callingUser: ""
+	currentConvUserInfo: {}
 };
 
 const reducer = (state = initialData, action) =>
@@ -44,10 +42,6 @@ const reducer = (state = initialData, action) =>
 				return Object.assign({}, draft, {
 					currentConvUserInfo: payload.currentConvUserInfo
 				})
-			case UPDATE_CALLING_USER:
-				return Object.assign({}, draft, {
-					callingUser: payload,
-				});
 			default:
 				return initialData;
 		}

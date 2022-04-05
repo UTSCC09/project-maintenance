@@ -179,12 +179,6 @@ const NewPost = ({ setDialog, post = {} }) => {
 							label="Find a Handyman"
 						/>
 
-						{/* to be done 设置disable radio， 只有修理工可以发布find contractor post <FormControlLabel
-          value="disabled"
-          disabled
-          control={<Radio />}
-          label="other"
-        /> */}
 					</RadioGroup>
 				</FormControl>
 

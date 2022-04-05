@@ -57,7 +57,7 @@ const Posts = () => {
 				variables: { page: 0, postPerPage: 6, queryText },
 			})
 				.then((res) => {
-					setPostsCount(res.data.searchPostCount || []);
+					setPostsCount(res.data.searchPostCount || 0);
 				})
 				.catch((err) => {
 					Emitter.emit("showMessage", {
@@ -90,12 +90,16 @@ const Posts = () => {
 		updatePostInfo();
 		Emitter.on("updatePostInfo", updatePostInfo);
 		Emitter.on("searchPosts", handlerPostsSearch);
+		Emitter.on("clearPosts", () => {
+			setPostsData([]);
+			setPostsCount(0)
+		});
 
 		return () => {
 			Emitter.off("updatePostInfo", updatePostInfo);
 			Emitter.off("searchPosts", handlerPostsSearch);
 		};
-	}, []);
+	}, [userLocation]);
 
 	if (loading || cloading) {
 		return (

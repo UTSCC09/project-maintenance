@@ -5,16 +5,17 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import Comments from "components/comments/comments";
 import Link from "next/link";
 import { Box } from "@mui/system";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { H3, H5, Small, Medium } from "components/Typography";
 import EmailIcon from "@mui/icons-material/Email";
 import { styled } from "@mui/material/styles";
 import { getUrlQuery } from "@/utils/index";
-
+import { IMAGE_URL } from '/src/constant.js'
 import Paper from "@mui/material/Paper";
 import FlexBox from "components/FlexBox";
 import { format } from "date-fns";
-import { Avatar, Button, Card, Grid } from "@mui/material";
-import UserProfileLayout from "components/layout/UserProfileLayout";
+import { Avatar, Button, Card, Grid,Dialog } from "@mui/material";
+import UserProfileLayout from "components/layout/userProfileLayout";
 import { GET_ONE_WORKER } from "../src/GraphQL/Queries";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -22,7 +23,7 @@ import Emitter from "@/utils/eventEmitter";
 import { CREATE_CONVERSATION } from "@/GraphQL/Mutations";
 import { useMutation, useLazyQuery, useSubscription } from "@apollo/client";
 import { useRouter } from "next/router";
-import Checkout from "components/paypal/checkout";
+import NewAppointment from "../src/components/appointment/newAppointment";
 
 const UserProfile = (props) => {
 	const router = useRouter();
@@ -31,18 +32,20 @@ const UserProfile = (props) => {
 	const [getWorkerDetail] = useLazyQuery(GET_ONE_WORKER, {
 		fetchPolicy: "network-only",
 	});
+	
 	const [workerDetail, setWorkerDetail] = useState({});
-
-	const [input, setInput] = useState('')
-
 	const createNewChat = () => {
 		createNewConv({
 			variables: {
 				email: workerDetail.email,
 			},
 		})
-			.then((res) => {
-				router.push('/chat')
+			.then(() => {
+				router.push('/chat', {
+					query: {
+						email: workerDetail.email,
+					}
+				})
 			})
 			.catch((err) => {
 				Emitter.emit("showMessage", {
@@ -51,7 +54,6 @@ const UserProfile = (props) => {
 				});
 			});
 	}
-	console.log(workerDetail);
 
 	useEffect(() => {
 		const urlQuery = getUrlQuery();
@@ -104,7 +106,7 @@ const UserProfile = (props) => {
 								}}
 							>
 								<Avatar
-									src={`https://www.drhandyman.me:4000/pictures/${workerDetail.email}`}
+									src={workerDetail.emai ? `${IMAGE_URL}/${workerDetail.email}?t=${Date.now()}`: null}
 									sx={{
 										height: 64,
 										width: 64,
@@ -134,17 +136,6 @@ const UserProfile = (props) => {
 									</Medium>
 									<span>{workerDetail.email}</span>
 								</FlexBox>
-								{/* <FlexBox flexDirection="column" p={1} mr={8}>
-									<Medium
-										color="grey.600"
-										mb={0.5}
-										textAlign="left"
-									>
-										Tips[in development]
-									</Medium>
-									<input type="text" value={input} onInput={e => setInput(e.target.value)}/>
-									<Checkout tips={input} email={workerDetail.email}></Checkout>
-								</FlexBox> */}
 								<FlexBox flexDirection="column" p={1} mr={8}>
 									<Medium
 										color="grey.600"
@@ -155,10 +146,32 @@ const UserProfile = (props) => {
 									</Medium>
 									<span>{workerDetail.phone}</span>
 								</FlexBox>
-								<Typography
+								{ workerDetail.email !== userData.email && 
+								<FlexBox flexDirection="column" p={1} mr={8}>
+									{/* <Typography
 									textAlign="center"
 									color="grey.600"
-									onClick={createNewChat}
+									
+									sx={{
+										display: {
+											xs: "none",
+											md: "block",
+											mr:'20px'
+										},
+									}}
+								> */}
+									<IconButton>
+										<ChatBubbleOutlineIcon
+											fontSize="small"
+											color="inherit" onClick={createNewChat}/>
+									</IconButton>
+								{/* </Typography> */}
+								</FlexBox> }
+
+								{/* { workerDetail.email !== userData.email && 	<><Typography
+									textAlign="center"
+									color="grey.600"
+									onClick={toggleNewAppointmentDialog}
 									sx={{
 										display: {
 											xs: "none",
@@ -167,12 +180,17 @@ const UserProfile = (props) => {
 									}}
 								>
 									<IconButton>
-										<ChatBubbleOutlineIcon
+										<CalendarTodayIcon
 											fontSize="small"
-											color="inherit"
-										/>
+											color="inherit" />
 									</IconButton>
-								</Typography>
+								</Typography><Dialog
+									open={newAppointmentDialogOpen}
+									scroll="body"
+									onClose={toggleNewAppointmentDialog}
+								>
+										<NewAppointment setDialog={setNewAppointmentDialogOpen} />
+									</Dialog></>} */}
 							</Card>
 						</Grid>
 					</Grid>
@@ -182,7 +200,7 @@ const UserProfile = (props) => {
 					title={"Comments on " + workerDetail.username}
 					mt={5}
 				/>
-				<Comments />
+				<Comments workerInfo={workerDetail}/>
 			</UserProfileLayout>
 		</AppLayout>
 	);

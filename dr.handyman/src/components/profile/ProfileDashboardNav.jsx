@@ -8,6 +8,7 @@ import { Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import React, { Fragment } from "react";
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import {
 	DashboardNavigationWrapper,
 	StyledDashboardNav,
@@ -75,10 +76,16 @@ const linkList = [
 				icon: AssignmentTurnedInIcon,
 			},
 			{
-				href: "/userAppointment",
-				title: "My Appointments",
+				href: "/userUpcomingAppointment",
+				title: "My Upcoming Appointments",
 				icon: CalendarTodayIcon,
 			},
+			{
+				href: "/userHistoryAppointment",
+				title: "My History Appointments",
+				icon: CalendarTodayIcon,
+			},
+			
 			{
 				href: "/userComment",
 				title: "My Comments",

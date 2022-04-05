@@ -1,70 +1,64 @@
-# Getting Started with Create React App
+## Description of the key features that will be completed by the Beta version
+### User
+**Non authenticated Users**
+- Can search for workers and other people’s postings
+- Can log in or sign up to be a client or worker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+**Client**
+- Can search for workers and other people’s postings
+- Users have a profile, including username, profile picture, phone, etc.
+- Users can change profile information.
+- Users can make/edit posts.
+- Have a message box of chat history with workers.
+- Can make posts asking for workers (Details reference Post section)
+- Can accept posts asking for work from workers.
 
-In the project directory, you can run:
 
-### `npm start`
+**Worker**
+- Have all privileges as authenticated.
+- Can ask for work with a post
+- Can accept posts that ask for help
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Post
+- Posts will include the description of the posts and have 2 types: recruitment and employment
+- Authenticated user can see their posting history
+- Authenticated user can delete their posts
+- Non authenticated users can only view posts
 
-### `npm test`
+### Search
+- Select Type of Posts: 
+- Looking for Help
+  - Looking for Work
+- Looking for Workers
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Description of the additional features that will be complete by the Final version
+- Distance Filter for searching and potential map distance showcase
+- Administrator user in charge of content regulation. 
+- Workers are authenticated by the Administrator.
+- Workers can post comments to users about previous uncancelled appointments.
+- Users can post comments to workers about previous uncancelled appointments.
+- Users can apply to be a worker.
+- Workers have a scheduled calendar.
+- Non-Authenticated now can message workers as anonymous users but have no history after leaving the page
+- Non-Authenticated now can book an appointment using emails
+- Non-Authenticated now can cancel appointments using email and appointment number
+- Non-Authenticated now can view history using email
 
-### `npm run build`
+## Description of the technology stack that will be used to build
+- Frontend: HTML, CSS, and Javascript with React
+- Backend: node.js, express.js with GraphQL + MongoDB
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## The top 5 technical challenges
+- Managing complex user relationships such as comments, posts, or chatting.
+- Managing Bad user behavior. For example, not showing up to appointments, fraud worker documents, etc.
+- Learning Curve of new frameworks. (eg. react, map functionalities, GraphQl/gRPC)
+- Little time for market research given the circumstances. 
+- Managing Security and User Privacy
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## new features:
+- Video Chat Peerjs
+- Tips Paypal Payment button, credit card button
+- 360o Image Display PANOLENS JS
+- audio messages/chat https://howlerjs.com/

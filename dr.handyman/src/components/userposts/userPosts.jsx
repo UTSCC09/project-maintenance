@@ -190,11 +190,11 @@ const UserPosts = ({ type = "all" }) => {
 					State
 				</H5>
 				{type === "accept" ? (
-					<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
+					<H5 color="grey.600" my="0px" mx={0.75} ml={-1.75} textAlign="left">
 						Posted By
 					</H5>
 				) : (
-					<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
+					<H5 color="grey.600" my="0px" mx={0.75} ml={-1.75} textAlign="left">
 						User Accept
 					</H5>
 				)}
@@ -209,7 +209,7 @@ const UserPosts = ({ type = "all" }) => {
 				<H5
 					flex="0 0 0 !important"
 					color="grey.600"
-					px={7.75}
+					px={2.75}
 					py={0.5}
 					my={0}
 				></H5>

@@ -60,7 +60,7 @@ const MaintainerList = () => {
 			variables: { page: 0, workerPerPage: 6, queryText },
 		})
 			.then((res) => {
-				setWorkersCount(res.data.searchWorkerCount || []);
+				setWorkersCount(res.data.searchWorkerCount || 0);
 			})
 			.catch((err) => {
 				Emitter.emit("showMessage", {
@@ -90,7 +90,10 @@ const MaintainerList = () => {
 			});
 	};
 	Emitter.on("searchWorkers", handlerWorkersSearch);
-
+	Emitter.on("clearWorkers", () => {
+		setWorkersData([]);
+		setWorkersCount(0)
+	});
 	return () => {
 		Emitter.off("searchWorkers", handlerWorkersSearch);
 	};
@@ -119,7 +122,14 @@ const MaintainerList = () => {
 	// 	getAllList();
 	// }, []);
 	if (loading || cloading || data == undefined || cdata == undefined) {
-		return <div>Loading...</div>;
+		return (
+			<NavbarLayout>
+				<H3 color="#2C2C2C" mb={2}>
+					See Maintainers
+				</H3>
+				<div>Loading...</div>
+			</NavbarLayout>
+		);
 	}
 	let index1 = (page - 1) * 6 + 1;
 	let index2 = page * 6;
@@ -148,7 +158,7 @@ const MaintainerList = () => {
 	return (
 		<NavbarLayout>
 			<H3 color="#2C2C2C" mb={2}>
-				See Top Rated Mantainers
+				See Mantainers
 			</H3>
 			{/* {workersCount == 0 && (
 				<H4 color="#2C2C2C" mt={3}>
