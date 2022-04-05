@@ -13,7 +13,6 @@ import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import PhoneIcon from '@mui/icons-material/Phone'
 import { Span } from "../Typography";
 import { formatTime } from "../../utils";
-import { Span } from "../Typography";
 import CallIcon from '@mui/icons-material/Call';
 const convId2MsgList = {};
 
@@ -88,7 +87,7 @@ const ChatMessage = () => {
 				type: UPDATE_CALLING_USER,
 				payload: email
 			})
-		}
+	}
 
 	const submitMsg = () => {
 		createNewMessage({
