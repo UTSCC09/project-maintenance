@@ -37,7 +37,7 @@ require('dotenv').config();
   const option2 = {
     host: "cache.drhandyman.me",
     port: 6379,
-    
+    password: "password123",
     tls: {
       key: fs.readFileSync('./server.key'),
       cert: fs.readFileSync('./server.crt'),
