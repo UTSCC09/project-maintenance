@@ -53,11 +53,9 @@ const Signup = () => {
 
 	const handleFormSubmit = async (values) => {
 		try {
+			const { email, name: username, password, phone } = values;
 
-			const { email, name: username, password, phone} = values;
-     
-			if (username && email && password && phone) {
-
+			if (username && email && password) {
 				invokeSignUp({
 					variables: {
 						username,
@@ -128,21 +126,6 @@ const Signup = () => {
 					value={values.name || ""}
 					error={!!touched.name && !!errors.name}
 					helperText={touched.name && errors.name}
-				/>
-
-				<TextField
-					mb={1.5}
-					name="phone"
-					label="Phone Number"
-					placeholder="Phone"
-					variant="outlined"
-					size="small"
-					fullWidth
-					onBlur={handleBlur}
-					onChange={handleChange}
-					value={values.phone || ""}
-					error={!!touched.phone && !!errors.phone}
-					helperText={touched.phone && errors.phone}
 				/>
 
 				<TextField
@@ -332,17 +315,15 @@ const initialValues = {
 	re_password: "",
 	agreement: false,
 };
-
-
 const phoneRegEx = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
-
 const formSchema = yup.object().shape({
 	name: yup.string().required("${path} is required"),
 	email: yup.string().email("invalid email").required("${path} is required"),
-
-
 	password: yup.string().required("${path} is required"),
-	phone: yup.string().matches(phoneRegEx, 'Phone number is not valid').required("${path} is required"),
+	phone: yup
+		.string()
+		.matches(phoneRegEx, "Phone number is not valid")
+		.required("${path} is required"),
 	re_password: yup
 		.string()
 		.oneOf([yup.ref("password"), null], "Passwords must match")

@@ -23,17 +23,20 @@ import {
 	Avatar,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-
+import NewAppointment from "../appointment/newAppointment";
 import SearchBox from "../homepage/SearchBox"; // component props interface
 import { useSelector, useDispatch } from "react-redux";
 import { useMutation, useLazyQuery } from "@apollo/client";
 import { CREATE_LOGOUT_MUTATION, SET_WORKER } from "../../GraphQL/Mutations";
-import { UPDATE_USER_DATA, TRIGGER_MESSAGE, UPDATE_USER_POSITION } from "../../store/constants";
+import {
+	UPDATE_USER_DATA,
+	TRIGGER_MESSAGE,
+	UPDATE_USER_POSITION,
+} from "../../store/constants";
 import { useRouter } from "next/router";
 import { getLocation } from "../../utils";
 import Emitter from "@/utils/eventEmitter";
-import SvgIcon from "@mui/material/SvgIcon";
-
+import {  IMAGE_URL} from "@/constant";
 
 // styled component
 export const HeaderWrapper = styled(Box)(({ theme }) => ({
@@ -107,7 +110,10 @@ const Header = ({ isFixed, className }) => {
 	const userData = useSelector((state) => state.userData);
 	const [repairmanDialogOpen, setRepairmanDialogOpen] = useState(false);
 	const [fetchApplyRepairmanApi] = useMutation(SET_WORKER);
-
+	const [newAppointmentDialogOpen, setNewAppointmentDialogOpen] =
+		useState(false);
+	const toggleNewAppointmentDialog = () =>
+		setNewAppointmentDialogOpen(!newAppointmentDialogOpen);
 	const toggleSidenav = () => setSidenavOpen(!sidenavOpen);
 	const togglePostDialog = () => setPostDialogOpen(!postDialogOpen);
 	const toggleDialog = () => {
@@ -122,15 +128,15 @@ const Header = ({ isFixed, className }) => {
 			dispatch({
 				type: UPDATE_USER_POSITION,
 				payload: {
-					userLocation: coords || {}
-				}
-			})
+					userLocation: coords || {},
+				},
+			});
 			Emitter.emit("showMessage", {
 				message: "User Location Authorization Success",
 				severity: "success",
 			});
 		});
-	}
+	};
 
 	const handleCloseRepairmanDialog = () => {
 		setRepairmanDialogOpen(false);
@@ -192,7 +198,7 @@ const Header = ({ isFixed, className }) => {
 				onClick={handleClick}
 			>
 				<Avatar
-					src={`https://api.drhandyman.me/pictures/${userData.email}`}
+					src={`${IMAGE_URL}/${userData.email}?t=${Date.now()}`}
 					sx={{
 						height: 50,
 						width: 50,
@@ -238,7 +244,7 @@ const Header = ({ isFixed, className }) => {
 						},
 					}}
 				>
-					<Link href="/" >
+					<Link href="/">
 						<a>
 							<img
 								height={50}
@@ -382,13 +388,48 @@ const Header = ({ isFixed, className }) => {
 							<MenuItem
 								disableRipple
 								onClick={() =>
-									router.push("/userAppointment", undefined, {
-										shallow: true,
-									})
+									router.push(
+										"/userUpcomingAppointment",
+										undefined,
+										{
+											shallow: true,
+										}
+									)
 								}
 							>
-								My Appointments
+								My Upcoming Appointments
 							</MenuItem>
+							<MenuItem
+								disableRipple
+								onClick={() =>
+									router.push(
+										"/userHistoryAppointment",
+										undefined,
+										{
+											shallow: true,
+										}
+									)
+								}
+							>
+								My History Appointments
+							</MenuItem>
+							{userData.type === "worker" && (
+								<MenuItem
+									disableRipple
+									onClick={toggleNewAppointmentDialog}
+								>
+									Add New Appointment
+								</MenuItem>
+							)}
+							<Dialog
+								open={newAppointmentDialogOpen}
+								scroll="body"
+								onClose={toggleNewAppointmentDialog}
+							>
+								<NewAppointment
+									setDialog={setNewAppointmentDialogOpen}
+								/>
+							</Dialog>
 							<MenuItem
 								disableRipple
 								onClick={() =>

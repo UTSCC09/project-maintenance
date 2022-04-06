@@ -161,7 +161,6 @@ const UserPostInfo = ({ post, closeDialog, type }) => {
 						</Medium>
 					)}
 
-					
 					{post.distance === null ? (<Medium
 						fontSize="16px"
 						color="grey.800"
@@ -182,8 +181,6 @@ const UserPostInfo = ({ post, closeDialog, type }) => {
 					</Medium>)
 					
 				}
-
-			
 
 					{type === "accept" ? (
 						<LoadingButton

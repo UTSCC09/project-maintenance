@@ -116,7 +116,6 @@ const UserPost = ({ post, type }) => {
 					{Math.ceil(post.distance) || "N/A"} KM
 				</Typography>}
 
-
 			<Typography
 				textAlign="center"
 				color="grey.600"

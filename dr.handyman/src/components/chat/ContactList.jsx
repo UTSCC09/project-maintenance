@@ -1,37 +1,37 @@
-import * as React from 'react';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import Divider from '@mui/material/Divider';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Avatar from '@mui/material/Avatar';
-import Typography from '@mui/material/Typography';
-import { borderColor } from '@mui/system';
-import ListItemButton from '@mui/material/ListItemButton';
-import { FixedSizeList } from 'react-window';
-import ContactListHeader from './ContactListHeader';
-import Link from 'next/link';
-import Box from '@mui/material/Box';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ContactListLayout from '../layout/ContactListLayout';
+import * as React from "react";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import Divider from "@mui/material/Divider";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+import Typography from "@mui/material/Typography";
+import { borderColor } from "@mui/system";
+import ListItemButton from "@mui/material/ListItemButton";
+import { FixedSizeList } from "react-window";
+import ContactListHeader from "./ContactListHeader";
+import Link from "next/link";
+import Box from "@mui/material/Box";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ContactListLayout from "../layout/ContactListLayout";
 
-import {LOAD_CURRENT_CONVOS} from "/src/GraphQL/Queries";
+import { GET_CURRENT_CONVOS_DES } from "/src/GraphQL/Queries";
 import { useLazyQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import ContactListRow from "./ContactListRow.jsx";
+import { useRouter } from "next/router";
 
 
 // function renderMessageRow(props) {
 //   const { key, style, item} = props;
-//   // const [getConvos, { loading, data, error }] = useLazyQuery(LOAD_CURRENT_CONVOS);
+//   // const [getConvos, { loading, data, error }] = useLazyQuery(GET_CURRENT_CONVOS_DES);
 
 //   // //const [convos, setConvos] = useState([]);
 
-  
 //   // useEffect(() => {
 // 	// 		getConvos();
 // 	// 			//setConvos(res.data.getCurrentConvos[0].userEmails[0])
-		
+
 //   // }, []);
 //   // if (loading || data == undefined) {
 //   //   return <div>Loading...</div>
@@ -39,27 +39,25 @@ import ContactListRow from "./ContactListRow.jsx";
 //   // console.log(data.getCurrentConvos);
 //   // //setConvos(data.getCurrentConvos)
 
-
 //   return (
-//     <ListItem style={style} key={key} alignItems="flex-start" component="div"   disablePadding > 
+//     <ListItem style={style} key={key} alignItems="flex-start" component="div"   disablePadding >
 //       <ListItemButton divider sx={{
 //           mt:'10px',
 //                     height:'90px',
-                    
+
 //                 }}>
-                    
+
 //       <ListItemAvatar>
 //           <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
 //         </ListItemAvatar>
-      
-  
+
 //         <ListItemText
 //           primary={item.userEmails[0]}
 //           secondary={
 //             <React.Fragment>
-              
+
 //               I'll be in your neighborhood doing errands this…
-//               <Typography 
+//               <Typography
 //               sx={{ display: 'inline'}}
 //               component="span"
 //               variant="overline"
@@ -67,112 +65,96 @@ import ContactListRow from "./ContactListRow.jsx";
 //             >
 //               2022-03-11
 //             </Typography>
-           
+
 //             </React.Fragment>
-            
+
 //           }
 //         />
 
-       
 //       </ListItemButton>
-      
+
 //     </ListItem>
-    
-    
-    
+
 //   );
 // }
 
-
 export default function ContactList() {
+	const router = useRouter();
+	const [getConvos, { loading, data, error }] =
+		useLazyQuery(GET_CURRENT_CONVOS_DES);
+	let [convosList, setConvosList] = useState([])
+	console.log(convosList && convosList.map(item => item.time).join(','), convosList )
 
-  const [getConvos, { loading, data, error }] = useLazyQuery(LOAD_CURRENT_CONVOS);
+	//const [convos, setConvos] = useState([]);
 
-  //const [convos, setConvos] = useState([]);
+	useEffect(() => {
+		getConvos().then(res => {
+			if (res.data) {
+				let convos = (res.data.getCurrentConvosWithDescription || []).slice();
+				convos.sort((a, b) =>  +b.time - +a.time);
+				setConvosList(convos);
+			}
+		});
+		//setConvos(res.data.getCurrentConvos[0].userEmails[0])
+	}, []);
+	if (loading || data == undefined) {
+		return <div>Loading...</div>;
+	}
 
-  useEffect(() => {
-			getConvos();
-				//setConvos(res.data.getCurrentConvos[0].userEmails[0])
-		
-  }, []);
-  if (loading || data == undefined) {
-    return <div>Loading...</div>
-  }
-  console.log(data.getCurrentConvos);
+	const setLastMessageTimeFromChild = (time, id) => {
+		const index = convosList.findIndex(item => item.conversation && item.conversation._id === id)
+		convosList[index] = Object.assign({}, convosList[index], { time });
+		const beforeSortItemsStr = convosList.map(item => item.conversation._id).join(',');
+		convosList.sort((a, b) =>  +b.time - +a.time);
+		const afterSortItemsStr = convosList.map(item => item.conversation._id).join(',');
+		(beforeSortItemsStr !== afterSortItemsStr) && setConvosList(convosList.slice());
+	}
 
-  return (
-    <ContactListLayout>
-    <Box sx={{ width: '100%', maxWidth: 360, color: 'grey'}}>
-        <ContactListHeader title = "Contact List" button={<Link href="/profile">
-          
-          <ArrowBackIcon sx={{
-              borderRadius:'20px',
-              mr:'20px',
-              
-          }}/>
-      </Link>} />
+	return (
+		<ContactListLayout>
+			<Box sx={{ width: "100%", maxWidth: 360, color: "grey" }}>
+				<ContactListHeader
+					title="Contact List"
+					button={
+						<Link href="/profile">
+							<ArrowBackIcon
+								sx={{
+									borderRadius: "20px",
+									mr: "20px",
+								}}
+							/>
+						</Link>
+					}
+				/>
 
-      <Divider sx={{ my: 0.5 }} />
-      <List
-      
-      
+				<Divider sx={{ my: 0.5 }} />
+				<List
+					sx={{
+						maxHeight: "350px",
+						overflow: "auto",
 
-        sx={{maxHeight:'350px',
-        overflow:'auto',
-      
-       width: 360
-       }}
-        
-        
-      >
-        {data.getCurrentConvos.map((item, index) => (
-        <ContactListRow contact={item} key={index}/>
-        ))}
-        {/* {fakeList.map((item, index) => (
+						width: 360,
+					}}
+				>
+					{convosList?.map((item, index) => (
+						<ContactListRow detail={item} key={(item.conversation && item.conversation._id) || index} setLastMessageTimeFromChild={(time) => setLastMessageTimeFromChild(time, item.conversation && item.conversation._id)}/>
+					))}
+					{/* {fakeList.map((item, index) => (
         <ContactListRow contact={item} key={index}/>
         ))} */}
-      </List>
-      
-    </Box>
-    </ContactListLayout>
-  );
+				</List>
+			</Box>
+		</ContactListLayout>
+	);
 }
 
 const fakeList = [
-
-  {userEmails: ['u1email', 'u2email'],
-  _typename:'mesage',
-  _id:'id'
-},
-{userEmails: ['u1email', 'u2email'],
-  _typename:'mesage',
-  _id:'id'
-},
-{userEmails: ['u1email', 'u2email'],
-  _typename:'mesage',
-  _id:'id'
-},
-{userEmails: ['u1email', 'u2email'],
-  _typename:'mesage',
-  _id:'id'
-},
-{userEmails: ['u1email', 'u2email'],
-  _typename:'mesage',
-  _id:'id'
-},
-{userEmails: ['u1email', 'u2email'],
-  _typename:'mesage',
-  _id:'id'
-},
-{userEmails: ['u1email', 'u2email'],
-  _typename:'mesage',
-  _id:'id'
-},
-{userEmails: ['u1email', 'u2email'],
-  _typename:'mesage',
-  _id:'id'
-}
-  
-  
+	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
+	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
+	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
+	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
+	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
+	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
+	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
+	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
 ];
-

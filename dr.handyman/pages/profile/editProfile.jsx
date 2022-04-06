@@ -23,6 +23,7 @@ import { useRouter } from "next/router";
 import { GET_USER_DATA } from "../../src/GraphQL/Queries";
 import Emitter from "@/utils/eventEmitter";
 import axios from "axios";
+import { IMAGE_URL, SERVER_URL } from '/src/constant.js'
 
 const ProfileEdit = () => {
 	const [modifyUser] = useMutation(SET_USER);
@@ -30,16 +31,18 @@ const ProfileEdit = () => {
 	const dispatch = useDispatch();
 	const router = useRouter();
 	const [fetchUserData] = useLazyQuery(GET_USER_DATA);
-	const [waitForUserProfileAvatarFile, setWaitForUserProfileAvatarFile] = useState(null)
+	const [waitForUserProfileAvatarFile, setWaitForUserProfileAvatarFile] =
+		useState(null);
 
-	let userProfileImage = "/assets/user.png";
-	console.log(userData)
-	if (userData.profilePic) {
-		// userProfileImage = userData.profilePic.fileGetPath;
-		userProfileImage = `https://api.drhandyman.me/pictures/${userData.email}`;
-	}
+	let userProfileImage = `${IMAGE_URL}/${userData.email}`;
+	// if (userData.profilePic && userData.profilePic.fileGetPath) {
+	// 	userProfileImage = userData.profilePic.fileGetPath || `${IMAGE_URL}/${userData.email}`;
+	// }
+
 	if (waitForUserProfileAvatarFile) {
-		userProfileImage = window.URL.createObjectURL(waitForUserProfileAvatarFile)
+		userProfileImage = window.URL.createObjectURL(
+			waitForUserProfileAvatarFile
+		);
 	}
 
 	const uploadAvatar = () => {
@@ -54,7 +57,7 @@ const ProfileEdit = () => {
 		formData.append("0", waitForUserProfileAvatarFile);
 
 		return axios({
-			url: "https://api.drhandyman.me/graphql",
+			url: `https://${SERVER_URL}/graphql`,
 			method: "POST",
 			withCredentials: true,
 			data: formData,
@@ -167,7 +170,7 @@ const ProfileEdit = () => {
 				<Card sx={{ p: 4, bgcolor: "#FFF9EC" }}>
 					<FlexBox alignItems="flex-end" mb={3}>
 						<Avatar
-							src={`https://api.drhandyman.me/pictures/${userData.email}`}
+							src={userProfileImage}
 							sx={{
 								height: 64,
 								width: 64,
@@ -194,7 +197,9 @@ const ProfileEdit = () => {
 						<Box display="none">
 							<input
 								onChange={(e) =>
-									setWaitForUserProfileAvatarFile(e.target.files[0])
+									setWaitForUserProfileAvatarFile(
+										e.target.files[0]
+									)
 								}
 								id="profile-image"
 								accept="image/*"
@@ -223,7 +228,7 @@ const ProfileEdit = () => {
 										}
 									/>
 								</Grid>
-							
+
 								{/* <Grid item md={6} xs={12}>
 									<TextField
 										name="email"
@@ -327,7 +332,10 @@ const checkoutSchema = yup.object().shape({
 	username: yup.string().required("required"),
 	// last_name: yup.string().required("required"),
 	// email: yup.string().email("invalid email").required("required"),
-	 phone: yup.string().matches(phoneRegEx, 'Phone number is not valid').required("${path} is required"),
+	phone: yup
+		.string()
+		.matches(phoneRegEx, "Phone number is not valid")
+		.required("${path} is required"),
 	//phone: yup.string().required("required"),
 	// birth_date: yup.date().required("invalid date"),
 });

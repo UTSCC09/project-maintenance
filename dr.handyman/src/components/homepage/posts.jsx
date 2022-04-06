@@ -50,14 +50,14 @@ const Posts = () => {
 			});
 		};
 
-		const handlerPostsSearch = ({ queryText = "", coordinates = null}) => {
+		const handlerPostsSearch = ({ queryText = "" }) => {
 			if (!queryText) return updatePostInfo();
 			const userLocationNew = store.getState().userLocation;
 			searchPostCount({
 				variables: { page: 0, postPerPage: 6, queryText },
 			})
 				.then((res) => {
-					setPostsCount(res.data.searchPostCount || []);
+					setPostsCount(res.data.searchPostCount || 0);
 				})
 				.catch((err) => {
 					Emitter.emit("showMessage", {
@@ -66,7 +66,6 @@ const Posts = () => {
 					});
 				});
 			searchPost({
-
 				variables: {
 					page: 0,
 					postPerPage: 6,
@@ -91,6 +90,10 @@ const Posts = () => {
 		updatePostInfo();
 		Emitter.on("updatePostInfo", updatePostInfo);
 		Emitter.on("searchPosts", handlerPostsSearch);
+		Emitter.on("clearPosts", () => {
+			setPostsData([]);
+			setPostsCount(0)
+		});
 
 		return () => {
 			Emitter.off("updatePostInfo", updatePostInfo);
@@ -174,7 +177,7 @@ const Posts = () => {
 				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
 					Post Time
 				</H5>
-				<H5 color="grey.600"  mx={0.75} textAlign="left">
+				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
 					Distance
 				</H5>
 				<H5

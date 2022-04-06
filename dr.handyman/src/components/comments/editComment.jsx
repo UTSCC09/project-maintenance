@@ -11,15 +11,14 @@ import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import { SET_POST } from "@/GraphQL/Mutations";
+import { EDIT_COMMENT } from "@/GraphQL/Mutations";
 import { useMutation } from "@apollo/client";
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from "react-redux";
 import { CANCEL_ACCEPT } from "@/GraphQL/Mutations";
 
-
-import { Box, Card, Divider, Button } from "@mui/material";
+import { Box, Card, Divider, Button, Rating } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import Emitter from '@/utils/eventEmitter';
+import Emitter from "@/utils/eventEmitter";
 
 const StyledCard = styled(
 	({
@@ -36,52 +35,51 @@ const StyledCard = styled(
 	},
 }));
 
-const EditPost = ({ closeDialog, post = {} }) => {
-	const [editPost] = useMutation(SET_POST);
+const EditComment = ({ closeDialog, comment = {} }) => {
+	const [editComment] = useMutation(EDIT_COMMENT);
 	const userData = useSelector(state => state.userData);
 	const handleFormSubmit = async (values) => {
-    const { title, description: content } = values;
+		const { description: content, rating } = values;
 		if (!userData.isLogin) {
-      Emitter.emit('showMessage', {
-        message: "Please login first.",
-        severity: "error"
-      })
+			Emitter.emit("showMessage", {
+				message: "Please login first.",
+				severity: "error",
+			});
 		}
-    editPost({
-      variables: {
-        id: post._id,
-        title,
-        content
-      },
-    }).then((res) => {
-      if (res.data && res.data.setPost) {
-        Emitter.emit('updatePostInfo')
-        Emitter.emit('updateMyPosts')
-        Emitter.emit('showMessage', {
-          message: "Edit post success.",
-          severity: "success"
-        })
-        closeDialog()
-      }
-    }).catch((err) => {
-      Emitter.emit('showMessage', {
-        message: err.message,
-        severity: "error"
-      })
-    });
-  }
-	const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
+		editComment({
+			variables: {
+				id: comment._id,
+				rating,
+				content
+			},
+		})
+			.then((res) => {
+				if (res.data && res.data.editComment) {
+					Emitter.emit("showMessage", {
+						message: "Edit post success.",
+						severity: "success",
+					});
+					Emitter.emit("updateCommentList");
+					closeDialog();
+				}
+			})
+			.catch((err) => {
+				Emitter.emit("showMessage", {
+					message: err.message,
+					severity: "error",
+				});
+			});
+	};
+	const { values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue } =
 		useFormik({
 			initialValues: {
-        title: post.title || "",
-				description: post.content || "",
-				// type: post.type || null,
-      },
+				description: comment.content || "",
+				rating: comment.rating
+			},
 			onSubmit: handleFormSubmit,
 			validationSchema: formSchema,
 		});
 
-		
 	return (
 		<StyledCard
 			elevation={3}
@@ -90,22 +88,7 @@ const EditPost = ({ closeDialog, post = {} }) => {
 			}}
 		>
 			<form className="content" onSubmit={handleSubmit}>
-				<DialogTitle fontSize="25px">New Post</DialogTitle>
-
-				<TextField
-					autoFocus
-					margin="dense"
-					id="title"
-					label="Title"
-					type="content"
-					fullWidth
-					variant="standard"
-					onBlur={handleBlur}
-					onChange={handleChange}
-					value={values.title || ""}
-					error={!!touched.title && !!errors.title}
-					helperText={touched.title && errors.title}
-				/>
+				<DialogTitle fontSize="25px">Edit Comment</DialogTitle>
 
 				<TextField
 					mt="20px"
@@ -120,31 +103,25 @@ const EditPost = ({ closeDialog, post = {} }) => {
 					error={!!touched.description && !!errors.description}
 					helperText={touched.description && errors.description}
 				/>
-				{/* <FormControl mt="10px" mb="10px">
-					<FormLabel id="type">Post Type</FormLabel>
-					<RadioGroup
-						row
-						aria-labelledby="demo-row-radio-buttons-group-label"
-						name="type"
-						onChange={handleChange}
-            defaultValue={post.type}
-					>
-						<FormControlLabel
-							disabled={userData.type === 'user'}
-							value={1}
-							control={<Radio />}
-							label="Find a Contractor"
-						/>
-						<FormControlLabel
-							value={0}
-							control={<Radio />}
-							label="Find a Handyman"
-						/>
+				<Typography m={0.75} textAlign="center">
+					{" "}
+					Rating
+				</Typography>
 
-					</RadioGroup>
-				</FormControl> */}
- 
-				
+				<Rating
+					color="warn"
+					size="small"
+					id="rating"
+					precision={0.1}
+					sx={{ mb: "0.75rem" }}
+					onBlur={handleBlur}
+					onChange={(e, newValue) => {
+						setFieldValue('rating', newValue);
+					}}
+					value={values.rating || 0}
+					error={!!touched.rating && !!errors.rating}
+					helpertext={touched.rating && errors.rating}
+				/>
 				<Button
 					variant="contained"
 					type="submit"
@@ -159,7 +136,7 @@ const EditPost = ({ closeDialog, post = {} }) => {
 						mt: "20px",
 					}}
 				>
-					Submit the Post
+					Submit the Changes
 				</Button>
 				<Button
 					variant="contained"
@@ -181,9 +158,9 @@ const EditPost = ({ closeDialog, post = {} }) => {
 	);
 };
 const formSchema = yup.object().shape({
-	title: yup.string().required("title is required"),
+	// title: yup.string().required("title is required"),
 	description: yup.string().required("post description is required"),
-    // type: yup.string().required("type is required"),
+	// type: yup.string().required("type is required"),
 	//type 必选验证 to be done
 });
-export default EditPost;
+export default EditComment;

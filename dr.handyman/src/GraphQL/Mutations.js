@@ -7,7 +7,6 @@ export const CREATE_USER_MUTATION = gql `
 				email
 				username
 				createdAt
-				permissions
 				phone
 				rating
 				type
@@ -16,24 +15,25 @@ export const CREATE_USER_MUTATION = gql `
 	}
 `;
 
-export const CREATE_CONVO_MUTATION = gql `
-mutation CreateConvo($email: String!) {
-	createConvo(email: $email) {
-	  _id
-	}
-  }
-`
-
 export const CREATE_SIGN_UP_MUTATION = gql `
-	mutation Signup($username: String!, $email: String!, $password: String!, $phone: String!) {
-		signup(username: $username, email: $email, password: $password, phone: $phone) {
+	mutation Signup(
+		$username: String!
+		$email: String!
+		$password: String!
+		$phone: String!
+	) {
+		signup(
+			username: $username
+			email: $email
+			password: $password
+			phone: $phone
+		) {
 			user {
 				email
 				username
 				type
 				phone
 				rating
-				permissions
 				createdAt
 			}
 		}
@@ -65,9 +65,12 @@ export const CREATE_LOGOUT_MUTATION = gql `
 `;
 
 export const SET_USER = gql `
-	mutation SetUser($username: String!, $phone: String!) {
-		setUser(username: $username, phone: $phone)
-	}
+mutation SetUser($username: String!, $phone: String!) {
+  setUser(username: $username, phone: $phone){
+	  username
+	  phone
+  }
+}
 `;
 
 export const SET_WORKER = gql `
@@ -95,20 +98,132 @@ export const DEL_POST = gql `
 `;
 
 export const UPLOAD_AVATAR = gql `
-mutation ProfilePicUpload($file: Upload!) {
-  profilePicUpload(file: $file)
-}
-`
+	mutation ProfilePicUpload($file: Upload!) {
+		profilePicUpload(file: $file)
+	}
+`;
 
 export const CANCEL_ACCEPT = gql `
-mutation UnacquirePost($id: String!) {
-  unacquirePost(_id: $id)
-}
-`
+	mutation UnacquirePost($id: String!) {
+		unacquirePost(_id: $id)
+	}
+`;
 
 export const SET_POST = gql `
+	mutation SetPost($id: String!, $content: String!, $title: String!) {
+		setPost(_id: $id, content: $content, title: $title) {
+			content
+			title
+			_id
+		}
+	}
+`;
 
-mutation SetPost($id: String!, $content: String!, $title: String!) {
-  setPost(_id: $id, content: $content, title: $title)
-}
-`
+export const CREATE_MESSAGE = gql `
+	mutation CreateMessage($id: String!, $content: String!) {
+		createMessage(_id: $id, content: $content)
+	}
+`;
+export const CREATE_CONVERSATION = gql `
+	mutation CreateConvo($email: String!) {
+		createConvo(email: $email) {
+			_id
+			userEmails
+		}
+	}
+`;
+
+export const ADD_NEW_APPOINTMENT = gql `
+	mutation AddAppointment(
+		$description: String!
+		$startTime: Float!
+		$endTime: Float!
+		$userEmail: String!
+	) {
+		addAppointment(
+			description: $description
+			startTime: $startTime
+			endTime: $endTime
+			userEmail: $userEmail
+		) {
+			_id
+			description
+			workerEmail
+			userEmail
+			startTime
+			endTime
+		}
+	}
+`;
+export const EDIT_NEW_APPOINTMENT = gql `
+	mutation EditAppointment(
+		$id: String!
+		$description: String!
+		$startTime: Float!
+		$endTime: Float!
+		$userEmail: String!
+	) {
+		editAppointment(
+			_id: $id
+			description: $description
+			startTime: $startTime
+			endTime: $endTime
+			userEmail: $userEmail
+		) {
+			_id
+			description
+			workerEmail
+			userEmail
+			startTime
+			endTime
+		}
+	}
+`;
+
+export const DEL_APPOINTMENT = gql `
+	mutation DeleteAppointment($id: String!) {
+		deleteAppointment(_id: $id)
+	}
+`;
+
+export const ADD_NEW_COMMENT = gql `
+	mutation AddComment(
+		$appointmentId: String!
+		$workerEmail: String!
+		$rating: Float!
+		$content: String!
+	) {
+		addComment(
+			appointmentId: $appointmentId
+			workerEmail: $workerEmail
+			rating: $rating
+			content: $content
+		) {
+			_id
+			content
+			appointmentId
+			workerEmail
+			userEmail
+			rating
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const EDIT_COMMENT = gql `
+	mutation EditComment($id: String!, $rating: Float!, $content: String!) {
+		editComment(_id: $id, rating: $rating, content: $content){
+			_id
+			rating
+			content
+
+		}
+	}
+`;
+
+export const DEL_COMMENT = gql `
+	mutation DeleteComment($id: String!) {
+		deleteComment(_id: $id)
+	}
+`;

@@ -173,19 +173,10 @@ const PostInformation = () => {
 								? postDetail.acceptorUsername
 								: "N/A"}
 						</Box>
-
-            {postDetail.distance === null && <Box mb={3}>
-							Distance: {Math.ceil(postDetail.distance) || "N/A"} {" "}
+						<Box mb={3}>
+							Distance: {Math.ceil(postDetail.distance) || "N/A"}{" "}
 							KM
-						</Box>}
-              {console.log(postDetail.distance)}
-              {postDetail.distance && <Box mb={3}>
-							Distance: {(postDetail.distance).toFixed(2) || "N/A"} {" "}
-							KM
-						</Box>}
-
-					
-					
+						</Box>
 
 						<Box mb={3}>
 							Post Time: {formatTime(postDetail.createdAt)}
