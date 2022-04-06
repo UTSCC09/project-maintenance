@@ -33,17 +33,35 @@ require('dotenv').config();
 // Redis subscription configuration
   const { RedisPubSub } = require('graphql-redis-subscriptions');
   const Redis = require('ioredis');
-
-  const options = {
-    host: "redis-19500.c239.us-east-1-2.ec2.cloud.redislabs.com",
-    port: 19500,
-    password: process.env.REDIS,
+  const fs = require('fs');
+  const option2 = {
+    host: "cache.drhandyman.me",
+    port: 6379,
+    
+    tls: {
+      key: fs.readFileSync('./server.key'),
+      cert: fs.readFileSync('./server.crt'),
+      rejectUnauthorized: false,
+      requestCert: true,
+      agent: false
+    },
     retryStrategy: times => {
       // reconnect after
       return Math.min(times * 50, 2000);
     }
   };
-
+  const options = {
+    host: "redis-19500.c239.us-east-1-2.ec2.cloud.redislabs.com",
+    port: 19500,
+    password: process.env.REDIS,
+    
+    retryStrategy: times => {
+      // reconnect after
+      return Math.min(times * 50, 2000);
+    }
+  };
+  const userStatus = new Redis(option2);
+  
   const pubsub = new RedisPubSub({
     publisher: new Redis(options),
     subscriber: new Redis(options)
@@ -51,7 +69,6 @@ require('dotenv').config();
 // Redis subscription configuration
 
 // Express X Passport X HTTPS setup
-  const fs = require('fs');
   const https = require('https');
   const http = require('http');
   const uuid = require('uuid').v4;
@@ -117,7 +134,7 @@ require('dotenv').config();
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 360000,
+      maxAge: 600000,
       sameSite: 'strict',
       httpOnly: true,
       secure: true,
@@ -173,16 +190,22 @@ io.on("connection", (socket) => {
   socket.on('login', function(email){
     console.log(email);
     if (email != null)
-      users[email] = socket.id; 
+      userStatus.set(email, socket.id, "EX", 600000);
   })
   socket.on('callEmail', async (data) => {
-    if (data.email in users && io.sockets.sockets.get(users[data.email]) !== undefined){
-      // const user = await User.find({email: data.email});
-      io.to(users[data.email]).emit("incomingCall", {signal: data.signalData, fromId: socket.id, username: data.username})
-    }else{
+    userStatus.get(data.email).then((result) => {
+      if (io.sockets.sockets.get(result) !== undefined){
+        // const user = await User.find({email: data.email});
+        io.to(result).emit("incomingCall", {signal: data.signalData, fromId: socket.id, username: data.username})
+      }else{
+        console.log("not online")
+        socket.emit("user not active");
+      }
+    }).catch((err) => {
       console.log("not online")
       socket.emit("user not active");
-    }
+    });
+    
   })
 
   socket.on("answer", async (data) => {
@@ -213,13 +236,18 @@ io.on("connection", (socket) => {
       io.to(id).emit("reject", {})
   })
   socket.on("cancel", (email) => {
-    if (email in users && io.sockets.sockets.get(users[email]) !== undefined){
-      // const user = await User.find({email: data.email});
-      io.to(users[email]).emit("cancel", {});
-    }else{
+    userStatus.get(email).then((result) => {
+      if (io.sockets.sockets.get(result) !== undefined){
+        // const user = await User.find({email: data.email});
+        io.to(result).emit("cancel", {});
+      }else{
+        console.log("not online")
+        socket.emit("user not active");
+      }
+    }).catch((err) => {
       console.log("not online")
       socket.emit("user not active");
-    }
+    });
   })
 });
 
