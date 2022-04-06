@@ -131,7 +131,7 @@ require('dotenv').config();
     genid: (req) => uuid(),
     secret: SESSION_SECRET,
     proxy: true,
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     cookie: {
       maxAge: 600000,
