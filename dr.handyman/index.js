@@ -120,7 +120,7 @@ require('dotenv').config();
       maxAge: 600000,
       sameSite: 'strict',
       httpOnly: true,
-      secure: process.env.PROD == 'false' ? false : true,
+      secure: true,
     }
   });
   app.set('trust proxy', true);
