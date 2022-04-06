@@ -113,6 +113,7 @@ require('dotenv').config();
   const sessionMid = session({
     genid: (req) => uuid(),
     secret: SESSION_SECRET,
+    proxu: true,
     resave: false,
     saveUninitialized: false,
     cookie: {
