@@ -34,7 +34,7 @@ require('dotenv').config();
   const { RedisPubSub } = require('graphql-redis-subscriptions');
   const Redis = require('ioredis');
   const fs = require('fs');
-  const option2 = {
+  /*const option2 = {
     host: "cache.drhandyman.me",
     port: 6379,
     password: "password123",
@@ -49,7 +49,7 @@ require('dotenv').config();
       // reconnect after
       return Math.min(times * 50, 2000);
     }
-  };
+  };*/
   const options = {
     host: "redis-19500.c239.us-east-1-2.ec2.cloud.redislabs.com",
     port: 19500,
@@ -60,7 +60,7 @@ require('dotenv').config();
       return Math.min(times * 50, 2000);
     }
   };
-  const userStatus = new Redis(option2);
+  const userStatus = new Redis(options);
   
   const pubsub = new RedisPubSub({
     publisher: new Redis(options),
