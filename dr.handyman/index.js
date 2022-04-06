@@ -62,15 +62,9 @@ require('dotenv').config();
   const { graphqlUploadExpress } = require('graphql-upload');
   const PORT = process.env.PORT;
 
-  var privateKey = fs.readFileSync( 'server.key' );
-  var certificate = fs.readFileSync( 'server.crt' );
-  var config = {
-          key: privateKey,
-          cert: certificate
-  };
-
   const SESSION_SECRET = process.env.SECRET;
   const app = express();
+
   // const Sentry = require('@sentry/node');
   // const Tracing = require("@sentry/tracing");
   const httpServer = https.createServer(config, app);
@@ -123,9 +117,7 @@ require('dotenv').config();
     saveUninitialized: false,
     cookie: {
       maxAge: 360000,
-      secure: true,
-      httpOnly: true,
-      sameSite: 'none',
+      sameSite: true
     }
   });
   app.use(sessionMid);
@@ -307,8 +299,8 @@ io.on("connection", (socket) => {
       await server.start();
       const cors = {
         credentials: true,
-        // origin: '*',
-         origin: ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001']
+        origin: ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001',
+	'https://www.drhandyman.me']
       };
       server.applyMiddleware({ app, cors });
   }
