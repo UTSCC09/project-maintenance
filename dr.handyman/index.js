@@ -123,7 +123,7 @@ require('dotenv').config();
       secure: true,
     }
   });
-  app.set('triust proxy', true);
+  app.set('trust proxy', true);
   app.use(sessionMid);
 
   passport.use(
