@@ -43,23 +43,6 @@ require('dotenv').config();
       return Math.min(times * 50, 2000);
     }
   };
-  const option2 = {
-    host: "cache.drhandyman.me",
-    port: 443,
-    
-    tls: {
-      key: fs.readFileSync('./server.key'),
-      cert: fs.readFileSync('./server.crt'),
-      rejectUnauthorized: false,
-      requestCert: true,
-      agent: false
-    },
-    retryStrategy: times => {
-      // reconnect after
-      return Math.min(times * 50, 2000);
-    }
-  };
-  const userStatus = new Redis(option2);
   const pubsub = new RedisPubSub({
     publisher: new Redis(options),
     subscriber: new Redis(options)
