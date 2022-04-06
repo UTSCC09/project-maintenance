@@ -67,7 +67,7 @@ require('dotenv').config();
 
   // const Sentry = require('@sentry/node');
   // const Tracing = require("@sentry/tracing");
-  const httpServer = https.createServer(config, app);
+  const httpServer = http.createServer(app);
   
   // Sentry.init({
   //   dsn: "https://73fbf33220804aadb06952f71a4fc08b@o1186949.ingest.sentry.io/6306768",
@@ -117,7 +117,8 @@ require('dotenv').config();
     saveUninitialized: false,
     cookie: {
       maxAge: 360000,
-      sameSite: true
+      sameSite: true,
+      httpOnly: true,
     }
   });
   app.use(sessionMid);
