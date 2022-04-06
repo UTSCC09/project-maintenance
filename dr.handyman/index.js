@@ -114,15 +114,15 @@ require('dotenv').config();
     genid: (req) => uuid(),
     secret: SESSION_SECRET,
     proxy: true,
-    resave: true,
+    resave: false,
     saveUninitialized: false,
     cookie: {
       domain:
-        process.env.PROD == 'false' ? 'localhost' : 'www.drhandyman.me',
+        process.env.PROD == false ? 'localhost' : 'www.drhandyman.me',
       maxAge: 600000,
       sameSite: 'strict',
       httpOnly: true,
-      secure: process.env.PROD == 'false' ? false : true,
+      secure: process.env.PROD == false ? false : true,
     }
   });
   app.set('trust proxy', true);
@@ -160,7 +160,7 @@ require('dotenv').config();
 const io = require("socket.io")(httpServer, {
   cors: {
     credentials: true,
-    origin: process.env.PROD == 'false' ? ['https://www.drhandyman.me', 'http://localhost:3001'] : ['https://www.drhandyman.me'],
+    origin: process.env.PROD == false ? ['https://www.drhandyman.me', 'http://localhost:3001'] : ['https://www.drhandyman.me'],
     methods: [ "GET", "POST" ]
   },
 })
@@ -317,7 +317,7 @@ io.on("connection", (socket) => {
       await server.start();
       const cors = {
         credentials: true,
-        origin: process.env.PROD == 'false' ? ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001', 'https://www.drhandyman.me'] : ['https://www.drhandyman.me'],
+        origin: process.env.PROD == false ? ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001', 'https://www.drhandyman.me'] : ['https://www.drhandyman.me'],
       };
       server.applyMiddleware({ app, cors });
   }
