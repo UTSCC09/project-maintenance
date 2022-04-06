@@ -117,8 +117,6 @@ require('dotenv').config();
     resave: false,
     saveUninitialized: false,
     cookie: {
-      domain:
-        process.env.PROD == false ? 'localhost' : 'www.drhandyman.me',
       maxAge: 600000,
       sameSite: 'strict',
       httpOnly: true,
