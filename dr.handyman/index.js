@@ -117,15 +117,13 @@ require('dotenv').config();
     resave: false,
     saveUninitialized: false,
     cookie: {
-      domain: 'api.drhandyman.me',
-      path: "/",
       maxAge: 360000,
       sameSite: 'strict',
       httpOnly: true,
       secure: true,
     }
   });
-  app.set('trust proxy', 1);
+  app.set('triust proxy', true);
   app.use(sessionMid);
 
   passport.use(
