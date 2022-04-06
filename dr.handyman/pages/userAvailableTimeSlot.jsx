@@ -25,8 +25,6 @@ const UserAvailableTimeSlot = (props) => {
 					title="My Available Appointment TimeSlots"
 					navigation={<ProfileDashboardNavigation />}
 				/>
-
-				<AppointmentTime />
 			</ProfileDashboardLayout>
 		</AppLayout>
 	);
