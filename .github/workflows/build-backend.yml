@@ -64,4 +64,3 @@ jobs:
                         cd ~/nginx-docker
                         docker-compose pull
                         docker-compose up -d --build --force-recreate
-                        docker rmi -f $(docker images -aq)
