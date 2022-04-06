@@ -14,8 +14,8 @@ import { format } from "date-fns";
 import { Avatar, Button, Card, Grid, Typography } from "@mui/material";
 
 import UserPosts from "components/userposts/userPosts";
-import Appointment from "../src/components/appointment/Appointment";
-import AppointmentTime from "../src/components/appointment/AppointmentTime";
+import Appointment from "components/appointment/Appointment";
+//import AppointmentTime from "components/appointment/AppointmentTime";
 
 const UserAvailableTimeSlot = (props) => {
 	return (
