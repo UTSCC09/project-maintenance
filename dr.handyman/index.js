@@ -119,6 +119,7 @@ require('dotenv').config();
       maxAge: 360000,
       sameSite: true,
       httpOnly: true,
+      secure: true,
     }
   });
   app.use(sessionMid);
@@ -154,7 +155,8 @@ require('dotenv').config();
 // Express X Passport X HTTPS setup
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "*",
+    credentials: true,
+    origin: ['https://www.drhandyman.me'],
     methods: [ "GET", "POST" ]
   },
 })
