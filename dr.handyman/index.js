@@ -117,10 +117,12 @@ require('dotenv').config();
     resave: true,
     saveUninitialized: false,
     cookie: {
+      domain:
+        process.env.PROD == 'false' ? 'localhost' : 'www.drhandyman.me'
       maxAge: 600000,
       sameSite: 'strict',
       httpOnly: true,
-      secure: true,
+      secure: process.env.PROD == 'false' ? false : true,
     }
   });
   app.set('trust proxy', true);
