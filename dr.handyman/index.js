@@ -36,8 +36,8 @@ require('dotenv').config();
   const fs = require('fs');
   const option2 = {
     host: "redis",
-    port: 6379,
-    password: "password123",
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASS,
     retryStrategy: times => {
       // reconnect after
       return Math.min(times * 50, 2000);
@@ -105,9 +105,6 @@ require('dotenv').config();
     res.sendFile(user.profilePic.filepath);
   })
 
-  app.get("/debug-sentry", function mainHandler(req, res) {
-    throw new Error("My first Sentry error!");
-  });
   app.use(Sentry.Handlers.errorHandler());
 
   const sessionMid = session({
