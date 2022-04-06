@@ -1,8 +1,8 @@
 import { createStore } from "redux";
 import { produce } from "immer";
 import { UPDATE_USER_DATA, TRIGGER_MESSAGE, UPDATE_USER_POSITION, SET_CURRENT_CONV_USER_INFO, UPDATE_CALLING_USER } from "./constants";
-import io from "socket.io-client"i
-import { SERVER_URL } from '@/constant.js'
+import io from "socket.io-client";
+import { SERVER_URL } from '@/constant.js';
 const initialData = {
 	userData: {},
 	globalMessage: {
