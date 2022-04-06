@@ -33,7 +33,7 @@ require('dotenv').config();
 // Redis subscription configuration
   const { RedisPubSub } = require('graphql-redis-subscriptions');
   const Redis = require('ioredis');
-
+  const fs = require('fs');
   const options = {
     host: "redis-19500.c239.us-east-1-2.ec2.cloud.redislabs.com",
     port: 19500,
@@ -67,7 +67,6 @@ require('dotenv').config();
 // Redis subscription configuration
 
 // Express X Passport X HTTPS setup
-  const fs = require('fs');
   const https = require('https');
   const http = require('http');
   const uuid = require('uuid').v4;
