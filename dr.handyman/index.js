@@ -38,23 +38,6 @@ require('dotenv').config();
     host: "redis",
     port: 6379,
     password: "password123",
-    /*tls: {
-      key: fs.readFileSync('./server.key'),
-      cert: fs.readFileSync('./server.crt'),
-      rejectUnauthorized: false,
-      requestCert: true,
-      agent: false
-    },*/
-    retryStrategy: times => {
-      // reconnect after
-      return Math.min(times * 50, 2000);
-    }
-  };
-  const options = {
-    host: "redis-19500.c239.us-east-1-2.ec2.cloud.redislabs.com",
-    port: 19500,
-    password: process.env.REDIS,
-    
     retryStrategy: times => {
       // reconnect after
       return Math.min(times * 50, 2000);
@@ -63,8 +46,8 @@ require('dotenv').config();
   const userStatus = new Redis(option2);
   
   const pubsub = new RedisPubSub({
-    publisher: new Redis(options),
-    subscriber: new Redis(options)
+    publisher: new Redis(option2),
+    subscriber: new Redis(option2)
   });
 // Redis subscription configuration
 
