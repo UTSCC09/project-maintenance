@@ -149,7 +149,7 @@ const Posts = () => {
 		return (
 			<NavbarLayout>
 				<H3 color="#2C2C2C" mb={2}>
-					See Newest Posts
+					See All Posts
 				</H3>
 				<div>Loading...</div>
 			</NavbarLayout>
@@ -190,7 +190,7 @@ const Posts = () => {
 			{!hiddenTitle && (
 				<>
 					<H3 color="#2C2C2C" mb={2}>
-						See Newest Posts
+						See All Posts
 					</H3>
 					<PostRow
 						sx={{
