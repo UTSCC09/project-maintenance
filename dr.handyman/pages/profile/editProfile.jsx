@@ -113,9 +113,14 @@ const ProfileEdit = () => {
 							}
 						})
 						.catch(() => {
-							Emitter.emit("showMessage", {
-								message: "Please login first.",
-								severity: "error",
+							dispatch({
+								type: TRIGGER_MESSAGE,
+								payload: {
+									globalMessage: {
+										message: `Not Logged In`,
+										severity: "error",
+									},
+								},
 							});
 						});
 					router.push("/profile");
