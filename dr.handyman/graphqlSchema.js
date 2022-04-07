@@ -67,9 +67,9 @@ const typeDefs = gql(`
 
     # Mutation Types
     type Mutation {
-        '''
+        """
         Logs in user 
-        '''
+        """
         login(email: String!, password: String!): AuthPayload
         signup(username: String!, email: String!, password: String!, phone: String!): AuthPayload
         logout: Boolean`+ 

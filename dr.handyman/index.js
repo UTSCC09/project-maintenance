@@ -1,4 +1,13 @@
 /*jshint esversion: 9 */
+/**
+ * Reference numbers:
+ *
+ * 1. Johannes Kettmann: https://dev.to/jkettmann/password-based-authentication-with-graphql-and-passport-8nd
+ * 2. Sentry Express: https://docs.sentry.io/platforms/node/guides/express/
+ * 3. Darwin Tech: https://github.com/NikValdez/VideoChatTut
+ * 4. Apollo Docs: https://www.apollographql.com/docs/apollo-server/
+ * 5. 
+ */
 
 // Apollo Graphql Imports
   const { execute, subscribe } = require('graphql');
@@ -70,6 +79,7 @@ require('dotenv').config();
   const httpServer = http.createServer(app);
 
   // Sentry monitoring for express communication
+  // Reference Number: 2
   const Sentry = require('@sentry/node');
   const Tracing = require("@sentry/tracing");
   Sentry.init({
@@ -177,6 +187,7 @@ require('dotenv').config();
 // Express X Passport X HTTPS setup
 
 // Socket io mid-point for video initialization
+// Reference Number: 3
   const io = require("socket.io")(httpServer, {
     cors: {
       credentials: true,
@@ -265,6 +276,7 @@ require('dotenv').config();
 // Socket io mid-point for video initialization
 
 // Initialize and start the HTTPS server
+// Reference Number: 4
   async function startServer() {
     const server = new ApolloServer({
       schema,
@@ -346,7 +358,3 @@ module.exports = {
   Comment
 };
 
-// Reference numbers:
-/*
-1. Johannes Kettmann: https://dev.to/jkettmann/password-based-authentication-with-graphql-and-passport-8nd
- */
