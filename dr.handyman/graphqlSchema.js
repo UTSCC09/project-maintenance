@@ -54,7 +54,9 @@ const typeDefs = gql(`
 
     # Query types
     type Query {
-        User: [User]
+        """
+        Get current user information
+        """
         currentUser: User` + 
         chatQueryDef +
         postQueryDef +
@@ -71,7 +73,13 @@ const typeDefs = gql(`
         Logs in user 
         """
         login(email: String!, password: String!): AuthPayload
+        """
+        Signup user
+        """
         signup(username: String!, email: String!, password: String!, phone: String!): AuthPayload
+        """
+        Logout user
+        """
         logout: Boolean`+ 
         userMutDef + 
         postMutDef + 
@@ -83,7 +91,10 @@ const typeDefs = gql(`
     }
 
     type Subscription {
-        newUser: User
+        """
+        Subscription service that getChat through the conversation channel on publish.
+        Automatically publish messages on the first call.
+        """
         getChat(conversationId: String!, count: Int!): [Message]
     }
 `
@@ -115,8 +126,8 @@ const resolvers = {
         signup: async (parent, { username, email, password, phone}, context) => {
             if (!emailValidate(email) || stripXss(email) != email)
                 throw new Error("Invalid Email");
-            if (username.length <= 0 || textFieldLenCheck(username, 20) || !unmodifiableValidate(username) || stripXss(username) != username)
-                throw new Error("Username should contain alphanumerics");
+            if (username.length <= 0 || !textFieldLenCheck(username, 20) || !unmodifiableValidate(username) || stripXss(username) != username)
+                throw new Error("Username should contain alphanumerics and be less than or equal to 20 letters");
             if (!passwordValidate(password))
                 throw new Error("Password should be minimum 8 characters with lower case, upper case and a number");
             if (!phoneValidate(phone))
