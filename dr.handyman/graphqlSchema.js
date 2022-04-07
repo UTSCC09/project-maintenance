@@ -1,5 +1,12 @@
 /*jshint esversion: 9 */
 
+/**
+ * 
+ * References in general:
+ * Mongoose Docs: https://mongoosejs.com/docs/guide.html
+ * Apollo Docs: https://www.apollographql.com/docs/apollo-server/
+ * 
+ */
 const bcrypt = require('bcrypt');
 const { passwordValidate, stripXss, textFieldLenCheck, emailValidate, unmodifiableValidate, phoneValidate } = require('./schemaRules/sanitizationRules');
 const { permissions } = require('./permissions');
@@ -101,35 +108,43 @@ const typeDefs = gql(`
 );
 
 /**
+ * Note: Graphql operations handle thrown errors automatically.
  * Comments on object:
  * 
  * @param Upload check fileUploadSchema for more detail
- * @param Subscription.getChat subscription 
+ * @param Subscription.getChat subscribe user to chat channel conversationId and responds with publisher info.
+ *                             publish the first set of messages on the first run.
+ * @param Mutation.login Logs the user in with email and password. Goes through the passport strategy context
+ *                       and returns the user payload.
+ * @param Mutation.logout Logs the current user out from passport and express
+ * @param signup Signs the user up with the basic informations. Any invalid entries will be met with an error
+ *               Passwords are slat-hashed before user creation.
+ * @param Query.currentUser returns the current user.
  */
 const resolvers = {
     Upload: fileUploadScalar.Upload,
     Subscription: {
         getChat: {
-            subscribe: (parent, args, context) => {  
+            subscribe: (_, {conversationId}, context) => {  
             if (context.email == null)
                 throw new Error("Unauthorized");
             else{
-                setTimeout(async () => context.pubsub.publish(args.conversationId, {
-                    getChat: await Message.find({ conversationId: args.conversationId })
+                setTimeout(async () => context.pubsub.publish(conversationId, {
+                    getChat: await Message.find({ conversationId })
                 }), 0);
-                return context.pubsub.asyncIterator(args.conversationId);
+                return context.pubsub.asyncIterator(conversationId);
             }
             }
         }
     },
     Mutation: {
-        login: async (parent, { email, password }, context) => {
+        login: async (_, { email, password }, context) => {
             const { user } = await context.authenticate('graphql-local', { email, password });
             await context.login(user);
             return { user };
         },
-        logout: (parent, args, context) => context.logout(),
-        signup: async (parent, { username, email, password, phone}, context) => {
+        logout: (_, __, context) => context.logout(),
+        signup: async (_, { username, email, password, phone}) => {
             if (!emailValidate(email) || stripXss(email) != email)
                 throw new Error("Invalid Email");
             if (username.length <= 0 || !textFieldLenCheck(username, 20) || !unmodifiableValidate(username) || stripXss(username) != username)
@@ -140,9 +155,9 @@ const resolvers = {
                 throw new Error("Phone number invalid");
 
             const existUser = await User.findOne({ email: email});
-            if (existUser) {
+            if (existUser)
                 throw new Error('User with email already exists');
-            }
+
             const doSignup = () => new Promise((resolve, reject) => {
                 bcrypt.genSalt(10, function(err, salt) {
                     if (err) reject(Error('salt gen failed'));
@@ -159,7 +174,7 @@ const resolvers = {
     },
 
     Query: {
-        currentUser: (parent, args, context) => context.getUser(),
+        currentUser: (_, __, context) => context.getUser(),
     },
 };
 

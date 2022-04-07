@@ -1,6 +1,13 @@
 const mongoose  = require('mongoose');
 const { Schema } = mongoose;
 
+/**
+ * All mongoose schema creations. Not much to comment
+ * 
+ * References in general:
+ *  Mongoose Docs: https://mongoosejs.com/docs/guide.html
+ */
+
 const UserSchema = new Schema({
     email: {
         type: String,

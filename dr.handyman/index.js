@@ -1,12 +1,12 @@
 /*jshint esversion: 9 */
 /**
+ * 
  * Reference numbers:
- *
  * 1. Johannes Kettmann: https://dev.to/jkettmann/password-based-authentication-with-graphql-and-passport-8nd
  * 2. Sentry Express: https://docs.sentry.io/platforms/node/guides/express/
  * 3. Darwin Tech: https://github.com/NikValdez/VideoChatTut
  * 4. Apollo Docs: https://www.apollographql.com/docs/apollo-server/
- * 5. 
+ * 
  */
 
 // Apollo Graphql Imports

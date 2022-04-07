@@ -1,4 +1,11 @@
 /*jshint esversion: 9 */
+/**
+ * 
+ * References in general:
+ * Validator npm: https://www.npmjs.com/package/validator
+ * XSS npm: https://www.npmjs.com/package/xss
+ * 
+ */
 
 const xss = require("xss");
 const validator = require('validator');
@@ -25,8 +32,6 @@ function textFieldLenCheck(content, length){
 function emailValidate(email){
     return validator.isEmail(email);
 }
-
-
 
 module.exports = {
     passwordValidate,
