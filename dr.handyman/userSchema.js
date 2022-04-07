@@ -233,7 +233,7 @@ const userMut = {
         if (!res.acknowledged)
             throw new Error("update User Posts failed");
 
-        let updatedUser = await User.findOne({ email: context.getUser().email });
+        const updatedUser = await User.findOne({ email: context.getUser().email });
         if (!updatedUser)
             throw new Error("User disappeared, should not happen");
         return updatedUser;

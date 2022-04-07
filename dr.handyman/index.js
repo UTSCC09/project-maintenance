@@ -218,11 +218,11 @@ require('dotenv').config();
           io.to(result).emit("incomingCall", {signal: data.signalData, fromId: socket.id, username: data.username})
         }else{
           console.log("not online")
-          socket.emit("user not active");
+          socket.emit("callEnded");
         }
       }).catch((err) => {
         console.log("not online")
-        socket.emit("user not active");
+        socket.emit("callEnded");
       });
       
     })
@@ -265,11 +265,11 @@ require('dotenv').config();
           io.to(result).emit("cancel", {});
         }else{
           console.log("not online")
-          socket.emit("user not active");
+          socket.emit("callEnded");
         }
       }).catch((err) => {
         console.log("not online")
-        socket.emit("user not active");
+        socket.emit("callEnded");
       });
     })
   });
