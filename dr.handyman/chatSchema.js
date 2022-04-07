@@ -1,18 +1,36 @@
 /*jshint esversion: 9 */
 
+/**
+ * 
+ * Reference in general
+ * Mongoose Docs: https://mongoosejs.com/docs/guide.html
+ * Apollo Docs: https://www.apollographql.com/docs/apollo-server/
+ *  
+ */
 const { Conversation, Message, User } = require('./mongooseSchemas');
-const { UserInputError } = require('apollo-server'); 
-// https://stackoverflow.com/questions/14040562/how-to-search-in-array-of-object-in-mongodb
+const { stripXss, textFieldLenCheck } = require('./schemaRules/sanitizationRules');
+
 const chatDefs = `
+    """
+    Conversation object type
+    """
     type Conversation {
         _id: String
         userEmails: [String]
     }
+
+    """
+    Conversation object embedded with usernames
+    """
     type ConversationDescrciption {
         username1: String!
         username2: String!
         conversation: Conversation!
     }
+
+    """
+    Message Object
+    """
     type Message {
         _id: String
         conversationId: String
@@ -25,22 +43,53 @@ const chatDefs = `
 `;
 
 const chatMutDef = `
+    """
+    Create conversation between the current user and the email user
+    """
     createConvo(email: String!): Conversation
+
+    """
+    Create a message in the conversation
+    """
     createMessage(_id: String!, content: String!): Boolean
 `;
 const chatQueryDef = `
+    """
+    Get a conversation by id
+    """
     getOneConvo(_id: String!): Conversation
+
+    """
+    Gets the list of conversations of the current user
+    """
     getCurrentConvos: [Conversation]
+
+    """
+    Gets the list of conversations with username embedded of the current user
+    """
     getCurrentConvosWithDescription: [ConversationDescrciption]
+
+    """
+    Gets the Latest messages of current user.
+    """
     getLatestMessage(_id: String!): Message
 `;
 
+/**
+ * Note: Graphql operations handle thrown errors automatically. Graphql Shield has taken care
+ *       of authorization and sanitization
+ * Comments on object:
+ * 
+ * @param createConvo Creates a communication channel/id where the current user and user specified by
+ *                    email can communicate. If channel already exist, return the existing channel
+ * @param createMessage Publishes a message with content onto channel _id.
+ */
 const chatMut = {
-    async createConvo(parent, args, context, info){
-        const { email } = args;
+    async createConvo(_, { email }, context){
         const user = await User.findOne({ email: email });
         if (user == null || user.email == context.getUser().email)
-            throw new UserInputError("End users does not exist");
+            throw new Error("End users does not exist");
+
         const convo = await Conversation.findOne({ $or: [{userEmails: [email, context.getUser().email]},
                                                          {userEmails: [context.getUser().email, email]}]});
         if (convo != null)
@@ -48,6 +97,7 @@ const chatMut = {
         const conversationObj = new Conversation({
             userEmails: [email , context.getUser().email]
         });
+
         return conversationObj.save()
             .then (result => {
                 return { ...result._doc };
@@ -56,14 +106,18 @@ const chatMut = {
                 console.error(err);
             });
     },
-    async createMessage(parent, args, context, info){
-        const { _id, content } = args;
+    async createMessage(_, { _id, content }, context){
+        if (content.length <= 0 || !textFieldLenCheck(content, 500))
+            throw new Error("Content should have at least one character and maximum 500 letters")
+
+        content = stripXss(content);
         const messageObj = new Message({
             conversationId: _id,
             email: context.getUser().email,
             username: context.getUser().username,
             content: content,
         });
+        
         await messageObj.save();
         await Conversation.updateOne({_id}, {_id: _id});
         context.pubsub.publish(_id, {
@@ -73,18 +127,29 @@ const chatMut = {
     }
 };
 
+/**
+ * Note: Graphql operations handle thrown errors automatically. Graphql Shield has taken care
+ *       of authorization and sanitization
+ * Comments on object:
+ * 
+ * @param getOneConvo Returns a conversation object specified by _id
+ * @param getCurrentConvos Returns a list of conversation objects associated with the current user.
+ *                         Results sorted by earliest update time.
+ * @param getCurrentConvosWithDescription Same as getCurrentConvos but each object embeds username.
+ * @param getLatestMessage Returns the latest message in a conversation channel. Sorted by earliest creation time.
+ * 
+ */
 const chatQuery = {
-    async getOneConvo(parent, args, context, info){
-        const { _id } = args;
-        const conv = await Conversation.findOne({ _id: _id});
+    async getOneConvo(_, { _id }){
+        const conv = await Conversation.findOne({ _id});
         if (conv == null)
-            throw new UserInputError("conversation does not exist");
+            throw new Error("conversation does not exist");
         return conv;
     },
-    async getCurrentConvos(parent, args, context, info){
+    async getCurrentConvos(_, __, context){
         return await Conversation.find({userEmails: context.getUser().email}).sort({ 'updatedAt': -1 });
     },
-    async getCurrentConvosWithDescription(parent, args, context, info){
+    async getCurrentConvosWithDescription(_, __, context){
         const conversations = await Conversation.find({userEmails: context.getUser().email}).sort({ 'updatedAt': -1 });
         const convDescriptions = [];
         await Promise.all(conversations.map(async (elem) => {
@@ -94,8 +159,8 @@ const chatQuery = {
         }));
         return convDescriptions;
     },
-    async getLatestMessage(parent, args, context, info){
-        const latestMessage = await Message.find({conversationId: args._id}).sort({ 'createdAt': -1 }).limit(1);
+    async getLatestMessage(_, {_id}){
+        const latestMessage = await Message.find({conversationId: _id}).sort({ 'createdAt': -1 }).limit(1);
         if (latestMessage.length != 1)
             return null;
         return latestMessage[0];

@@ -1,4 +1,12 @@
 /*jshint esversion: 9 */
+
+/**
+ * 
+ * Reference in general
+ * Mongoose Docs: https://mongoosejs.com/docs/guide.html
+ * Apollo Docs: https://www.apollographql.com/docs/apollo-server/
+ *  
+ */
 const { Comment, User } = require('./mongooseSchemas');
 const { stripXss } = require('./schemaRules/sanitizationRules');
 const commentDefs = `
