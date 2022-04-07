@@ -304,10 +304,10 @@ export default () => {
             {callAccepted ? 
             (<div>
                 
-                <Button variant="contained" color="secondary" onClick={leaveCall}>
+                <Button variant="contained" color="secondary" onClick={leaveCall} ml={20}>
                             End Call
                 </Button>
-                {meStopped ? <VideocamOffIcon fontSize={'large'} onClick={startVideo}></VideocamOffIcon> : <VideocamIcon fontSize={'large'} onClick={stopVideo}></VideocamIcon>}
+                {meStopped ? <VideocamOffIcon fontSize={'large'} onClick={startVideo} mr={5}></VideocamOffIcon> : <VideocamIcon fontSize={'large'} onClick={stopVideo} mr={5}></VideocamIcon>}
                 {meMuted ? <MicOffIcon fontSize={'large'} onClick={startAudio}></MicOffIcon> : <MicIcon fontSize={'large'} onClick={stopAudio}></MicIcon>}
             </div>
                 
