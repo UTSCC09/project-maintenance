@@ -108,7 +108,7 @@ const UserProfile = (props) => {
 							>
 								<Avatar
 									src={
-										workerDetail.emai
+										workerDetail.email
 											? `${IMAGE_URL}/${
 													workerDetail.email
 											  }?t=${Date.now()}`
