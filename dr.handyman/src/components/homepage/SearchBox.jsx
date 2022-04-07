@@ -4,6 +4,7 @@ import FlexBox from "components/FlexBox";
 import Menu from "components/Menu";
 import Link from "next/link";
 import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowDownOutlined from "@mui/icons-material/KeyboardArrowDownOutlined";
 import SearchOutlined from "@mui/icons-material/SearchOutlined";
@@ -21,6 +22,8 @@ import { styled } from "@mui/material/styles";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Emitter from "@/utils/eventEmitter";
 import { useRouter } from "next/router";
+import { getLocation } from "@/utils";
+import { useSelector, useDispatch } from "react-redux";
 
 export const SearchOutlinedIcon = styled(SearchOutlined)(({ theme }) => ({
 	color: theme.palette.grey[600],
@@ -51,6 +54,7 @@ const SearchBox = () => {
 	const parentRef = useRef();
 	const [searchText, setSearchText] = useState("");
 	const router = useRouter();
+	const dispatch = useDispatch();
 
 	const handleCategoryChange = (cat) => () => {
 		setCategory(cat);

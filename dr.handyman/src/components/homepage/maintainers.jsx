@@ -4,7 +4,7 @@ import Maintainer from "./maintainer";
 import { H3, Span, H4 } from "components/Typography";
 import { Grid, Pagination } from "@mui/material";
 import React from "react";
-import { useSelector, useStore } from "react-redux";
+import { useSelector, useStore, useDispatch } from "react-redux";
 
 import {
 	SEARCH_WORKER,
@@ -17,6 +17,13 @@ import { Query } from "react-query";
 import { useState, useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import Emitter from "@/utils/eventEmitter";
+import { useRouter } from "next/router";
+import { getLocation } from "@/utils";
+import {
+	UPDATE_USER_DATA,
+	TRIGGER_MESSAGE,
+	UPDATE_USER_POSITION,
+} from "@/store/constants";
 
 const MaintainerList = () => {
 	const userLocation = useSelector((state) => state.userLocation);
@@ -32,6 +39,14 @@ const MaintainerList = () => {
 	const [searchWorkerCount] = useLazyQuery(SEARCH_WORKER_COUNT);
 	const [cacheQueryParams, setCacheQueryParams] = useState("");
 	const [hiddenTitle, setHiddenTitle] = useState(false);
+	const dispatch = useDispatch();
+
+	const authorizePosition = () => {
+		return getLocation().then((data) => {
+			const coords = data.coords;
+			return coords;
+		});
+	};
 
 	useEffect(() => {
 		const getAllList = () => {
@@ -61,51 +76,57 @@ const MaintainerList = () => {
 				sortByDist = false,
 				page = 0,
 			} = queryParams;
-			if (!queryText) return getAllList();
-			setCacheQueryParams(queryParams);
-			const userLocationNew = store.getState().userLocation;
-			searchWorkerCount({
-				variables: {
-					page,
-					workerPerPage: 6,
-					queryText,
-					sortByDist,
-					coordinates: [
-						userLocationNew.longitude,
-						userLocationNew.latitude,
-					],
-				},
-			})
-				.then((res) => {
-					setWorkersCount(res.data.searchWorkerPageCount || 0);
-				})
-				.catch((err) => {
-					Emitter.emit("showMessage", {
-						message: err.message,
-						severity: "error",
-					});
+			if (sortByDist) {
+				authorizePosition().then((coords) => {
+					if (!queryText) return getAllList();
+					setCacheQueryParams(queryParams);
+					const userLocationNew = store.getState().userLocation;
+					searchWorkerCount({
+						variables: {
+							page,
+							workerPerPage: 6,
+							queryText,
+							sortByDist,
+							coordinates: [
+								coords.longitude,
+								coords.latitude,
+							],
+						},
+					})
+						.then((res) => {
+							setWorkersCount(
+								res.data.searchWorkerPageCount || 0
+							);
+						})
+						.catch((err) => {
+							Emitter.emit("showMessage", {
+								message: err.message,
+								severity: "error",
+							});
+						});
+					searchWorker({
+						variables: {
+							page,
+							workerPerPage: 6,
+							queryText,
+							sortByDist,
+							coordinates: [
+								coords.longitude,
+								coords.latitude,
+							],
+						},
+					})
+						.then((res) => {
+							setWorkersData(res.data.searchWorkerPage || []);
+						})
+						.catch((err) => {
+							Emitter.emit("showMessage", {
+								message: err.message,
+								severity: "error",
+							});
+						});
 				});
-			searchWorker({
-				variables: {
-					page,
-					workerPerPage: 6,
-					queryText,
-					sortByDist,
-					coordinates: [
-						userLocationNew.longitude,
-						userLocationNew.latitude,
-					],
-				},
-			})
-				.then((res) => {
-					setWorkersData(res.data.searchWorkerPage || []);
-				})
-				.catch((err) => {
-					Emitter.emit("showMessage", {
-						message: err.message,
-						severity: "error",
-					});
-				});
+			}
 		};
 		Emitter.on("searchWorkers", handlerWorkersSearch);
 		Emitter.on("clearWorkers", () => {
@@ -157,7 +178,6 @@ const MaintainerList = () => {
 		}).then((res) => {
 			setWorkersData(res.data.getWorkerPage || []);
 		});
-
 	};
 
 	console.log(cdata);

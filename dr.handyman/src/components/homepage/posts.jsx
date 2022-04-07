@@ -15,8 +15,15 @@ import {
 import { useMutation, useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
-import { useSelector, useStore } from "react-redux";
+import { useSelector, useStore, useDispatch } from "react-redux";
 import Emitter from "@/utils/eventEmitter";
+import { useRouter } from "next/router";
+import { getLocation } from "@/utils";
+import {
+	UPDATE_USER_DATA,
+	TRIGGER_MESSAGE,
+	UPDATE_USER_POSITION,
+} from "@/store/constants";
 
 const Posts = () => {
 	const [page, setPage] = useState(1);
@@ -34,6 +41,14 @@ const Posts = () => {
 		fetchPolicy: "no-cache",
 	});
 	const [cacheQueryParams, setCacheQueryParams] = useState("");
+	const dispatch = useDispatch();
+
+	const authorizePosition = () => {
+		return getLocation().then((data) => {
+			const coords = data.coords;
+			return coords;
+		});
+	};
 
 	useEffect(() => {
 		const updatePostInfo = () => {
@@ -62,52 +77,56 @@ const Posts = () => {
 				sortByDist = false,
 				page = 0,
 			} = queryParams;
-			setCacheQueryParams(queryParams);
-			setHiddenTitle(false);
-			if (!queryText) return updatePostInfo();
-			const userLocationNew = store.getState().userLocation;
-			searchPostCount({
-				variables: {
-					page,
-					postPerPage: 6,
-					queryText,
-					sortByDist,
-					coordinates: [
-						userLocationNew.longitude,
-						userLocationNew.latitude,
-					],
-				},
-			})
-				.then((res) => {
-					setPostsCount(res.data.searchPostPageCount || 0);
-				})
-				.catch((err) => {
-					Emitter.emit("showMessage", {
-						message: err.message,
-						severity: "error",
-					});
+			if (sortByDist) {
+				authorizePosition().then((coords) => {
+					setCacheQueryParams(queryParams);
+					setHiddenTitle(false);
+					if (!queryText) return updatePostInfo();
+					const userLocationNew = store.getState().userLocation;
+					searchPostCount({
+						variables: {
+							page,
+							postPerPage: 6,
+							queryText,
+							sortByDist,
+							coordinates: [
+								coords.longitude,
+								coords.latitude,
+							],
+						},
+					})
+						.then((res) => {
+							setPostsCount(res.data.searchPostPageCount || 0);
+						})
+						.catch((err) => {
+							Emitter.emit("showMessage", {
+								message: err.message,
+								severity: "error",
+							});
+						});
+					searchPost({
+						variables: {
+							page,
+							postPerPage: 6,
+							queryText,
+							sortByDist,
+							coordinates: [
+								coords.longitude,
+								coords.latitude,
+							],
+						},
+					})
+						.then((res) => {
+							setPostsData(res.data.searchPostPage || []);
+						})
+						.catch((err) => {
+							Emitter.emit("showMessage", {
+								message: err.message,
+								severity: "error",
+							});
+						});
 				});
-			searchPost({
-				variables: {
-					page,
-					postPerPage: 6,
-					queryText,
-					sortByDist,
-					coordinates: [
-						userLocationNew.longitude,
-						userLocationNew.latitude,
-					],
-				},
-			})
-				.then((res) => {
-					setPostsData(res.data.searchPostPage || []);
-				})
-				.catch((err) => {
-					Emitter.emit("showMessage", {
-						message: err.message,
-						severity: "error",
-					});
-				});
+			}
 		};
 
 		updatePostInfo();
@@ -193,7 +212,7 @@ const Posts = () => {
 						>
 							Title
 						</H5>
-						
+					
 						<H5
 							color="grey.600"
 							my="0px"
