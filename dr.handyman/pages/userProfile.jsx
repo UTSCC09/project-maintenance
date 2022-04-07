@@ -94,7 +94,7 @@ const UserProfile = (props) => {
 					title={workerDetail.username + " '" + "s profile"}
 				/>
 
-				<Box mb={4}>
+				<Box mb={10}>
 					<Grid container spacing={3}>
 						<Grid item lg={10} md={6} sm={12} xs={12}>
 							<Card
@@ -175,9 +175,9 @@ const UserProfile = (props) => {
 					</Grid>
 				</Box>
 
-				<DashboardPageHeader
+				<DashboardPageHeader 
 					title={"Comments on " + workerDetail.username}
-					mt={5}
+					
 				/>
 				<Comments workerInfo={workerDetail} />
 			</UserProfileLayout>

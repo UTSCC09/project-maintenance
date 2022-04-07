@@ -120,6 +120,7 @@ const Comments = ({ workerInfo }) => {
 				}}
 				elevation={0}
 			>
+				
 				<H5 color="grey.600" mx={0.75} textAlign="left">
 					Posted By
 				</H5>
