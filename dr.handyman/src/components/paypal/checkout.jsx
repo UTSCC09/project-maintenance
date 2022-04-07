@@ -6,7 +6,7 @@ import {GET_ONE_WORKER} from "GraphQL/Queries";
 
 // from https://www.unimedia.tech/2021/10/09/paypal-checkout-integration-with-react/
 export default function Checkout({tips, email}) {
-    console.log({email});
+   
     const [show, setShow] = useState(false);
     const [success, setSuccess] = useState(false);
     const [ErrorMessage, setErrorMessage] = useState("");

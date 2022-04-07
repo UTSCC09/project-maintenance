@@ -39,9 +39,9 @@ const StyledCard = styled(
 }));
 
 const NewComment = ({ closeDialog, appointment = {} }) => {
-	// const [sendPost] = useMutation(CREATE_POST_MUTATION);
+	
 	const dispatch = useDispatch();
-	console.log('appointment', appointment);
+	
 
 	const [fetchAddComment] = useMutation(ADD_NEW_COMMENT);
 	const userData = useSelector((state) => state.userData);
@@ -67,8 +67,6 @@ const NewComment = ({ closeDialog, appointment = {} }) => {
 				appointmentId: appointment._id,
 				workerEmail: appointment.workerEmail,
 
-				// startTime: dateRange[0].getTime(),
-				// endTime: dateRange[1].getTime()
 			},
 		})
 			.then((res) => {
@@ -178,6 +176,5 @@ const NewComment = ({ closeDialog, appointment = {} }) => {
 const formSchema = yup.object().shape({
 	content: yup.string().required("post description is required"),
 
-	//type 必选验证 to be done
 });
 export default NewComment;

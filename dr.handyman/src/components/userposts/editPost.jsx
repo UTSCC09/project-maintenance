@@ -75,7 +75,7 @@ const EditPost = ({ closeDialog, post = {} }) => {
 			initialValues: {
         title: post.title || "",
 				description: post.content || "",
-				// type: post.type || null,
+				
       },
 			onSubmit: handleFormSubmit,
 			validationSchema: formSchema,
@@ -120,29 +120,7 @@ const EditPost = ({ closeDialog, post = {} }) => {
 					error={!!touched.description && !!errors.description}
 					helperText={touched.description && errors.description}
 				/>
-				{/* <FormControl mt="10px" mb="10px">
-					<FormLabel id="type">Post Type</FormLabel>
-					<RadioGroup
-						row
-						aria-labelledby="demo-row-radio-buttons-group-label"
-						name="type"
-						onChange={handleChange}
-            defaultValue={post.type}
-					>
-						<FormControlLabel
-							disabled={userData.type === 'user'}
-							value={1}
-							control={<Radio />}
-							label="Find a Contractor"
-						/>
-						<FormControlLabel
-							value={0}
-							control={<Radio />}
-							label="Find a Handyman"
-						/>
-
-					</RadioGroup>
-				</FormControl> */}
+				
  
 				
 				<Button
@@ -183,7 +161,6 @@ const EditPost = ({ closeDialog, post = {} }) => {
 const formSchema = yup.object().shape({
 	title: yup.string().required("title is required"),
 	description: yup.string().required("post description is required"),
-    // type: yup.string().required("type is required"),
-	//type 必选验证 to be done
+   
 });
 export default EditPost;

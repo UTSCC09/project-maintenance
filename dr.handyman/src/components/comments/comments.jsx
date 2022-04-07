@@ -158,48 +158,5 @@ const Comments = ({ workerInfo }) => {
 	);
 };
 
-const commentsList = [
-	{
-		user: "Alice",
-		rating: "4.5",
-		content: "this is the co ntent ",
-		time: "2022-03-21",
-		userUrl: "/users/500000",
-	},
-	{
-		user: "Alice",
-		rating: "3",
-		content: "this is the content",
-		time: "2022-03-21",
-		userUrl: "/users/500000",
-	},
-	{
-		user: "Alice",
-		rating: "3",
-		content: "this is the content",
-		time: "2022-03-21",
-		userUrl: "/users/500000",
-	},
-	{
-		user: "Alice",
-		rating: "3",
-		content: "this is the content",
-		time: "2022-03-21",
-		userUrl: "/users/500000",
-	},
-	{
-		user: "Alice",
-		rating: "3",
-		content: "this is the content",
-		time: "2022-03-21",
-		userUrl: "/users/500000",
-	},
-	{
-		user: "Alice",
-		rating: "3",
-		content: "this is the content",
-		time: "2022-03-21",
-		userUrl: "/users/500000",
-	},
-];
+
 export default Comments;

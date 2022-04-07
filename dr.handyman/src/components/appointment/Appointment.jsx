@@ -22,7 +22,7 @@ import { formatTime, getUrlQuery } from "@/utils";
 const Appointment = ({ appointment, type} ) => {
 	const [dialogOpen, setDialogOpen] = useState(false);
   const userData = useSelector((state) => state.userData);
-  console.log(appointment)
+  
   let user_email = appointment.userEmail;
   if (appointment.userEmail == userData.email){
        user_email = appointment.workerEmail;

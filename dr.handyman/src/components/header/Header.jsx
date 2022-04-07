@@ -206,8 +206,6 @@ const Header = ({ isFixed, className }) => {
 						bgcolor: "#FFFFFF",
 					}}
 				/>
-
-				{/* <PersonOutline /> */}
 			</Box>
 		);
 	} else {

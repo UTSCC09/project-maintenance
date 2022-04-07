@@ -22,70 +22,13 @@ import ContactListRow from "./ContactListRow.jsx";
 import { useRouter } from "next/router";
 
 
-// function renderMessageRow(props) {
-//   const { key, style, item} = props;
-//   // const [getConvos, { loading, data, error }] = useLazyQuery(GET_CURRENT_CONVOS_DES);
-
-//   // //const [convos, setConvos] = useState([]);
-
-//   // useEffect(() => {
-// 	// 		getConvos();
-// 	// 			//setConvos(res.data.getCurrentConvos[0].userEmails[0])
-
-//   // }, []);
-//   // if (loading || data == undefined) {
-//   //   return <div>Loading...</div>
-//   // }
-//   // console.log(data.getCurrentConvos);
-//   // //setConvos(data.getCurrentConvos)
-
-//   return (
-//     <ListItem style={style} key={key} alignItems="flex-start" component="div"   disablePadding >
-//       <ListItemButton divider sx={{
-//           mt:'10px',
-//                     height:'90px',
-
-//                 }}>
-
-//       <ListItemAvatar>
-//           <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-//         </ListItemAvatar>
-
-//         <ListItemText
-//           primary={item.userEmails[0]}
-//           secondary={
-//             <React.Fragment>
-
-//               I'll be in your neighborhood doing errands this…
-//               <Typography
-//               sx={{ display: 'inline'}}
-//               component="span"
-//               variant="overline"
-//               color="text.primary"
-//             >
-//               2022-03-11
-//             </Typography>
-
-//             </React.Fragment>
-
-//           }
-//         />
-
-//       </ListItemButton>
-
-//     </ListItem>
-
-//   );
-// }
-
 export default function ContactList() {
 	const router = useRouter();
 	const [getConvos, { loading, data, error }] =
 		useLazyQuery(GET_CURRENT_CONVOS_DES);
 	let [convosList, setConvosList] = useState([])
-	console.log(convosList && convosList.map(item => item.time).join(','), convosList )
+	
 
-	//const [convos, setConvos] = useState([]);
 
 	useEffect(() => {
 		getConvos().then(res => {
@@ -95,7 +38,7 @@ export default function ContactList() {
 				setConvosList(convos);
 			}
 		});
-		//setConvos(res.data.getCurrentConvos[0].userEmails[0])
+		
 	}, []);
 	if (loading || data == undefined) {
 		return <div>Loading...</div>;
@@ -139,22 +82,9 @@ export default function ContactList() {
 					{convosList?.map((item, index) => (
 						<ContactListRow detail={item} key={(item.conversation && item.conversation._id) || index} setLastMessageTimeFromChild={(time) => setLastMessageTimeFromChild(time, item.conversation && item.conversation._id)}/>
 					))}
-					{/* {fakeList.map((item, index) => (
-        <ContactListRow contact={item} key={index}/>
-        ))} */}
+					
 				</List>
 			</Box>
 		</ContactListLayout>
 	);
 }
-
-const fakeList = [
-	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
-	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
-	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
-	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
-	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
-	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
-	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
-	{ userEmails: ["u1email", "u2email"], _typename: "mesage", _id: "id" },
-];

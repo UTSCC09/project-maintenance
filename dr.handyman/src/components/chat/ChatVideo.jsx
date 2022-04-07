@@ -61,7 +61,7 @@ function ChatVideo({callerEmail}) {
 			stream: stream
 		})
 		connectionRef.current.on("signal", (data) => {
-			console.log(1)
+		
 			socket.emit("callEmail", {
 				email,
 				signalData: data,
@@ -101,7 +101,6 @@ function ChatVideo({callerEmail}) {
 	}
 
 	const leaveCall = () => {
-		// setCallEnded(true)
 		setCallAccepted(false)
 		setReceivingCall(false)
 		connectionRef.current.destroy();

@@ -158,9 +158,8 @@ const EditComment = ({ closeDialog, comment = {} }) => {
 	);
 };
 const formSchema = yup.object().shape({
-	// title: yup.string().required("title is required"),
+
 	description: yup.string().required("post description is required"),
-	// type: yup.string().required("type is required"),
-	//type 必选验证 to be done
+
 });
 export default EditComment;

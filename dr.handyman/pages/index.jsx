@@ -13,6 +13,5 @@ const IndexPage = props => {
   );
 };
 
-//client.query({query: gql`query TestQuery {users}`})
 
 export default IndexPage;

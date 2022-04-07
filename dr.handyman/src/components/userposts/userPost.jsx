@@ -36,24 +36,7 @@ const UserPost = ({ post, type }) => {
 	};
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const toggleDialog = () => setDialogOpen(!dialogOpen);
-	// const [fetchCancelAccept,{ loading: btnLoading }] = useMutation(CANCEL_ACCEPT, {
-	//   variables: {
-	//     id: post._id
-	//   }
-	// });
-
-	// const cancelAccept = () => {
-	//   fetchCancelAccept().then(res => {
-	//     if (res.data) {
-	//       Emitter.emit('updateMyPosts')
-	//     }
-	//   }).catch(err => {
-	//     Emitter.emit('showMessage', {
-	//       message: err.message || "Cancel Post Failed.",
-	//       severity: "error"
-	//     })
-	//   })
-	// }
+	
 
 	return (
 		<Row
@@ -101,9 +84,7 @@ const UserPost = ({ post, type }) => {
 					{post.acceptorUsername || "N/A"}
 				</Typography>
 			)}
-			{/* <Typography className="pre" m={0.75} textAlign="left">
-				{post.acceptorUsername || "N/A"}
-			</Typography> */}
+		
 
 			<Typography className="pre" m={0.75} textAlign="left">
 				{formatTime(post.createdAt)}
@@ -127,19 +108,7 @@ const UserPost = ({ post, type }) => {
 					},
 				}}
 			>
-				{/* {type === "accept" ? (
-          <LoadingButton
-          type="submit"
-          loading={btnLoading}
-          onClick={cancelAccept}
-          variant="outlined"
-          color="warning"
-        >
-          Cancel Accept
-        </LoadingButton>
-				) : (
-				
-				)} */}
+			
 				<Box
 					component={IconButton}
 					ml={2}

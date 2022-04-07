@@ -64,7 +64,7 @@ const ChatMessage = () => {
 				subscriptionData &&
 				subscriptionData.data &&
 				subscriptionData.data.getChat;
-			console.log(chatList, "chatList");
+			
 			convId2MsgList[conversation._id] = chatList || [];
 			setMessageList(chatList);
 			messageAreaRef.current.scrollTop =
@@ -120,18 +120,7 @@ const ChatMessage = () => {
 	};
 
 	useEffect(() => {
-		// conversation._id && getLatestMessage({
-		// 	variables: {
-		// 		id: conversation._id
-		// 	}
-		// }).then(res => {
-		// 	console.log(res);
-		// }).catch(err => {
-		// 	Emitter.emit("showMessage", {
-		// 		message: err.message,
-		// 		severity: "error",
-		// 	});
-		// })
+	
 	}, [conversation]);
 
 	let user_send = currentConvUserInfo.username2;
@@ -183,8 +172,8 @@ const ChatMessage = () => {
 					ref={messageAreaRef}
 				>
 					{messageList.map((item, index) => {
-						console.log(item);
-						console.log(formatTime(item.createdAt));
+						
+						
 						return (
 							<Box
 								sx={{
@@ -263,7 +252,7 @@ const ChatMessage = () => {
 						sx={{
 							width: "100%",
 							border:'none',
-							// borderRadius: "10px",
+					
 						}}
 					/>
 					<Chip

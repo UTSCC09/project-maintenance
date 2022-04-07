@@ -131,7 +131,7 @@ const MaintainerList = () => {
 		setPage(value);
 	};
 
-	console.log(cdata);
+
 	return (
 		<NavbarLayout>
 			<H3 color="#2C2C2C" mb={2}>

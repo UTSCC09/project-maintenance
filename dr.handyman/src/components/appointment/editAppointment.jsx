@@ -43,10 +43,9 @@ const StyledCard = styled(
 }));
 
 const EditAppointment = ({ closeDialog, appointment = {} }) => {
-	// const [sendPost] = useMutation(CREATE_POST_MUTATION);
     
     const userData = useSelector((state) => state.userData);
-  console.log(appointment)
+
   let user_email = appointment.userEmail;
   if (appointment.userEmail == userData.email){
        user_email = appointment.workerEmail;
@@ -54,7 +53,6 @@ const EditAppointment = ({ closeDialog, appointment = {} }) => {
 	const dispatch = useDispatch();
 	
 	const [fetchEditAppointment] = useMutation(EDIT_NEW_APPOINTMENT);
-	//const [dateRange, setDateRange] = useState([null, null]);
     const [dateRange0, setDateRange0] = useState(appointment.startTime && new Date(+appointment.startTime));
     const [dateRange1, setDateRange1] = useState(appointment.endTime && new Date(+appointment.endTime));
 	const handleFormSubmit = async (values) => {
@@ -94,7 +92,7 @@ const EditAppointment = ({ closeDialog, appointment = {} }) => {
 			});
 		}
 
-		console.log(values);
+	
 
 		fetchEditAppointment({
 			variables: {
@@ -200,7 +198,7 @@ const EditAppointment = ({ closeDialog, appointment = {} }) => {
 						)}
 					/>
 				</LocalizationProvider>
-				{/* 需要加booking appointment 时间的time selector */}
+			
 
 				<Button
 					variant="contained"
@@ -228,6 +226,5 @@ const formSchema = yup.object().shape({
 
 	description: yup.string().required("Appointment description is required"),
 
-	//时间 必选验证 to be done
 });
 export default EditAppointment;

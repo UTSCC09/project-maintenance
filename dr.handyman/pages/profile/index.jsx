@@ -98,12 +98,7 @@ const ProfilePage = (props) => {
 						</Medium>
 						<span>{userData.username}</span>
 					</FlexBox>
-					{/* <FlexBox flexDirection="column" p={1} mr={8}>
-						<Medium color="grey.600" mb={0.5} textAlign="left">
-							Last Name
-						</Medium>
-						<span>{userData.username}</span>
-					</FlexBox> */}
+				
 					<FlexBox flexDirection="column" p={1} mr={20}>
 						<Medium color="grey.600" mb={0.5} textAlign="left">
 							Email
@@ -116,14 +111,7 @@ const ProfilePage = (props) => {
 						</Medium>
 						<span>{userData.phone}</span>
 					</FlexBox>
-					{/* <FlexBox flexDirection="column" p={1}>
-						<Medium color="grey.600" mb={0.5}>
-							Birth Date
-						</Medium>
-						<span className="pre">
-							{format(new Date(2000, 9, 12), "yyyy-MM-dd")}
-						</span>
-					</FlexBox> */}
+					
 				</FlexBox>
 			</ProfileDashboardLayout>
 		</AppLayout>

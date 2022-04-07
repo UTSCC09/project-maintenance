@@ -58,7 +58,7 @@ const PostInformation = () => {
 			})
 			.catch((res) => {
 				setBtnLoading(false);
-				console.log(res);
+				
 			});
 	};
 
@@ -129,15 +129,15 @@ const PostInformation = () => {
 
 						<FlexBox alignItems="center" mb={2}>
 							<Box fontSize={18}>Posted by: </Box>
-							<Link href={`/userProfile` /*post user url*/}>
+							
 								<H5
 									ml={1}
 									mr={1}
-									sx={{ textDecoration: "underline" }}
+									
 								>
 									{postDetail.posterUsername}
 								</H5>
-							</Link>
+							
 							<Link href={"/chat"}>
 								<Typography
 									textAlign="center"
@@ -211,7 +211,7 @@ const PostInformation = () => {
 								variant={isAccepted ? "outlined" : "contained"}
 								type="submit"
 								loading={btnLoading}
-								// disabled={ (+postDetail.type === 0 && userData.type !== "worker") }
+							
 								fullWidth
 								onClick={acceptOrCancelPost}
 								color={isAccepted ? "secondary" : "primary"}
@@ -220,7 +220,7 @@ const PostInformation = () => {
 									height: 44,
 								}}
 							>
-								{/* {isAccepted ? "Cancel Accepted Post" : "Accept Post"} */}
+								
 								Cancel Accepted Post
 							</LoadingButton>
 						)}

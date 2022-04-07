@@ -30,9 +30,7 @@ const UserPosts = ({ type = "all" }) => {
 	const [getCount, { loading: cloading }] = useLazyQuery(
 		type === "accept" ? GET_ACCEPT_USER_POST_COUNT : GET_USER_POST_COUNT
 	);
-	//   if (postCount == null){
-	// postCount = [];
-	//   }
+	
 	const [postCount, setPostCount] = useState(0);
 	const [postData, setPostData] = useState([]);
 
@@ -118,7 +116,7 @@ const UserPosts = ({ type = "all" }) => {
 			</NavbarLayout>
 		);
 	}
-	console.log("load");
+	
 	let index1 = (page - 1) * 6 + 1;
 	let index2 = page * 6;
 	if (postCount <= page * 6) {

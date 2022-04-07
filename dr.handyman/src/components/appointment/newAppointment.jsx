@@ -42,7 +42,6 @@ const StyledCard = styled(
 }));
 
 const NewAppointment = ({ setDialog, appointment = {} }) => {
-	// const [sendPost] = useMutation(CREATE_POST_MUTATION);
 	const dispatch = useDispatch();
 	const userData = useSelector((state) => state.userData);
 	const [fetchAddAppointment] = useMutation(ADD_NEW_APPOINTMENT);
@@ -62,17 +61,6 @@ const NewAppointment = ({ setDialog, appointment = {} }) => {
 			});
 		}
 
-		// if (!dateRange.every(i => i)) {
-		// 	return dispatch({
-		// 		type: TRIGGER_MESSAGE,
-		// 		payload: {
-		// 			globalMessage: {
-		// 				message: "Please select time.",
-		// 				severity: "error",
-		// 			},
-		// 		},
-		// 	});
-		// }
 		if (!dateRange0) {
 			return dispatch({
 				type: TRIGGER_MESSAGE,
@@ -96,7 +84,7 @@ const NewAppointment = ({ setDialog, appointment = {} }) => {
 			});
 		}
 
-		console.log(values);
+	
 
 		fetchAddAppointment({
 			variables: {
@@ -104,8 +92,7 @@ const NewAppointment = ({ setDialog, appointment = {} }) => {
 				userEmail,
 				startTime: dateRange0.getTime(),
 				endTime: dateRange1.getTime(),
-				// startTime: dateRange[0].getTime(),
-				// endTime: dateRange[1].getTime()
+			
 			},
 		})
 			.then((res) => {
@@ -125,61 +112,7 @@ const NewAppointment = ({ setDialog, appointment = {} }) => {
 					severity: "error",
 				});
 			});
-		// 	getLocation()
-		// 		.then((res) => {
-		// 			const coords = res.coords;
-		// 			const { title, description: content, type } = values;
-		// 			sendPost({
-		// 				variables: {
-		// 					title,
-		// 					type: +type,
-		// 					content,
-		// 					coordinates: [coords.longitude, coords.latitude],
-		// 				},
-		// 			})
-		// 				.then((res) => {
-		// 					if (
-		// 						res.data &&
-		// 						res.data.addPost &&
-		// 						res.data.addPost._id
-		// 					) {
-		// 						Emitter.emit("updatePostInfo");
-		// 						Emitter.emit("updateMyPosts");
-		// 						dispatch({
-		// 							type: TRIGGER_MESSAGE,
-		// 							payload: {
-		// 								globalMessage: {
-		// 									message: "Add new post success.",
-		// 									severity: "success",
-		// 								},
-		// 							},
-		// 						});
-		// 						setDialog(false);
-		// 					}
-		// 				})
-		// 				.catch(() => {
-		// 					dispatch({
-		// 						type: TRIGGER_MESSAGE,
-		// 						payload: {
-		// 							globalMessage: {
-		// 								message: "Add new post failed.",
-		// 								severity: "error",
-		// 							},
-		// 						},
-		// 					});
-		// 				});
-		// 		})
-		// 		.catch(() => {
-		// 			dispatch({
-		// 				type: TRIGGER_MESSAGE,
-		// 				payload: {
-		// 					globalMessage: {
-		// 						message: "Get location failed.",
-		// 						severity: "error",
-		// 					},
-		// 				},
-		// 			});
-		// 		});
+	
 	};
 	const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
 		useFormik({
@@ -226,22 +159,6 @@ const NewAppointment = ({ setDialog, appointment = {} }) => {
 					helperText={touched.description && errors.description}
 				/>
 
-				{/* <LocalizationProvider dateAdapter={AdapterDateFns}>
-					<DesktopDateRangePicker
-						startText="Appointment start"
-						value={dateRange}
-						onChange={(newValue) => {
-							setDateRange(newValue);
-						}}
-						renderInput={(startProps, endProps) => (
-							<React.Fragment>
-								<TextField {...startProps} />
-								<Box sx={{ mx: 2 }}> to </Box>
-								<TextField {...endProps} />
-							</React.Fragment>
-						)}
-					/>
-				</LocalizationProvider> */}
 				<LocalizationProvider dateAdapter={AdapterDateFns}>
 					<DateTimePicker
 						label="Appointment start"
@@ -265,7 +182,7 @@ const NewAppointment = ({ setDialog, appointment = {} }) => {
 						renderInput={(endProps) => <TextField {...endProps} />}
 					/>
 				</LocalizationProvider>
-				{/* 需要加booking appointment 时间的time selector */}
+			
 
 				<Button
 					variant="contained"
@@ -307,6 +224,5 @@ const formSchema = yup.object().shape({
 
 	description: yup.string().required("Appointment description is required"),
 
-	//时间 必选验证 to be done
 });
 export default NewAppointment;

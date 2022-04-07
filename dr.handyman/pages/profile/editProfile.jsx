@@ -35,10 +35,7 @@ const ProfileEdit = () => {
 		useState(null);
 
 	let userProfileImage = `${IMAGE_URL}/${userData.email}`;
-	// if (userData.profilePic && userData.profilePic.fileGetPath) {
-	// 	userProfileImage = userData.profilePic.fileGetPath || `${IMAGE_URL}/${userData.email}`;
-	// }
-
+	
 	if (waitForUserProfileAvatarFile) {
 		userProfileImage = window.URL.createObjectURL(
 			waitForUserProfileAvatarFile
@@ -121,7 +118,7 @@ const ProfileEdit = () => {
 					router.push("/profile");
 				})
 				.catch((err) => {
-					console.log(err);
+					
 					dispatch({
 						type: TRIGGER_MESSAGE,
 						payload: {
@@ -229,25 +226,7 @@ const ProfileEdit = () => {
 									/>
 								</Grid>
 
-								{/* <Grid item md={6} xs={12}>
-									<TextField
-										name="email"
-										type="email"
-										label="Email"
-										fullWidth
-										onBlur={formik.handleBlur}
-										onChange={formik.handleChange}
-										value={formik.values.email || ""}
-										error={
-											!!formik.touched.email &&
-											!!formik.errors.email
-										}
-										helperText={
-											formik.touched.email &&
-											formik.errors.email
-										}
-									/>
-								</Grid> */}
+							
 								<Grid item md={6} xs={12}>
 									<TextField
 										name="phone"
@@ -266,43 +245,7 @@ const ProfileEdit = () => {
 										}
 									/>
 								</Grid>
-								{/* <Grid item md={6} xs={12}>
-											<LocalizationProvider
-												dateAdapter={AdapterDateFns}
-											>
-												<DateTimePicker
-													label="Birth Date"
-													value={values.birth_date}
-													maxDate={new Date()}
-													inputFormat="dd MMMM, yyyy"
-													shouldDisableTime={() =>
-														false
-													}
-													renderInput={(props) => (
-														<TextField
-															size="small"
-															fullWidth
-															{...props}
-															error={
-																(!!touched.birth_date &&
-																	!!errors.birth_date) ||
-																props.error
-															}
-															helperText={
-																touched.birth_date &&
-																errors.birth_date
-															}
-														/>
-													)}
-													onChange={(newValue) =>
-														setFieldValue(
-															"birth_date",
-															newValue
-														)
-													}
-												/>
-											</LocalizationProvider>
-										</Grid> */}
+							
 							</Grid>
 						</Box>
 
@@ -329,14 +272,11 @@ const ProfileEdit = () => {
 const phoneRegEx = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
 const checkoutSchema = yup.object().shape({
-	username: yup.string().required("required"),
-	// last_name: yup.string().required("required"),
-	// email: yup.string().email("invalid email").required("required"),
+	username: yup.string().required("required"),	
 	phone: yup
 		.string()
 		.matches(phoneRegEx, "Phone number is not valid")
 		.required("${path} is required"),
-	//phone: yup.string().required("required"),
-	// birth_date: yup.date().required("invalid date"),
+	
 });
 export default ProfileEdit;

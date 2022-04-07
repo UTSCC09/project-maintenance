@@ -33,7 +33,7 @@ const AppointmentInfo = ({ appointment, closeDialog, type }) => {
 	const [displayNewComment, setNewComment] = useState("");
 	const userData = useSelector((state) => state.userData);
 	const toggleDialog = () => setDialogOpen(!dialogOpen);
-	console.log('appointment', appointment);
+	
 	let user_email = appointment.userEmail;
 	if (appointment.userEmail == userData.email) {
 		user_email = appointment.workerEmail;
@@ -41,7 +41,7 @@ const AppointmentInfo = ({ appointment, closeDialog, type }) => {
 	const [fetchDelAppointment] = useMutation(DEL_APPOINTMENT);
 
 	const delAppointment = () => {
-		//setShowDelBtnLoading(true);
+	
 		fetchDelAppointment({
 			variables: {
 				id: appointment._id,
@@ -54,14 +54,14 @@ const AppointmentInfo = ({ appointment, closeDialog, type }) => {
 					message: "Delete Appointment Success.",
 					severity: "success",
 				});
-				//setShowDelBtnLoading(false);
+				
 			})
 			.catch((err) => {
 				Emitter.emit("showMessage", {
 					message: err.message || "Delete Appointment Failed.",
 					severity: "error",
 				});
-				//	setShowDelBtnLoading(false);
+				
 			});
 	};
 	return (
@@ -183,35 +183,7 @@ const AppointmentInfo = ({ appointment, closeDialog, type }) => {
 										></NewComment>
 									</Dialog>
 								</> )}
-                {/* {appointment.isCommented === true && (
-								<>
-									<Button
-										variant="contained"
-										fullWidth
-										onClick={toggleDialog}
-										sx={{
-											mb: "1.65rem",
-											height: 44,
-											bgcolor: "#4790E5",
-											"&:hover": {
-												bgcolor: "#146DA3",
-											},
-										}}
-									>
-										View Comment
-									</Button>
-									<Dialog
-										open={dialogOpen}
-										scroll="body"
-										onClose={toggleDialog}
-									>
-										<MyCommentInfo
-											appointment={appointment}
-											closeDialog={toggleDialog}
-										></MyCommentInfo>
-									</Dialog>
-								</>
-							)} */}
+                
 						</>
 					)}
 

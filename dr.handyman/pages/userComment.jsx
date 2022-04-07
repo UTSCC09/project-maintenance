@@ -38,7 +38,7 @@ const UserComment = (props) => {
 	const [commentCount, setCommentCount] = useState(0);
 	const [commentList, setCommentData] = useState([]);
 	const [page, setPage] = useState(1);
-	console.log('commentCount', commentCount)
+	
 	useEffect(() => {
 		const getCommentsData = (page = 0) => {
 			if (!userData.isLogin) {

@@ -74,7 +74,7 @@ const UserProfile = (props) => {
 					}
 				})
 				.catch((err) => {
-					console.log(err.message);
+					
 					Emitter.emit("showMessage", {
 						message: err.message,
 						severity: "error",

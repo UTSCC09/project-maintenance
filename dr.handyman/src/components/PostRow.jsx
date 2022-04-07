@@ -1,7 +1,3 @@
-/*
-from https://mui.com/store/items/bazar-pro-react-ecommerce-template
-*/
-
 import { Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
 const PostRow = styled(Card)({

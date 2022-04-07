@@ -66,11 +66,11 @@ const Signup = () => {
 				})
 					.then((res) => {
 						if (res) {
-							//console.log(signUpData)
+							
 							const userData = res.data.signup;
 							return router.replace("/", undefined, {
 								shallow: true,
-							}); //going back to homepage instead of login page is more make sense.
+							}); 
 						}
 					})
 					.catch((err) => {
