@@ -53,7 +53,7 @@ const userDefs = `
 const userMutDef = `
     deleteUser(email: String): Del
     setUser(username: String!, phone: String!): User
-    setWorker(coordinates: [Float!]): Boolean
+    setWorker(coordinates: [Float!]): User
 `;
 
 const userQueryDef = `
@@ -191,7 +191,12 @@ const userMut = {
                                                 location: {coordinates, type: 'Point'}
                                             }
                                          });
-        return res.acknowledged;
+        if (!res.acknowledged)
+            throw new Error("set failed");
+        let updatedUser = await User.findOne({ email: context.getUser().email });
+        if (!res.acknowledged)
+            throw new Error("User disappeared, should not happen");
+        return updatedUser;
     }
 };
 
