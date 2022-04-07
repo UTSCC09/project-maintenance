@@ -48,13 +48,16 @@ function ContactListRow({ detail, setLastMessageTimeFromChild }) {
 	if (userData.username == detail.username2) {
 		user_send = detail.username1;
 	}
-
+	let user_send_email = conversation.userEmails[1];
+	if (userData.username == detail.username2) {
+		user_send_email = conversation.userEmails[0];
+	}
 	let shortMessage = latestMessage;
 	if (latestMessage.length >= 25) {
 		shortMessage = latestMessage.substring(0, 25) + "...";
 	}
 	const avatar = `${IMAGE_URL}/${
-		conversation.userEmails && user_send
+		conversation.userEmails && user_send_email
 	}`;
 	useEffect(() => {
 		const updateAndRenderMessage = (id) => {
