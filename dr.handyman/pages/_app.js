@@ -6,6 +6,7 @@ import {
     createHttpLink,
     split
 } from "@apollo/client";
+import './styles.css'
 import { store } from "../src/store";
 import { Provider } from "react-redux";
 import { GET_USER_DATA } from "../src/GraphQL/Queries";

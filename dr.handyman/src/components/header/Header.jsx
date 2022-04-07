@@ -223,7 +223,7 @@ const Header = ({ isFixed, className }) => {
 		);
 	}
 	return (
-		<HeaderWrapper className={clsx(className)} scroll="body">
+		<HeaderWrapper className={clsx(className) }>
 			<Container
 				sx={{
 					display: "flex",
@@ -319,7 +319,6 @@ const Header = ({ isFixed, className }) => {
 				<Dialog
 					open={postDialogOpen}
 					fullWidth={isMobile}
-					scroll="body"
 					onClose={togglePostDialog}
 				>
 					<NewPost setDialog={setPostDialogOpen} />
@@ -422,7 +421,6 @@ const Header = ({ isFixed, className }) => {
 							)}
 							<Dialog
 								open={newAppointmentDialogOpen}
-								scroll="body"
 								onClose={toggleNewAppointmentDialog}
 							>
 								<NewAppointment
@@ -464,7 +462,6 @@ const Header = ({ isFixed, className }) => {
 				<Dialog
 					open={dialogOpen}
 					fullWidth={isMobile}
-					scroll="body"
 					onClose={toggleDialog}
 				>
 					<Login />
