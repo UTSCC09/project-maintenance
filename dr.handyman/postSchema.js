@@ -165,8 +165,6 @@ const postMut = {
         const res = await Post.updateOne({ _id },
                                          { title: title == null ? post.title : title,
                                            content: content == null ? post.content : content,});
-        if (!res.acknowledged)
-            throw new Error("Update Failed");
         const updatedPost = await Post.findOne({_id});
         if (!updatedPost)
             throw new Error("Post does not exist anymore")
