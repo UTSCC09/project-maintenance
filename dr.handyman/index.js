@@ -134,7 +134,8 @@ require('dotenv').config();
   app.use(sessionMid);
 
   /**
-   * Login strategy for passport. Compares the ssalted hash
+   * Login strategy for passport. Compares the ssalted hash.
+   * Reference Number: 1
    */
   passport.use(
     new GraphQLLocalStrategy(async (email, password, done) => {
@@ -344,3 +345,8 @@ module.exports = {
   Appointment,
   Comment
 };
+
+// Reference numbers:
+/*
+1. Johannes Kettmann: https://dev.to/jkettmann/password-based-authentication-with-graphql-and-passport-8nd
+ */
