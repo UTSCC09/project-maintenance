@@ -33,10 +33,6 @@ const Posts = () => {
 		fetchPolicy: "no-cache",
 	});
 
-	// useEffect(() => {
-	//   if (!loading){
-	//   setPost(data.getAllPost);
-	// },[])
 	useEffect(() => {
 		const updatePostInfo = () => {
 			getPosts({ variables: { page: 0, postPerPage: 6, coordinates: [
@@ -120,11 +116,7 @@ const Posts = () => {
 		index1 = 0;
 		index2 = 0;
 	}
-	// if (!loading) {
-	// useEffect(() => {
-	//   getPosts();
-	//  },[])
-
+	
 	const handleChange = (event, value) => {
 		getPosts({
 			variables: {
@@ -158,9 +150,7 @@ const Posts = () => {
 				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
 					Title
 				</H5>
-				{/* <H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-          Information
-        </H5> */}
+			
 				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
 					Posted By
 				</H5>
@@ -188,11 +178,7 @@ const Posts = () => {
 					my={0}
 				></H5>
 			</PostRow>
-			{/* {postsCount == 0 && (
-				<H4 color="#2C2C2C" mt={3}>
-					No posts found.
-				</H4>
-			)} */}
+		
 			{postsData.map((item, ind) => (
 				<Post post={item} key={ind} />
 			))}

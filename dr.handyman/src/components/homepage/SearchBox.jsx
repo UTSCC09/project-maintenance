@@ -98,7 +98,6 @@ const SearchBox = () => {
 			handler={
 				<DropDownHandler
 					alignItems="center"
-					// bgcolor="#AFD0E7"
 					height="100%"
 					px={3}
 					color="grey.700"
@@ -164,7 +163,6 @@ const SearchBox = () => {
 					endAdornment: categoryDropdown,
 				}}
 			/>
-			{/* <LoadingButton  variant="contained" onClick={startSearch}>Search</LoadingButton> */}
 
 			{!!resultList.length && (
 				<SearchResultCard elevation={2}>

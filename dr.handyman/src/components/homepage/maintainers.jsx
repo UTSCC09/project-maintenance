@@ -25,7 +25,6 @@ const MaintainerList = () => {
 	const store = useStore();
 
 	const [page, setPage] = useState(1);
-	// console.log(useQuery(GET_POSTS_QUERY));
 	const [getWorkers, { data, loading, error }] = useLazyQuery(GET_WORKER);
 	const [getCount, { data: cdata, loading: cloading }] =
 		useLazyQuery(WORKER_COUNT);
@@ -101,28 +100,13 @@ const MaintainerList = () => {
 	}, [userLocation])
 
 
-	// useEffect(() => {
-	// 	const getAllList = () => {
-	// 		getCount().then((res) => {
-	// 			setWorkersCount(res.data.getWorkerCount);
-	// 		});
-	// 		getWorkers({
-	// 			variables: {
-	// 				page: 0,
-	// 				workerPerPage: 6,
-	// 				coordinates: [
-	// 					userLocation.longitude,
-	// 					userLocation.latitude,
-	// 				],
-	// 			},
-	// 		}).then((res) => {
-	// 			setWorkersData(res.data.getWorkerPage || []);
-	// 		});
-	// 	};
-	// 	getAllList();
-	// }, []);
 	if (loading || cloading || data == undefined || cdata == undefined) {
-		return <div>Loading...</div>;
+		return (<NavbarLayout>
+		<H3 color="#2C2C2C" mb={2}>
+			See Top Rated Handymans
+		</H3>
+		<div>Loading...</div>
+	</NavbarLayout>);
 	}
 	let index1 = (page - 1) * 6 + 1;
 	let index2 = page * 6;
@@ -151,13 +135,9 @@ const MaintainerList = () => {
 	return (
 		<NavbarLayout>
 			<H3 color="#2C2C2C" mb={2}>
-				See Top Rated Mantainers
+				See Top Rated Handymans
 			</H3>
-			{/* {workersCount == 0 && (
-				<H4 color="#2C2C2C" mt={3}>
-					No Handyman found.
-				</H4>
-			)} */}
+			
 			<Grid container spacing={3}>
 				{workersData.map((item, ind) => (
 					<Grid item lg={4} sm={6} xs={12} key={ind}>

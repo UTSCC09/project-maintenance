@@ -46,13 +46,13 @@ const Post = ({ post }) => {
 					{post.title}
 				</H5>
 
-				{/* <Typography m={0.75} textAlign="left"> {post.content}</Typography> */}
+				
 
-				<Link href={"" /*post.postUrl*/}>
+				
 					<Typography m={0.75} textAlign="left">
 						{post.posterUsername}
 					</Typography>
-				</Link>
+				
 				
 				<Box m={0.75}>
 					<Chip
@@ -80,7 +80,7 @@ const Post = ({ post }) => {
 						}}
 					/>
 				</Box>
-				{/* <Typography m={0.75} textAlign="left"> {post.state ? 'Accpted' : 'Not Accepted'}</Typography> */}
+		
 				<Typography m={0.75} textAlign="left">
 					{post.acceptorUsername || "N/A"}
 				</Typography>
