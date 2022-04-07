@@ -32,9 +32,7 @@ function ContactListRow({ detail, setLastMessageTimeFromChild }) {
 	const [targetConversation, setTargetConversation] = useState("");
 	const [latestMessage, setLastMessage] = useState("");
 	const [latestMessageTime, setLastMessageTime] = useState("");
-	const avatar = `${IMAGE_URL}/${
-		conversation.userEmails && conversation.userEmails[0]
-	}`;
+	
 
 	const setActiveContact = () => {
 		dispatch({
@@ -55,7 +53,9 @@ function ContactListRow({ detail, setLastMessageTimeFromChild }) {
 	if (latestMessage.length >= 25) {
 		shortMessage = latestMessage.substring(0, 25) + "...";
 	}
-
+	const avatar = `${IMAGE_URL}/${
+		user_send
+	}`;
 	useEffect(() => {
 		const updateAndRenderMessage = (id) => {
 			getLatestMessage({
