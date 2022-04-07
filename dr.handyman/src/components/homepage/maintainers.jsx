@@ -180,7 +180,6 @@ const MaintainerList = () => {
 		});
 	};
 
-	console.log(cdata);
 	return (
 		<NavbarLayout>
 			{!hiddenTitle && (

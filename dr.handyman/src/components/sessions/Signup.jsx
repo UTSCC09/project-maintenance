@@ -78,7 +78,7 @@ const Signup = () => {
 							message: err.message,
 							severity: "error",
 						});
-						console.log(err);
+						
 					});
 			}
 		} catch (error) {
@@ -86,7 +86,7 @@ const Signup = () => {
 				message: err.message,
 				severity: "error",
 			});
-			console.log(error);
+			
 		}
 	};
 	const { values, errors, touched, handleBlur, handleChange, handleSubmit } =

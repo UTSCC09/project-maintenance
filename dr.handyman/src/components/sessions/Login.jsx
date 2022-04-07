@@ -79,7 +79,7 @@ const Login = () => {
 				message: err.message,
 				severity: "error"
 			})
-			console.log(err.message);
+			
 		});
 	};
 	const { values, errors, touched, handleBlur, handleChange, handleSubmit } =

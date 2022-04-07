@@ -113,7 +113,10 @@ const ProfileEdit = () => {
 							}
 						})
 						.catch(() => {
-							console.log("Not Login!");
+							Emitter.emit("showMessage", {
+								message: err.message,
+								severity: "error",
+							});
 						});
 					router.push("/profile");
 				})

@@ -118,7 +118,7 @@ export default () => {
                 
         })
         socket.on("cancel", () => {
-            console.log("other canceled");
+            
             leaveCall();
         })
         socket.on("stopVideo", () => {
@@ -138,7 +138,7 @@ export default () => {
             setOtherMuted(false);
         })
         socket.on("callEnded", () => {
-            console.log("other ended");
+           
             leaveCall();
         })
 	}, [callingUser])
