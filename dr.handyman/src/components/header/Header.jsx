@@ -223,7 +223,7 @@ const Header = ({ isFixed, className }) => {
 		);
 	}
 	return (
-		<HeaderWrapper className={clsx(className)}>
+		<HeaderWrapper className={clsx(className)} scroll="body">
 			<Container
 				sx={{
 					display: "flex",
