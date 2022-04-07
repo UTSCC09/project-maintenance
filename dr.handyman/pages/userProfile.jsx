@@ -46,7 +46,7 @@ const UserProfile = (props) => {
 						email: workerDetail.email,
 					},
 				});
-				location.href = `/chat`;
+				location.href = `/chat?email=${workerDetail.email}`;
 			})
 			.catch((err) => {
 				Emitter.emit("showMessage", {

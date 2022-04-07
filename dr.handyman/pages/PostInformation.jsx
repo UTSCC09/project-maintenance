@@ -72,7 +72,7 @@ const PostInformation = () => {
 						email: postDetail.posterEmail,
 					},
 				});
-				location.href = `/chat`;
+				location.href = `/chat?email=${postDetail.posterEmail}`;
 			})
 			.catch((err) => {
 				Emitter.emit("showMessage", {
@@ -157,8 +157,8 @@ const PostInformation = () => {
 									{postDetail.posterUsername}
 								</H5>
 							
-							<Link href={"/chat"}>
-								<Typography
+							
+								{postDetail.posterEmail !== userData.email && (<Typography
 									textAlign="center"
 									color="grey.600"
 									sx={{
@@ -175,8 +175,8 @@ const PostInformation = () => {
 											onClick={createNewChat}
 										/>
 									</IconButton>
-								</Typography>
-							</Link>
+								</Typography>)}
+							
 						</FlexBox>
 						<Box fontSize={18}>Content: </Box>
 						<FlexBox fontSize={18} alignItems="center" mb={2}>
