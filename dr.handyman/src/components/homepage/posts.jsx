@@ -28,17 +28,27 @@ const Posts = () => {
 	const [postsCount, setPostsCount] = useState(0);
 	const [searchPost] = useLazyQuery(SEARCH_POST);
 	const [searchPostCount] = useLazyQuery(SEARCH_POST_COUNT);
+	const [hiddenTitle, setHiddenTitle] = useState(false);
 	const store = useStore();
 	const [getCount, { loading: cloading }] = useLazyQuery(GET_COUNT, {
 		fetchPolicy: "no-cache",
 	});
+	const [cacheQueryParams, setCacheQueryParams] = useState("");
 
 	useEffect(() => {
 		const updatePostInfo = () => {
-			getPosts({ variables: { page: 0, postPerPage: 6, coordinates: [
-				userLocation.longitude,
-				userLocation.latitude,
-			], } }).then((res) => {
+			setCacheQueryParams({});
+			setHiddenTitle(false);
+			getPosts({
+				variables: {
+					page: 0,
+					postPerPage: 6,
+					coordinates: [
+						userLocation.longitude,
+						userLocation.latitude,
+					],
+				},
+			}).then((res) => {
 				setPostsData(res.data.getPostPage);
 			});
 			getCount().then((res) => {
@@ -46,14 +56,30 @@ const Posts = () => {
 			});
 		};
 
-		const handlerPostsSearch = ({ queryText = "" }) => {
+		const handlerPostsSearch = (queryParams) => {
+			const {
+				queryText = "",
+				sortByDist = false,
+				page = 0,
+			} = queryParams;
+			setCacheQueryParams(queryParams);
+			setHiddenTitle(false);
 			if (!queryText) return updatePostInfo();
 			const userLocationNew = store.getState().userLocation;
 			searchPostCount({
-				variables: { page: 0, postPerPage: 6, queryText },
+				variables: {
+					page,
+					postPerPage: 6,
+					queryText,
+					sortByDist,
+					coordinates: [
+						userLocationNew.longitude,
+						userLocationNew.latitude,
+					],
+				},
 			})
 				.then((res) => {
-					setPostsCount(res.data.searchPostCount || 0);
+					setPostsCount(res.data.searchPostPageCount || 0);
 				})
 				.catch((err) => {
 					Emitter.emit("showMessage", {
@@ -63,9 +89,10 @@ const Posts = () => {
 				});
 			searchPost({
 				variables: {
-					page: 0,
+					page,
 					postPerPage: 6,
 					queryText,
+					sortByDist,
 					coordinates: [
 						userLocationNew.longitude,
 						userLocationNew.latitude,
@@ -87,9 +114,11 @@ const Posts = () => {
 		Emitter.on("updatePostInfo", updatePostInfo);
 		Emitter.on("searchPosts", handlerPostsSearch);
 		Emitter.on("clearPosts", () => {
+			setHiddenTitle(true);
 			setPostsData([]);
-			setPostsCount(0)
+			setPostsCount(0);
 		});
+		Emitter.on("cancelHidden", () => setHiddenTitle(false));
 
 		return () => {
 			Emitter.off("updatePostInfo", updatePostInfo);
@@ -117,7 +146,15 @@ const Posts = () => {
 		index2 = 0;
 	}
 	
+
 	const handleChange = (event, value) => {
+		setPage(value);
+		if (cacheQueryParams.queryText) {
+			return Emitter.emit(
+				"searchPosts",
+				Object.assign(cacheQueryParams, { page: value - 1 })
+			);
+		}
 		getPosts({
 			variables: {
 				page: value - 1,
@@ -127,82 +164,120 @@ const Posts = () => {
 		}).then((res) => {
 			setPostsData(res.data.getPostPage);
 		});
-		setPage(value);
 	};
 
 	return (
 		<NavbarLayout>
-			<H3 color="#2C2C2C" mb={2}>
-				See Newest Posts
-			</H3>
-			<PostRow
-				sx={{
-					display: {
-						xs: "none",
-						md: "flex",
-					},
-					padding: "0px 18px",
-					background: "none",
-					bgcolor: "#B9D9EF",
-				}}
-				elevation={0}
-			>
-				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-					Title
-				</H5>
-			
-				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-					Posted By
-				</H5>
+			{!hiddenTitle && (
+				<>
+					<H3 color="#2C2C2C" mb={2}>
+						See Newest Posts
+					</H3>
+					<PostRow
+						sx={{
+							display: {
+								xs: "none",
+								md: "flex",
+							},
+							padding: "0px 18px",
+							background: "none",
+							bgcolor: "#B9D9EF",
+						}}
+						elevation={0}
+					>
+						<H5
+							color="grey.600"
+							my="0px"
+							mx={0.75}
+							textAlign="left"
+						>
+							Title
+						</H5>
+						
+						<H5
+							color="grey.600"
+							my="0px"
+							mx={0.75}
+							textAlign="left"
+						>
+							Posted By
+						</H5>
 
-				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-					Posts Type
-				</H5>
-				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-					State
-				</H5>
-				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-					Accept User
-				</H5>
-				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-					Post Time
-				</H5>
-				<H5 color="grey.600" my="0px" mx={0.75} textAlign="left">
-					Distance
-				</H5>
-				<H5
-					flex="0 0 0 !important"
-					color="grey.600"
-					px={2.75}
-					py={0.5}
-					my={0}
-				></H5>
-			</PostRow>
-		
-			{postsData.map((item, ind) => (
-				<Post post={item} key={ind} />
-			))}
+						<H5
+							color="grey.600"
+							my="0px"
+							mx={0.75}
+							textAlign="left"
+						>
+							Posts Type
+						</H5>
+						<H5
+							color="grey.600"
+							my="0px"
+							mx={0.75}
+							textAlign="left"
+						>
+							State
+						</H5>
+						<H5
+							color="grey.600"
+							my="0px"
+							mx={0.75}
+							textAlign="left"
+						>
+							Accept User
+						</H5>
+						<H5
+							color="grey.600"
+							my="0px"
+							mx={0.75}
+							textAlign="left"
+						>
+							Post Time
+						</H5>
+						<H5
+							color="grey.600"
+							my="0px"
+							mx={0.75}
+							textAlign="left"
+						>
+							Distance
+						</H5>
+						<H5
+							flex="0 0 0 !important"
+							color="grey.600"
+							px={2.75}
+							py={0.5}
+							my={0}
+						></H5>
+					</PostRow>
+				
+					{postsData.map((item, ind) => (
+						<Post post={item} key={ind} />
+					))}
 
-			<FlexBox
-				flexWrap="wrap"
-				justifyContent="space-between"
-				alignItems="center"
-				mt={5}
-			>
-				<Span color="grey.600">
-					{}
-					Showing {index1}-{index2} of {postsCount} Posts
-				</Span>
-				<Pagination
-					count={Math.ceil(postsCount / 6)}
-					page={page}
-					onChange={handleChange}
-					boundaryCount={0}
-					siblingCount={0}
-					variant="outlined"
-					color="primary"
-				/>
-			</FlexBox>
+					<FlexBox
+						flexWrap="wrap"
+						justifyContent="space-between"
+						alignItems="center"
+						mt={5}
+					>
+						<Span color="grey.600">
+							{}
+							Showing {index1}-{index2} of {postsCount} Posts
+						</Span>
+						<Pagination
+							count={Math.ceil(postsCount / 6)}
+							page={page}
+							onChange={handleChange}
+							boundaryCount={0}
+							siblingCount={0}
+							variant="outlined"
+							color="primary"
+						/>
+					</FlexBox>
+				</>
+			)}
 		</NavbarLayout>
 	);
 };

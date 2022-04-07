@@ -30,9 +30,12 @@ const MaintainerList = () => {
 		useLazyQuery(WORKER_COUNT);
 	const [searchWorker] = useLazyQuery(SEARCH_WORKER);
 	const [searchWorkerCount] = useLazyQuery(SEARCH_WORKER_COUNT);
+	const [cacheQueryParams, setCacheQueryParams] = useState("");
+	const [hiddenTitle, setHiddenTitle] = useState(false);
 
 	useEffect(() => {
 		const getAllList = () => {
+			setCacheQueryParams({});
 			getCount().then((res) => {
 				setWorkersCount(res.data.getWorkerCount);
 			});
@@ -50,63 +53,83 @@ const MaintainerList = () => {
 			});
 		};
 		getAllList();
-	
 
-	const handlerWorkersSearch = ({ queryText = "" }) => {
-		if (!queryText) return getAllList();
-		const userLocationNew = store.getState().userLocation;
-		searchWorkerCount({
-			variables: { page: 0, workerPerPage: 6, queryText },
-		})
-			.then((res) => {
-				setWorkersCount(res.data.searchWorkerCount || 0);
+		const handlerWorkersSearch = (queryParams) => {
+			setHiddenTitle(false);
+			const {
+				queryText = "",
+				sortByDist = false,
+				page = 0,
+			} = queryParams;
+			if (!queryText) return getAllList();
+			setCacheQueryParams(queryParams);
+			const userLocationNew = store.getState().userLocation;
+			searchWorkerCount({
+				variables: {
+					page,
+					workerPerPage: 6,
+					queryText,
+					sortByDist,
+					coordinates: [
+						userLocationNew.longitude,
+						userLocationNew.latitude,
+					],
+				},
 			})
-			.catch((err) => {
-				Emitter.emit("showMessage", {
-					message: err.message,
-					severity: "error",
+				.then((res) => {
+					setWorkersCount(res.data.searchWorkerPageCount || 0);
+				})
+				.catch((err) => {
+					Emitter.emit("showMessage", {
+						message: err.message,
+						severity: "error",
+					});
 				});
-			});
-		searchWorker({
-			variables: {
-				page: 0,
-				workerPerPage: 6,
-				queryText,
-				coordinates: [
-					userLocationNew.longitude,
-					userLocationNew.latitude,
-				],
-			},
-		})
-			.then((res) => {
-				setWorkersData(res.data.searchWorkerPage || []);
+			searchWorker({
+				variables: {
+					page,
+					workerPerPage: 6,
+					queryText,
+					sortByDist,
+					coordinates: [
+						userLocationNew.longitude,
+						userLocationNew.latitude,
+					],
+				},
 			})
-			.catch((err) => {
-				Emitter.emit("showMessage", {
-					message: err.message,
-					severity: "error",
+				.then((res) => {
+					setWorkersData(res.data.searchWorkerPage || []);
+				})
+				.catch((err) => {
+					Emitter.emit("showMessage", {
+						message: err.message,
+						severity: "error",
+					});
 				});
-			});
-	};
-	Emitter.on("searchWorkers", handlerWorkersSearch);
-	Emitter.on("clearWorkers", () => {
-		setWorkersData([]);
-		setWorkersCount(0)
-	});
-	return () => {
-		Emitter.off("searchWorkers", handlerWorkersSearch);
-	};
+		};
+		Emitter.on("searchWorkers", handlerWorkersSearch);
+		Emitter.on("clearWorkers", () => {
+			console.log("clearWorkers");
+			setHiddenTitle(true);
+			setWorkersData([]);
+			setWorkersCount(0);
+		});
+		Emitter.on("cancelHidden", () => setHiddenTitle(false));
+		return () => {
+			Emitter.off("searchWorkers", handlerWorkersSearch);
+		};
+	}, [userLocation]);
+
 	
-	}, [userLocation])
-
-
 	if (loading || cloading || data == undefined || cdata == undefined) {
-		return (<NavbarLayout>
-		<H3 color="#2C2C2C" mb={2}>
-			See Top Rated Handymans
-		</H3>
-		<div>Loading...</div>
-	</NavbarLayout>);
+		return (
+			<NavbarLayout>
+				<H3 color="#2C2C2C" mb={2}>
+					See Top Ratest Handymans
+				</H3>
+				<div>Loading...</div>
+			</NavbarLayout>
+		);
 	}
 	let index1 = (page - 1) * 6 + 1;
 	let index2 = page * 6;
@@ -118,6 +141,13 @@ const MaintainerList = () => {
 		index2 = 0;
 	}
 	const handleChange = (event, value) => {
+		setPage(value);
+		if (cacheQueryParams.queryText) {
+			return Emitter.emit(
+				"searchWorkers",
+				Object.assign(cacheQueryParams, { page: value - 1 })
+			);
+		}
 		getWorkers({
 			variables: {
 				page: value - 1,
@@ -128,43 +158,47 @@ const MaintainerList = () => {
 			setWorkersData(res.data.getWorkerPage || []);
 		});
 
-		setPage(value);
 	};
 
-
+	console.log(cdata);
 	return (
 		<NavbarLayout>
-			<H3 color="#2C2C2C" mb={2}>
-				See Top Rated Handymans
-			</H3>
-			
-			<Grid container spacing={3}>
-				{workersData.map((item, ind) => (
-					<Grid item lg={4} sm={6} xs={12} key={ind}>
-						<Maintainer {...item} />
+			{!hiddenTitle && (
+				<>
+					<H3 color="#2C2C2C" mb={2}>
+						See Top Rated Handymans
+					</H3>
+				
+					<Grid container spacing={3}>
+						{workersData.map((item, ind) => (
+							<Grid item lg={4} sm={6} xs={12} key={ind}>
+								<Maintainer {...item} />
+							</Grid>
+						))}
 					</Grid>
-				))}
-			</Grid>
 
-			<FlexBox
-				flexWrap="wrap"
-				justifyContent="space-between"
-				alignItems="center"
-				mt={4}
-			>
-				<Span color="grey.600">
-					Showing {index1}-{index2} of {workersCount} Maintaners
-				</Span>
-				<Pagination
-					count={Math.ceil(workersCount / 6)}
-					page={page}
-					onChange={handleChange}
-					boundaryCount={1}
-					siblingCount={1}
-					variant="outlined"
-					color="primary"
-				/>
-			</FlexBox>
+					<FlexBox
+						flexWrap="wrap"
+						justifyContent="space-between"
+						alignItems="center"
+						mt={4}
+					>
+						<Span color="grey.600">
+							Showing {index1}-{index2} of {workersCount}{" "}
+							Handymans
+						</Span>
+						<Pagination
+							count={Math.ceil(workersCount / 6)}
+							page={page}
+							onChange={handleChange}
+							boundaryCount={1}
+							siblingCount={1}
+							variant="outlined"
+							color="primary"
+						/>
+					</FlexBox>
+				</>
+			)}
 		</NavbarLayout>
 	);
 };

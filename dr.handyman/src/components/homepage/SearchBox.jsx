@@ -1,10 +1,3 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"; // styled components
-import { H3, Span, H5, H4 } from "components/Typography";
-import FlexBox from "components/FlexBox";
-import Menu from "components/Menu";
-import Link from "next/link";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowDownOutlined from "@mui/icons-material/KeyboardArrowDownOutlined";
 import SearchOutlined from "@mui/icons-material/SearchOutlined";
@@ -62,22 +55,25 @@ const SearchBox = () => {
 	};
 
 	const startSearch = () => {
+		if (category === 0) {
+			Emitter.emit("cancelHidden");
+		}
 		if (category === 0 || category === 1 || category === 4) {
 			Emitter.emit("searchWorkers", {
-				queryText: searchText,
+				queryText: searchText || (category === 4 ? '   ' : ""),
 				sortByDist: category === 4,
 			});
 
-			if (category !== 1 || category !== 4) {
+			if (category !== 0) {
 				Emitter.emit("clearPosts");
 			}
 		}
 		if (category === 0 || category === 2 || category === 3) {
 			Emitter.emit("searchPosts", {
-				queryText: searchText,
+				queryText: searchText || (category === 3 ? '   ' : ""),
 				sortByDist: category === 3,
 			});
-			if (category !== 2 || category !== 3) {
+			if (category !== 0) {
 				Emitter.emit("clearWorkers");
 			}
 		}

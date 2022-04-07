@@ -193,14 +193,14 @@ query SearchWorkerPage($queryText: String!, $page: Int!, $workerPerPage: Int!, $
 `
 
 export const SEARCH_WORKER_COUNT = gql `
-query Query($queryText: String!) {
-  searchWorkerPageCount(queryText: $queryText)
+query Query($queryText: String!, $sortByDist: Boolean) {
+  searchWorkerPageCount(queryText: $queryText, sortByDist: $sortByDist)
 }
 `
 
 export const SEARCH_POST = gql `
-query SearchPostPage($queryText: String!, $page: Int!, $postPerPage: Int!, $coordinates: [Float]) {
-  searchPostPage(queryText: $queryText, page: $page, postPerPage: $postPerPage, coordinates: $coordinates) {
+query SearchPostPage($queryText: String!, $page: Int!, $postPerPage: Int!, $coordinates: [Float], $sortByDist: Boolean) {
+  searchPostPage(queryText: $queryText, page: $page, postPerPage: $postPerPage, coordinates: $coordinates, sortByDist: $sortByDist) {
     updatedAt
     type
     title
@@ -218,8 +218,8 @@ query SearchPostPage($queryText: String!, $page: Int!, $postPerPage: Int!, $coor
 `
 
 export const SEARCH_POST_COUNT = gql `
-query Query($queryText: String!) {
-  searchPostPageCount(queryText: $queryText)
+query Query($queryText: String!, $sortByDist: Boolean) {
+  searchPostPageCount(queryText: $queryText, sortByDist: $sortByDist)
 }
 `
 
