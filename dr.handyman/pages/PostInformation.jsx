@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { TRIGGER_MESSAGE } from "../src/store/constants";
 import { useState } from "react";
-
+import { CREATE_CONVERSATION } from "@/GraphQL/Mutations";
 const PostInformation = () => {
 	const router = useRouter();
 	const [getPostDetail, { loading, error, data = {} }] = useLazyQuery(
@@ -35,8 +35,7 @@ const PostInformation = () => {
 	const [fetchCancelAcceptPost] = useMutation(CANCEL_ACCEPT_POST);
 	const dispatch = useDispatch();
 	const [btnLoading, setBtnLoading] = useState(false);
-
-	// const isAccepted = postDetail.acceptorEmail && postDetail.acceptorEmail.indexOf(userData.email) === -1;
+	const [createNewConv] = useMutation(CREATE_CONVERSATION);
 	const isAccepted = postDetail.acceptorEmail !== "";
 	const sameUser = userData.email === postDetail.posterEmail;
 	const isAcceptedByCurrentUser =
@@ -61,7 +60,27 @@ const PostInformation = () => {
 				
 			});
 	};
-
+	const createNewChat = () => {
+		createNewConv({
+			variables: {
+				email: postDetail.posterEmail,
+			},
+		})
+			.then(() => {
+				router.replace("/chat", {
+					query: {
+						email: postDetail.posterEmail,
+					},
+				});
+				location.href = `/chat`;
+			})
+			.catch((err) => {
+				Emitter.emit("showMessage", {
+					message: err.message,
+					severity: "error",
+				});
+			});
+	};
 	const acceptOrCancelPost = () => {
 		const urlQuery = getUrlQuery();
 		const id = router.query.id || urlQuery.id;
@@ -153,6 +172,7 @@ const PostInformation = () => {
 										<ChatBubbleOutlineIcon
 											fontSize="small"
 											color="inherit"
+											onClick={createNewChat}
 										/>
 									</IconButton>
 								</Typography>
