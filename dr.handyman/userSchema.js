@@ -10,7 +10,7 @@
 
 const { Message, Post, User, Comment } = require('./mongooseSchemas');
 const { addDistances, getDistance, coordinateCheck } = require('./algorithms/distance');
-const { passwordValidate, stripXss, textFieldLenCheck, emailValidate, unmodifiableValidate, phoneValidate } = require('./schemaRules/sanitizationRules');
+const { stripXss, textFieldLenCheck, unmodifiableValidate, phoneValidate } = require('./schemaRules/sanitizationRules');
 /**
  * Add comment counts to the list of worker objects.
  * @param {Array} inputList list of workers.

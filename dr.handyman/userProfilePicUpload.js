@@ -1,3 +1,12 @@
+/*jshint esversion: 9 */
+
+/**
+ * 
+ * Reference in general
+ * Apollo Docs: https://www.apollographql.com/docs/apollo-server/
+ *  
+ */
+
 const { GraphQLUpload } = require('graphql-upload');
 const { finished } = require('stream/promises');
 const { User } = require('./userSchema');
@@ -8,6 +17,9 @@ const fileUploadDef = `
   # in the resolver map below.
   scalar Upload
 
+  """
+  File upload type
+  """
   type File {
     filepath: String
     fileGetPath: String
@@ -25,6 +37,9 @@ const fileUploadQueryDef = `
 
 const fileUploadMutDef =`
   # Multiple uploads are supported. See graphql-upload docs for details.
+  """
+  Uploads a profile picture to the server. Returns boolean indicating success status
+  """
   profilePicUpload(file: Upload!): Boolean!
 `
 
