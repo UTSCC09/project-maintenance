@@ -12,8 +12,7 @@ function unmodifiableValidate(inputString){
 }
 function passwordValidate(password){
     return !validator.contains(password, ' ') 
-        && validator.isStrongPassword(password, 
-            {minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, returnScore: false})
+        && validator.isStrongPassword(password);
 }
 
 function phoneValidate(phone){

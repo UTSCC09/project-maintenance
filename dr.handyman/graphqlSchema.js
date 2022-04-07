@@ -70,15 +70,15 @@ const typeDefs = gql(`
     # Mutation Types
     type Mutation {
         """
-        Logs in user 
+        Logs in user with passport context.
         """
         login(email: String!, password: String!): AuthPayload
         """
-        Signup user
+        Signup user with passport context. Does not auto signin.
         """
         signup(username: String!, email: String!, password: String!, phone: String!): AuthPayload
         """
-        Logout user
+        Logout user.
         """
         logout: Boolean`+ 
         userMutDef + 
@@ -100,6 +100,12 @@ const typeDefs = gql(`
 `
 );
 
+/**
+ * Comments on object:
+ * 
+ * @param Upload check fileUploadSchema for more detail
+ * @param Subscription.getChat subscription 
+ */
 const resolvers = {
     Upload: fileUploadScalar.Upload,
     Subscription: {
@@ -129,7 +135,7 @@ const resolvers = {
             if (username.length <= 0 || !textFieldLenCheck(username, 20) || !unmodifiableValidate(username) || stripXss(username) != username)
                 throw new Error("Username should contain alphanumerics and be less than or equal to 20 letters");
             if (!passwordValidate(password))
-                throw new Error("Password should be minimum 8 characters with lower case, upper case and a number");
+                throw new Error("Password should be minimum 8 characters with lower case, upper case, a number, and a symbol");
             if (!phoneValidate(phone))
                 throw new Error("Phone number invalid");
 
@@ -157,6 +163,7 @@ const resolvers = {
     },
 };
 
+// Appends query and mutation schemas from other schemas.
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut, postMut, chatMut, fileUploadMut, appointmentMut, commentMut);
 resolvers.Query = Object.assign({}, resolvers.Query, chatQuery, postQuery, userQuery, appointmentQuery, commentQuery);
 
