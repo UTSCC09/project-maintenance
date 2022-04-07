@@ -1,10 +1,8 @@
 /*jshint esversion: 9 */
 
 // Apollo Graphql Imports
-  const { WebSocketServer } = require('ws');
   const { execute, subscribe } = require('graphql');
-  const { useServer } = require('graphql-ws/lib/use/ws');
-  const { ApolloServer, gql } = require('apollo-server-express');
+  const { ApolloServer } = require('apollo-server-express');
   const { SubscriptionServer } = require('subscriptions-transport-ws');
   const { GraphQLLocalStrategy, buildContext }= require('graphql-passport');
   const { ApolloServerPluginDrainHttpServer } = require("apollo-server-core"); 
@@ -33,8 +31,9 @@ require('dotenv').config();
 // Redis subscription configuration
   const { RedisPubSub } = require('graphql-redis-subscriptions');
   const Redis = require('ioredis');
-  const fs = require('fs');
-  const option2 = {
+  
+  // Redis is only available in deployment. 
+  const option = {
     host: "redis",
     port: process.env.REDIS_PORT,
     password: process.env.REDIS_PASS,
@@ -43,16 +42,19 @@ require('dotenv').config();
       return Math.min(times * 50, 2000);
     }
   };
-  const userStatus = new Redis(option2);
+
+  // Redis instance for storing user online status and the socket id
+  const userStatus = new Redis(option);
   
+  // Redis graphql pubsub instance for messaging 
   const pubsub = new RedisPubSub({
-    publisher: new Redis(option2),
-    subscriber: new Redis(option2)
+    publisher: new Redis(option),
+    subscriber: new Redis(option)
   });
 // Redis subscription configuration
 
 // Express X Passport X HTTPS setup
-  const https = require('https');
+  const fs = require('fs');
   const http = require('http');
   const uuid = require('uuid').v4;
   const bcrypt = require('bcrypt');
@@ -60,15 +62,16 @@ require('dotenv').config();
   const passport = require('passport');
   const session = require('express-session');
   const { graphqlUploadExpress } = require('graphql-upload');
+  
   const PORT = process.env.PORT;
-
   const SESSION_SECRET = process.env.SECRET;
-  const app = express();
 
+  const app = express();
+  const httpServer = http.createServer(app);
+
+  // Sentry monitoring for express communication
   const Sentry = require('@sentry/node');
   const Tracing = require("@sentry/tracing");
-  const httpServer = http.createServer(app);
-  
   Sentry.init({
     dsn: "https://73fbf33220804aadb06952f71a4fc08b@o1186949.ingest.sentry.io/6306768",
     integrations: [
@@ -76,22 +79,21 @@ require('dotenv').config();
       new Sentry.Integrations.Http({ tracing: true }),
       // enable Express.js middleware tracing
       new Tracing.Integrations.Express({ app }),
+      // enable Mongodb tracing
       new Tracing.Integrations.Mongo({
         useMongoose: true // Default: false
       }),
     ],
- 
-    // Set tracesSampleRate to 1.0 to capture 100%
-    // of transactions for performance monitoring.
-    // We recommend adjusting this value in production
     tracesSampleRate: 1.0,
   });
- // RequestHandler creates a separate execution context using domains, so that every
- // transaction/span/breadcrumb is attached to its own Hub instance
+
+  // handlers before any other express handlers 
   app.use(Sentry.Handlers.requestHandler());
- // TracingHandler creates a trace for every incoming request
   app.use(Sentry.Handlers.tracingHandler());
 
+  /**
+   * Endpoint serving user profile pictures
+   */
   app.get('/pictures/:email', async (req, res) => {
     const user = await User.findOne({ email: req.params.email});
     if (!user)
@@ -105,8 +107,10 @@ require('dotenv').config();
     res.sendFile(user.profilePic.filepath);
   })
 
+  // Sentry error handler before middleware and after express handlers
   app.use(Sentry.Handlers.errorHandler());
 
+  // session cookie definition
   const sessionMid = session({
     genid: (req) => uuid(),
     secret: SESSION_SECRET,
@@ -120,21 +124,28 @@ require('dotenv').config();
       secure:  true,
     }
   });
+
   app.set('trust proxy', true);
   app.use(sessionMid);
 
+  /**
+   * Login strategy for passport. Compares the ssalted hash
+   */
   passport.use(
     new GraphQLLocalStrategy(async (email, password, done) => {
+
       const oneuser = await User.findOne({ email: email});
       const error = oneuser ? null : new Error('no matching user');
+
       if (error) return done(error, oneuser);
-      return await bcrypt.compare(password, oneuser.password, function (err, same){
-          if (err) return done(new Error('hash compare incorrect'), oneuser);
+      return bcrypt.compare(password, oneuser.password).then(function (same){
           if (same)
             done(error, oneuser);
           else{
             done(new Error('password incorrect'), oneuser);
           }
+      }).catch((err) => {
+        done(new Error('hash compare incorrect'), oneuser);
       });
       
     }),
@@ -152,116 +163,95 @@ require('dotenv').config();
   app.use(passport.session());
   app.use(graphqlUploadExpress());
 // Express X Passport X HTTPS setup
-const io = require("socket.io")(httpServer, {
-  cors: {
-    credentials: true,
-    origin: process.env.PROD == 'false' ? ['https://www.drhandyman.me', 'http://localhost:3001'] : ['https://www.drhandyman.me'],
-    methods: [ "GET", "POST" ]
-  },
-})
 
-// user need to send their email on login
-// each user has list of sockets
-// if one user openned multiple pages, only one page will be alerted
-const users = {};
-io.on("connection", (socket) => {
-  socket.emit("me", socket.id)
-
-  socket.on('login', function(email){
-    console.log(email);
-    if (email != null)
-      userStatus.set(email, socket.id, "EX", 600000);
+// Socket io mid-point for video initialization
+  const io = require("socket.io")(httpServer, {
+    cors: {
+      credentials: true,
+      origin: process.env.PROD == 'false' ? ['https://www.drhandyman.me', 'http://localhost:3001'] : ['https://www.drhandyman.me'],
+      methods: [ "GET", "POST" ]
+    },
   })
-  socket.on('callEmail', async (data) => {
-    userStatus.get(data.email).then((result) => {
-      if (io.sockets.sockets.get(result) !== undefined){
-        // const user = await User.find({email: data.email});
-        io.to(result).emit("incomingCall", {signal: data.signalData, fromId: socket.id, username: data.username})
-      }else{
+
+  io.on("connection", (socket) => {
+    socket.emit("me", socket.id)
+    socket.on('login', function(email){
+      console.log(email);
+      if (email != null)
+        userStatus.set(email, socket.id, "EX", 600000);
+    })
+    socket.on('callEmail', async (data) => {
+      userStatus.get(data.email).then((result) => {
+        if (io.sockets.sockets.get(result) !== undefined){
+          // const user = await User.find({email: data.email});
+          io.to(result).emit("incomingCall", {signal: data.signalData, fromId: socket.id, username: data.username})
+        }else{
+          console.log("not online")
+          socket.emit("user not active");
+        }
+      }).catch((err) => {
         console.log("not online")
         socket.emit("user not active");
-      }
-    }).catch((err) => {
-      console.log("not online")
-      socket.emit("user not active");
-    });
+      });
+      
+    })
+
+    socket.on("answer", async (data) => {
+      io.to(data.toId).emit("answered", { signal: data.signal, id: socket.id , username: data.toUsername});
+    })
+
+    socket.on("stopVideo", async (id) => {
+      io.to(id).emit("stopVideo", {});
+    })
     
-  })
+    socket.on("startVideo", async (id) => {
+      io.to(id).emit("startVideo", {});
+    })
 
-  socket.on("answer", async (data) => {
-    io.to(data.toId).emit("answered", { signal: data.signal, id: socket.id , username: data.toUsername});
-  })
+    socket.on("mute", async (id) => {
+      io.to(id).emit("mute", {});
+    })
 
-  socket.on("stopVideo", async (id) => {
-    io.to(id).emit("stopVideo", {});
-  })
-  
-  socket.on("startVideo", async (id) => {
-    io.to(id).emit("startVideo", {});
-  })
+    socket.on("unmute", async (id) => {
+      io.to(id).emit("unmute", {});
+    })
 
-  socket.on("mute", async (id) => {
-    io.to(id).emit("mute", {});
-  })
+    socket.on("callEnded", (id)=>{
+      io.to(id).emit("callEnded", {});
+    })
 
-  socket.on("unmute", async (id) => {
-    io.to(id).emit("unmute", {});
-  })
-
-  socket.on("callEnded", (id)=>{
-    io.to(id).emit("callEnded", {});
-  })
-
-  socket.on("reject", (id) => {
-      io.to(id).emit("reject", {})
-  })
-  socket.on("cancel", (email) => {
-    userStatus.get(email).then((result) => {
-      if (io.sockets.sockets.get(result) !== undefined){
-        // const user = await User.find({email: data.email});
-        io.to(result).emit("cancel", {});
-      }else{
+    socket.on("reject", (id) => {
+        io.to(id).emit("reject", {})
+    })
+    socket.on("cancel", (email) => {
+      userStatus.get(email).then((result) => {
+        if (io.sockets.sockets.get(result) !== undefined){
+          // const user = await User.find({email: data.email});
+          io.to(result).emit("cancel", {});
+        }else{
+          console.log("not online")
+          socket.emit("user not active");
+        }
+      }).catch((err) => {
         console.log("not online")
         socket.emit("user not active");
-      }
-    }).catch((err) => {
-      console.log("not online")
-      socket.emit("user not active");
-    });
-  })
-});
+      });
+    })
+  });
+// Socket io mid-point for video initialization
 
 // Initialize and start the HTTPS server
   async function startServer() {
-      // Creating the WebSocket server
-    // const wsServer = new WebSocketServer({
-    //   // This is the `httpServer` we created in a previous step.
-    //   server: httpServer,
-    //   // Pass a different path here if your ApolloServer serves at
-    //   // a different path.
-    //   path: '/graphql',
-    // });
-
-    // Hand in the schema we just created and have the
-    // WebSocketServer start listening.
-    // const temp = makeExecutableSchema({
-    //   typeDefs,
-    //   resolvers
-    // });
-    // const serverCleanup = useServer({ temp }, wsServer);
     const server = new ApolloServer({
       schema,
       introspection: true,
-      playground: {
+      playground: process.env.PROD == 'false' ? {
         settings: {
           "request.credentials": "include"
         }
-      },
+      } : false,
       plugins: [
-        // Proper shutdown for the HTTP server.
         ApolloServerPluginDrainHttpServer({ httpServer }),
-    
-        // Proper shutdown for the WebSocket server.
         {
           async serverWillStart() {
             return {
@@ -275,15 +265,11 @@ io.on("connection", (socket) => {
       
       context: ({ req, res }) => buildContext({ req, res, pubsub }),
     });
+
     const subscriptionServer = SubscriptionServer.create({
-        // This is the `schema` we just created.
         schema,
-        // These are imported from `graphql`.
         execute,
         subscribe,
-        // Providing `onConnect` is the `SubscriptionServer` equivalent to the
-        // `context` function in `ApolloServer`. Please [see the docs](https://github.com/apollographql/subscriptions-transport-ws#constructoroptions-socketoptions--socketserver)
-        // for more information on this hook.
         async onConnect(
             connectionParams,
             webSocket,
@@ -304,20 +290,19 @@ io.on("connection", (socket) => {
         onDisconnect(webSocket, context) {
         },
     }, {
-        // This is the `httpServer` we created in a previous step.
         server: httpServer,
-        // This `server` is the instance returned from `new ApolloServer`.
         path: server.graphqlPath,
     });
       await server.start();
       const cors = {
         credentials: true,
-        origin: process.env.PROD == 'false' ? ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001', 'https://www.drhandyman.me'] : ['https://www.drhandyman.me'],
+        origin: process.env.PROD == 'false' ? 
+        ['https://studio.apollographql.com','http://localhost:3000', 'http://localhost:3001', 'https://www.drhandyman.me'] 
+        : ['https://www.drhandyman.me'],
       };
       server.applyMiddleware({ app, cors });
   }
   startServer();
-
 
   // The `listen` method launches a web server.
   httpServer.listen(PORT, function (err) {
@@ -325,15 +310,13 @@ io.on("connection", (socket) => {
       else console.log("HTTPS server on https://localhost:%s", PORT);
       
   });
-
-  
+// Initialize and start the HTTPS server
 
 module.exports = {
-    User,
-    Post,
-    Conversation,
-    Message,
-    Appointment,
-    Comment
+  User,
+  Post,
+  Conversation,
+  Message,
+  Appointment,
+  Comment
 };
-// Initialize and start the HTTPS server
