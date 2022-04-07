@@ -113,15 +113,7 @@ const ProfileEdit = () => {
 							}
 						})
 						.catch(() => {
-							dispatch({
-								type: TRIGGER_MESSAGE,
-								payload: {
-									globalMessage: {
-										message: `Not Logged In`,
-										severity: "error",
-									},
-								},
-							});
+							
 						});
 					router.push("/profile");
 				})
@@ -234,7 +226,6 @@ const ProfileEdit = () => {
 									/>
 								</Grid>
 
-							
 								<Grid item md={6} xs={12}>
 									<TextField
 										name="phone"
@@ -253,7 +244,7 @@ const ProfileEdit = () => {
 										}
 									/>
 								</Grid>
-							
+								
 							</Grid>
 						</Box>
 
@@ -280,11 +271,12 @@ const ProfileEdit = () => {
 const phoneRegEx = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
 const checkoutSchema = yup.object().shape({
-	username: yup.string().required("required"),	
+	username: yup.string().required("required"),
+	
 	phone: yup
 		.string()
 		.matches(phoneRegEx, "Phone number is not valid")
 		.required("${path} is required"),
-	
+
 });
 export default ProfileEdit;
