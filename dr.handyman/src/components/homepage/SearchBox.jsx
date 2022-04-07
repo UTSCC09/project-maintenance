@@ -98,6 +98,7 @@ const SearchBox = () => {
 			window.removeEventListener("click", handleDocumentClick);
 		};
 	}, []);
+	
 	const categoryDropdown = (
 		<Menu
 			direction="left"

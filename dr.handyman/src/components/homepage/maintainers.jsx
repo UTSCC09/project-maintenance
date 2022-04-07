@@ -130,7 +130,7 @@ const MaintainerList = () => {
 		};
 		Emitter.on("searchWorkers", handlerWorkersSearch);
 		Emitter.on("clearWorkers", () => {
-			console.log("clearWorkers");
+			
 			setHiddenTitle(true);
 			setWorkersData([]);
 			setWorkersCount(0);
