@@ -54,7 +54,7 @@ function ContactListRow({ detail, setLastMessageTimeFromChild }) {
 		shortMessage = latestMessage.substring(0, 25) + "...";
 	}
 	const avatar = `${IMAGE_URL}/${
-		user_send
+		conversation.userEmails && user_send
 	}`;
 	useEffect(() => {
 		const updateAndRenderMessage = (id) => {
