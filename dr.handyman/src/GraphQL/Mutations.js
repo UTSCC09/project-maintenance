@@ -73,7 +73,6 @@ mutation SetUser($username: String!, $phone: String!) {
     type
     phone
     rating
-    location
     distance
     commentCount
     profilePic {
