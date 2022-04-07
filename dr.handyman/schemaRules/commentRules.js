@@ -1,10 +1,12 @@
 /*jshint esversion: 9 */
 const { rule } = require('graphql-shield');
 const { Comment, Appointment, User } = require('../mongooseSchemas');
+const { textFieldLenCheck } = require('./sanitizationRules');
 
 const commentRules = {
     addCommmentRule: rule()( async (parent, {appointmentId, workerEmail, rating, content}, context) => {
-
+        if (content.length <= 0 || !textFieldLenCheck(content, 500))
+            return new Error("Content should have at least one character and maximum 500 letters")
         const curDate = new Date();
         const appointment = await Appointment.findOne({$and: [
             {_id: appointmentId},
@@ -32,6 +34,14 @@ const commentRules = {
         if (duplicate != null)
             return new Error("Duplicate comment");
 
+        if (rating != null && (rating > 5 || rating < 0))
+            return new Error("Rating out of bounds");
+        return true;
+    }),
+
+    editCommmentRule: rule()( async (parent, {rating, content}, context) => {
+        if (content.length <= 0 || !textFieldLenCheck(content, 500))
+            return new Error("Content should have at least one character and maximum 500 letters")
         if (rating != null && (rating > 5 || rating < 0))
             return new Error("Rating out of bounds");
         return true;

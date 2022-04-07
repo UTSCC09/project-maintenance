@@ -10,7 +10,7 @@
 
 const { Message, Post, User, Comment } = require('./mongooseSchemas');
 const { addDistances, getDistance, coordinateCheck } = require('./algorithms/distance');
-const { stripXss, textFieldLenCheck, unmodifiableValidate, phoneValidate } = require('./schemaRules/sanitizationRules');
+
 /**
  * Add comment counts to the list of worker objects.
  * @param {Array} inputList list of workers.
@@ -109,7 +109,8 @@ const userQueryDef = `
 `;
 
 /**
- * Note: Graphql operations handle thrown errors automatically.
+ * Note: Graphql operations handle thrown errors automatically. Graphql Shield has taken care
+ *       of authorization and sanitization
  * Comments on object:
  * 
  * @param getWorkerPage Returns a page of workers sorted by newest. The comment counts of each worker is also added 
@@ -213,11 +214,6 @@ const userMut = {
                                 });
     },
     async setUser (_, { username, phone }, context){
-        if (!phoneValidate(phone))
-            throw new Error("Phone number invalid");
-        if (username.length <= 0 || !textFieldLenCheck(username, 20) || !unmodifiableValidate(username) || stripXss(username) != username)
-            throw new Error("Username should contain alphanumerics and be less than or equal to 20 letters");
-
         let res = await User.updateOne({ email: context.getUser().email },
                                          { phone, username});
         if (!res.acknowledged)

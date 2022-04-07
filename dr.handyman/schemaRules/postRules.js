@@ -1,9 +1,14 @@
 /*jshint esversion: 9 */
 const { rule } = require('graphql-shield');
 const { Post } = require('../mongooseSchemas');
+const { textFieldLenCheck } = require('./sanitizationRules');
 
 const postRules = {
-    addPostRules: rule()( async (parent, {coordinates, type}, context) => {
+    addPostRules: rule()( async (parent, {title, content, coordinates, type}, context) => {
+        if (title.length <= 0 || !textFieldLenCheck(title, 20))
+            return new Error("Title should have at least one character and maximum 20 letters")
+        if (content.length <= 0 || !textFieldLenCheck(title, 500))
+            return new Error("Content should have at least one character and maximum 500 letters")
         if (type > 1 || type < 0)
             return new Error("Type does not eixts");
 
@@ -16,6 +21,14 @@ const postRules = {
             return true;
         else
             return new Error("Coordinate invalid");
+    }),
+    setPostRules: rule()( async (parent, { title, content }, context) => {
+        if (title.length <= 0 || !textFieldLenCheck(title, 20))
+            return new Error("Title should have at least one character and maximum 20 letters")
+        if (content.length <= 0 || !textFieldLenCheck(title, 500))
+            return new Error("Content should have at least one character and maximum 500 letters")
+        return true;
+
     }),
     notAcquired: rule()( async (parent, args, context) => {
         const post = await Post.findOne({_id: args._id});

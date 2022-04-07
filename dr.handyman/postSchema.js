@@ -8,6 +8,7 @@
  */
 const { Post } = require('./mongooseSchemas');
 const { addDistances, getDistance, coordinateCheck } = require('./algorithms/distance');
+const { stripXss } = require('./schemaRules/sanitizationRules');
 
 const postDefs = `
     """
@@ -105,7 +106,8 @@ const postQueryDef = `
 
 
 /**
- * Note: Graphql operations handle thrown errors automatically.
+ * Note: Graphql operations handle thrown errors automatically.Graphql Shield has taken care
+ *       of authorization and sanitization
  * Comments on object:
  * 
  * @param addPost Adds a post to the data base and return the resulting document
@@ -117,6 +119,8 @@ const postQueryDef = `
  */
 const postMut = {
     async addPost (_, { title, content, coordinates, type}, context) {
+        title = stripXss(title);
+        content = stripXss(content);
         const postObj = new Post({
             posterEmail: context.getUser().email,
             posterUsername: context.getUser().username,
@@ -153,6 +157,8 @@ const postMut = {
         return res.acknowledged;
     },
     async setPost(_, { _id, title, content }){
+        title = stripXss(title);
+        content = stripXss(content);
         const post = await Post.findOne({_id});
         if (post == null)
             throw new Error("Post does not exist");
@@ -160,10 +166,10 @@ const postMut = {
                                          { title: title == null ? post.title : title,
                                            content: content == null ? post.content : content,});
         if (!res.acknowledged)
-            return new Error("Update Failed");
+            throw new Error("Update Failed");
         const updatedPost = await Post.findOne({_id});
         if (!updatedPost)
-            return new Error("Post does not exist anymore")
+            throw new Error("Post does not exist anymore")
         return updatedPost;
     },
     async deletePost(_, {_id}){
@@ -178,7 +184,8 @@ const postMut = {
 };
 
 /**
- * Note: Graphql operations handle thrown errors automatically.
+ * Note: Graphql operations handle thrown errors automatically. Graphql Shield has taken care
+ *       of authorization and sanitization
  * Comments on object:
  * 
  * @param getOnePost Gets the post with _id and add its distances if provided coordinates

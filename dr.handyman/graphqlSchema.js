@@ -8,7 +8,6 @@
  * 
  */
 const bcrypt = require('bcrypt');
-const { passwordValidate, stripXss, textFieldLenCheck, emailValidate, unmodifiableValidate, phoneValidate } = require('./schemaRules/sanitizationRules');
 const { permissions } = require('./permissions');
 const { gql } = require('apollo-server-express');
 const { applyMiddleware } = require('graphql-middleware');
@@ -108,7 +107,8 @@ const typeDefs = gql(`
 );
 
 /**
- * Note: Graphql operations handle thrown errors automatically.
+ * Note: Graphql operations handle thrown errors automatically. Graphql Shield has taken care
+ *       of authorization and sanitization
  * Comments on object:
  * 
  * @param Upload check fileUploadSchema for more detail
@@ -145,19 +145,6 @@ const resolvers = {
         },
         logout: (_, __, context) => context.logout(),
         signup: async (_, { username, email, password, phone}) => {
-            if (!emailValidate(email) || stripXss(email) != email)
-                throw new Error("Invalid Email");
-            if (username.length <= 0 || !textFieldLenCheck(username, 20) || !unmodifiableValidate(username) || stripXss(username) != username)
-                throw new Error("Username should contain alphanumerics and be less than or equal to 20 letters");
-            if (!passwordValidate(password))
-                throw new Error("Password should be minimum 8 characters with no spaces, lower case, upper case, a number, and a symbol");
-            if (!phoneValidate(phone))
-                throw new Error("Phone number invalid");
-
-            const existUser = await User.findOne({ email: email});
-            if (existUser)
-                throw new Error('User with email already exists');
-
             const doSignup = () => new Promise((resolve, reject) => {
                 bcrypt.genSalt(10, function(err, salt) {
                     if (err) reject(Error('salt gen failed'));
