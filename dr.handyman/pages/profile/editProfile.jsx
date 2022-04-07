@@ -114,7 +114,7 @@ const ProfileEdit = () => {
 						})
 						.catch(() => {
 							Emitter.emit("showMessage", {
-								message: err.message,
+								message: "Please login first.",
 								severity: "error",
 							});
 						});
