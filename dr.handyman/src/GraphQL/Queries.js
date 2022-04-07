@@ -18,6 +18,7 @@ query {
     type
     phone
     rating
+    commentCount
     createdAt
     profilePic {
       filepath
@@ -64,6 +65,7 @@ query GetWorkerPage($workerPerPage: Int!, $page: Int!, $coordinates: [Float]) {
     phone
     rating
     distance
+    commentCount
     profilePic {
       filepath
       fileGetPath
@@ -85,6 +87,7 @@ query GetOneWorker($email: String!) {
     phone
     rating
     distance
+    commentCount
     profilePic {
       filepath
       fileGetPath

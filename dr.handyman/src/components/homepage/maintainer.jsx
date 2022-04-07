@@ -16,7 +16,7 @@ import Link from "next/link";
 import React from "react";
 import { IMAGE_URL } from "@/constant";
 
-const Maintainer = ({ username, rating, phone, email, distance, _id }) => {
+const Maintainer = ({ username, rating, phone, email, distance, _id, commentCount }) => {
 	return (
 		<Card>
 			<Box
@@ -42,7 +42,10 @@ const Maintainer = ({ username, rating, phone, email, distance, _id }) => {
 						mb: "0.75rem",
 					}}
 				/>
-
+					<Span color="#616161" ml={1}>
+						({commentCount})
+					</Span>
+        
 				<FlexBox mb={1}>
 					<Place
 						fontSize="small"
