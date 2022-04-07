@@ -95,16 +95,21 @@ require('dotenv').config();
    * Endpoint serving user profile pictures
    */
   app.get('/pictures/:email', async (req, res) => {
-    const user = await User.findOne({ email: req.params.email});
-    if (!user)
-      return res.status(500).end('no such user');
+    try {
+      const user = await User.findOne({ email: req.params.email});
+      if (!user)
+        return res.status(404).end('no such user');
 
-    if (user.profilePic == undefined || !fs.existsSync(__dirname + '/files/pictures/' + req.params.email + '.pic')){
-      res.setHeader('Content-Type', '7bit');
-      return res.sendFile(__dirname + '/files/pictures/default');
+      if (user.profilePic == undefined || !fs.existsSync(__dirname + '/files/pictures/' + req.params.email + '.pic')){
+        res.setHeader('Content-Type', '7bit');
+        return res.sendFile(__dirname + '/files/pictures/default');
+      }
+      res.setHeader('Content-Type', user.profilePic.mimetype);
+      res.sendFile(user.profilePic.filepath);
+
+    } catch (e) {
+      res.status(500).end('failure in getting user');
     }
-    res.setHeader('Content-Type', user.profilePic.mimetype);
-    res.sendFile(user.profilePic.filepath);
   })
 
   // Sentry error handler before middleware and after express handlers
@@ -147,16 +152,22 @@ require('dotenv').config();
       }).catch((err) => {
         done(new Error('hash compare incorrect'), oneuser);
       });
-      
     }),
   );
 
+  // Store user email in session as identifier
   passport.serializeUser((user, done) => {
     done(null, user.email);
   });
+
+  // retrieve user information with identifier
   passport.deserializeUser(async (email, done) => {
-    const matchingUser = await User.findOne({ email: email});
-    done(null, matchingUser);
+    try {
+      const matchingUser = await User.findOne({ email: email});
+      done(null, matchingUser);
+    } catch (e) {
+      done(e, null);
+    }
   });
 
   app.use(passport.initialize());
@@ -174,12 +185,20 @@ require('dotenv').config();
   })
 
   io.on("connection", (socket) => {
-    socket.emit("me", socket.id)
+
+    /**
+     * caches the socket id of user
+     */
     socket.on('login', function(email){
       console.log(email);
       if (email != null)
         userStatus.set(email, socket.id, "EX", 600000);
     })
+
+    /**
+     * If the user trying to call exists, send calling information. Otherwise, emit to signal 
+     * termination
+     */
     socket.on('callEmail', async (data) => {
       userStatus.get(data.email).then((result) => {
         if (io.sockets.sockets.get(result) !== undefined){
@@ -196,33 +215,37 @@ require('dotenv').config();
       
     })
 
+    // Notify caller that the other end has answered
     socket.on("answer", async (data) => {
       io.to(data.toId).emit("answered", { signal: data.signal, id: socket.id , username: data.toUsername});
     })
 
+    // Notify caller that end user turned off video
     socket.on("stopVideo", async (id) => {
       io.to(id).emit("stopVideo", {});
     })
-    
+
+    // Notify caller that end user turned on video
     socket.on("startVideo", async (id) => {
       io.to(id).emit("startVideo", {});
     })
 
+    // Notify caller that end user turned on audio
     socket.on("mute", async (id) => {
       io.to(id).emit("mute", {});
     })
 
+    // Notify caller that end user turned off audio
     socket.on("unmute", async (id) => {
       io.to(id).emit("unmute", {});
     })
-
+    
+    // Notify caller that end user ended the call
     socket.on("callEnded", (id)=>{
       io.to(id).emit("callEnded", {});
     })
 
-    socket.on("reject", (id) => {
-        io.to(id).emit("reject", {})
-    })
+    // Notify end user that the caller is no longer calling. Emits signal if end user not active
     socket.on("cancel", (email) => {
       userStatus.get(email).then((result) => {
         if (io.sockets.sockets.get(result) !== undefined){
@@ -275,6 +298,7 @@ require('dotenv').config();
             webSocket,
             context
         ) {
+          // Subscriptions 
           const authSub = () => new Promise((resolve, reject) => {
             sessionMid(webSocket.upgradeReq, {}, () => {
               if (webSocket.upgradeReq.session.passport == undefined)
