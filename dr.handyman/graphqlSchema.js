@@ -135,7 +135,7 @@ const resolvers = {
             if (username.length <= 0 || !textFieldLenCheck(username, 20) || !unmodifiableValidate(username) || stripXss(username) != username)
                 throw new Error("Username should contain alphanumerics and be less than or equal to 20 letters");
             if (!passwordValidate(password))
-                throw new Error("Password should be minimum 8 characters with lower case, upper case, a number, and a symbol");
+                throw new Error("Password should be minimum 8 characters with no spaces, lower case, upper case, a number, and a symbol");
             if (!phoneValidate(phone))
                 throw new Error("Phone number invalid");
 
