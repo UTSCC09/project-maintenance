@@ -1,12 +1,31 @@
 /*jshint esversion: 9 */
+
+/**
+ * 
+ * Reference In General:
+ * Graphql Shield: https://www.graphql-shield.com/docs
+ * 
+ */
 const { rule } = require('graphql-shield');
 const { Comment, Appointment, User } = require('../mongooseSchemas');
 const { textFieldLenCheck } = require('./sanitizationRules');
 
+/**
+ * Comment on Object
+ * 
+ * @param addCommmentRule 1. Validates content who should have at least one character and maximum 500 letters
+ *                        2. Validates appointmentId who should exist and has already passed
+ *                        3. Validates worker email who should exist
+ *                        4. Validates rating who should be between 0 and 5
+ *                        5. Validates whether the appointment has already been commented
+ * @param editCommmentRule Validates content and rating
+ * @param isOwnCommenter Errors if current user does not own the comment
+ */
 const commentRules = {
-    addCommmentRule: rule()( async (parent, {appointmentId, workerEmail, rating, content}, context) => {
+    addCommmentRule: rule()( async (_, {appointmentId, workerEmail, rating, content}, context) => {
         if (content.length <= 0 || !textFieldLenCheck(content, 500))
             return new Error("Content should have at least one character and maximum 500 letters")
+
         const curDate = new Date();
         const appointment = await Appointment.findOne({$and: [
             {_id: appointmentId},
@@ -39,7 +58,7 @@ const commentRules = {
         return true;
     }),
 
-    editCommmentRule: rule()( async (parent, {rating, content}, context) => {
+    editCommmentRule: rule()( async (_, {rating, content}) => {
         if (content.length <= 0 || !textFieldLenCheck(content, 500))
             return new Error("Content should have at least one character and maximum 500 letters")
         if (rating != null && (rating > 5 || rating < 0))
@@ -47,7 +66,7 @@ const commentRules = {
         return true;
     }),
 
-    isOwnCommenter: rule()( async (parent, {_id}, context) => {
+    isOwnCommenter: rule()( async (_, {_id}, context) => {
         
         const comment = await Comment.findOne({ _id });
         if (comment == null || comment.userEmail != context.getUser().email)

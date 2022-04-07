@@ -57,9 +57,9 @@ const permissions = shield({
         setUser: chain(isAuthenticated, userRules.setUserRUle),
         setWorker: chain(isAuthenticated, isNotWorker),
 
-        addAppointment: chain(isAuthenticated, isWorker, appointmentRules.AppointmentRule),
-        deleteAppointment: chain(isAuthenticated, isWorker, appointmentRules.isAppointed, appointmentRules.AppointmentDeleteRule),
-        editAppointment: chain(isAuthenticated, isWorker, appointmentRules.isAppointedWorker, appointmentRules.AppointmentEditRule),
+        addAppointment: chain(isAuthenticated, isWorker, appointmentRules.appointmentRule),
+        deleteAppointment: chain(isAuthenticated, isWorker, appointmentRules.isAppointed, appointmentRules.appointmentDeleteRule),
+        editAppointment: chain(isAuthenticated, isWorker, appointmentRules.isAppointedWorker, appointmentRules.appointmentEditRule),
 
         addComment: chain(isAuthenticated, commentRules.addCommmentRule),
         deleteComment: chain(isAuthenticated, commentRules.isOwnCommenter),
