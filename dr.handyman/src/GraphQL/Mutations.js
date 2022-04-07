@@ -67,8 +67,22 @@ export const CREATE_LOGOUT_MUTATION = gql `
 export const SET_USER = gql `
 mutation SetUser($username: String!, $phone: String!) {
   setUser(username: $username, phone: $phone){
-	  username
-	  phone
+	username
+    email
+    password
+    type
+    phone
+    rating
+    location
+    distance
+    commentCount
+    profilePic {
+      filepath
+      fileGetPath
+      mimetype
+      encoding
+    }
+    createdAt
   }
 }
 `;

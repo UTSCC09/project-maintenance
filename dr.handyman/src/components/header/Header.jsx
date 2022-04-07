@@ -161,6 +161,7 @@ const Header = ({ isFixed, className }) => {
 						},
 					});
 					Emitter.emit("updateUserData");
+					Emitter.emit("searchWorkers", {});
 					setRepairmanDialogOpen(false);
 				}
 			});
