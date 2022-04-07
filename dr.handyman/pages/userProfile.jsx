@@ -15,7 +15,7 @@ import Paper from "@mui/material/Paper";
 import FlexBox from "components/FlexBox";
 import { format } from "date-fns";
 import { Avatar, Button, Card, Grid, Dialog } from "@mui/material";
-import UserProfileLayout from "components/layout/userProfileLayout";
+import UserProfileLayout from "components/layout/UserProfileLayout";
 import { GET_ONE_WORKER } from "../src/GraphQL/Queries";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
