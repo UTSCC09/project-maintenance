@@ -14,10 +14,8 @@ import MicIcon from '@mui/icons-material/Mic';
 import CloseIcon from '@mui/icons-material/Close';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
-import CardMedia from '@mui/material/CardMedia';
-import DialogContent from '@mui/material/DialogContent'
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Peer from "simple-peer"
 
@@ -37,6 +35,7 @@ export default () => {
     const [ meStopped, setMeStopped ] = useState(true);
     const [ meMuted, setMeMuted ] = useState(true);
     const [ otherMuted, setOtherMuted ] = useState(true);
+    const [ reason, setReason] = useState("");
     const myVideo = useRef()
 	const userVideo = useRef()
     const connectionRef= useRef()
@@ -50,20 +49,11 @@ export default () => {
             myVideo.current.srcObject.getVideoTracks()[0].enabled = false;
             myVideo.current.srcObject.getAudioTracks()[0].enabled = false;
         }
-		setvideoShow(false);
-        setOtherStopped(true);
-        setMeStopped(true)
-        setOtherMuted(true);
-        setMeMuted(true);
-        setReceivingCall(false);
-        setMakingCall(false);
-        setCallAccepted(false);
-        setRecievingEnd(false);
-        socket.removeAllListeners("answered");
-
         if (otherId)
             {
-                socket.emit("callEnded", otherId);
+                if (!reason && !makingCall)
+                    reason = "User Ended Call"
+                socket.emit("callEnded", {id: otherId, reason: reason});
                 setOtherId(null);
             }
         if (connectionRef.current)
@@ -75,6 +65,19 @@ export default () => {
             {
                 socket.emit("cancel", callingUser);
             }
+		setvideoShow(false);
+        setOtherStopped(true);
+        setMeStopped(true)
+        setOtherMuted(true);
+        setMeMuted(true);
+        setReceivingCall(false);
+        setMakingCall(false);
+        setCallAccepted(false);
+        setRecievingEnd(false);
+        setStream(null);
+        setOtherName(null);
+        setOtherId(null);
+        socket.removeAllListeners("answered");
         
         dispatch({
             type: UPDATE_CALLING_USER,
@@ -96,8 +99,11 @@ export default () => {
         socket.removeAllListeners("incomingCall");
         socket.removeAllListeners("callEnded");
         socket.removeAllListeners("cancel");
-        socket.removeAllListeners("startVideo")
-        socket.removeAllListeners("stopVideo")
+        socket.removeAllListeners("startVideo");
+        socket.removeAllListeners("stopVideo");
+        socket.removeAllListeners("mute");
+        socket.removeAllListeners("unmute");
+        socket.removeAllListeners("answered");
         socket.on("incomingCall", (data) => {
             if (!receivingCall && !makingCall && !callAccepted){
                 setReceivingCall(true)
@@ -118,7 +124,15 @@ export default () => {
                 
         })
         socket.on("cancel", () => {
-            
+            dispatch({
+				type: TRIGGER_MESSAGE,
+				payload: {
+					globalMessage: {
+						message: "Other User canceled",
+						severity: "error",
+					},
+				},
+			});
             leaveCall();
         })
         socket.on("stopVideo", () => {
@@ -137,10 +151,19 @@ export default () => {
             userVideo.current.srcObject.getAudioTracks()[0].enabled = true;
             setOtherMuted(false);
         })
-        socket.on("callEnded", () => {
-           
+        socket.on("callEnded",(reason) => {
+            dispatch({
+				type: TRIGGER_MESSAGE,
+				payload: {
+					globalMessage: {
+						message: reason,
+						severity: "error",
+					},
+				},
+			});
             leaveCall();
         })
+        
 	}, [callingUser])
 
     const callEmail = (email) => {
@@ -174,7 +197,7 @@ export default () => {
                 setOtherName(data.username);
             })
         }).catch(() => {
-            leaveCall();
+            leaveCall("Other user failed to connect");
         })
 		
 	}
@@ -201,7 +224,7 @@ export default () => {
             })
             connectionRef.current.signal(otherSignal)
         }).catch(() => {
-            leaveCall();
+            leaveCall("Other user failed to connect");
         })
 		
 	}
@@ -239,8 +262,8 @@ export default () => {
             socket.emit("unmute", otherId);
         }
     }
-    const leaveCall = () => {
-        closeVideo();
+    const leaveCall = (reason) => {
+        closeVideo(null, reason);
 	}
 
 	return (
@@ -304,18 +327,29 @@ export default () => {
             {callAccepted ? 
             (<div>
                 
-                <Button variant="contained" color="secondary" onClick={leaveCall} ml={20}>
+                <Button variant="contained" color="secondary" onClick={() => {leaveCall("User ended call")}} ml={20}>
                             End Call
                 </Button>
-                {meStopped ? <VideocamOffIcon fontSize={'large'} onClick={startVideo} mr={5}></VideocamOffIcon> : <VideocamIcon fontSize={'large'} onClick={stopVideo} mr={5}></VideocamIcon>}
-                {meMuted ? <MicOffIcon fontSize={'large'} onClick={startAudio}></MicOffIcon> : <MicIcon fontSize={'large'} onClick={stopAudio}></MicIcon>}
+                {meStopped ? <IconButton onClick={startVideo}>
+                                <VideocamOffIcon fontSize={'large'}  mr={5}></VideocamOffIcon>
+                             </IconButton> : 
+                             <IconButton onClick={stopVideo}>
+                                <VideocamIcon fontSize={'large'}  mr={5}></VideocamIcon>
+                             </IconButton>
+                    }
+                {meMuted ? <IconButton onClick={startAudio}>
+                                <MicOffIcon fontSize={'large'} ></MicOffIcon>
+                           </IconButton>  : 
+                           <IconButton onClick={stopAudio}>
+                               <MicIcon fontSize={'large'} ></MicIcon>
+                           </IconButton>}
             </div>
                 
             ) : null}
             <div className="myId">
                 {!recievingEnd && !receivingCall ? (
                     <div>
-                    {!callAccepted && <IconButton color="primary" aria-label="call" onClick={() => callEmail(callingUser)}>
+                    {!callAccepted && !makingCall && <IconButton color="primary" aria-label="call" onClick={() => callEmail(callingUser)}>
                         <PhoneIcon fontSize="large" />
                     </IconButton>}
                     {makingCall && <Button variant="contained" color="primary" onClick={cancel}>
@@ -331,14 +365,13 @@ export default () => {
                         <Button variant="contained" color="primary" onClick={answer}>
                             Answer
                         </Button>
-                        <Button variant="contained" color="primary" onClick={leaveCall}>
+                        <Button variant="contained" color="primary" onClick={() => {leaveCall("User declined call")}}>
                             Decline
                         </Button>
                     </div>
                 ) : null}
             </div>
-                
-            
         </Dialog>
+        
 	);
 };
