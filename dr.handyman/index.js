@@ -5,7 +5,7 @@
   const app = require('express')();
   const httpServer = http.createServer(app);
   const Redis = require('ioredis');
-  
+  const ws = require('ws');
   // Redis is only available in deployment. 
   const option = {
     host: "redis",
@@ -25,6 +25,7 @@
       origin: process.env.PROD == 'false' ? ['https://www.drhandyman.me', 'http://localhost:3001'] : ['https://www.drhandyman.me'],
       methods: [ "GET", "POST" ]
     },
+    wsEngine: ws.Server
   })
 
   io.on("connection", (socket) => {
