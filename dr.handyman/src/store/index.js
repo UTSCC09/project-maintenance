@@ -13,7 +13,7 @@ const initialData = {
 	},
 	userLocation: {},
 	currentConvUserInfo: {},
-	socket:  io.connect(`https://cache.drhandyman.me`, {transport: ['websockets']}),
+	socket:  io.connect(`https://cache.drhandyman.me`, {transport: ['websockets', 'polling']}),
 	callingUser: ""
 };
 
