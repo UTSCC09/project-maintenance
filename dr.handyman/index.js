@@ -188,7 +188,8 @@ require('dotenv').config();
 
 // Socket io mid-point for video initialization
 // Reference Number: 3
-  const io = require("socket.io")(httpServer, {
+  const socketHttp = http.createServer(app);
+  const io = require("socket.io")(socketHttp, {
     cors: {
       credentials: true,
       origin: process.env.PROD == 'false' ? ['https://www.drhandyman.me', 'http://localhost:3001'] : ['https://www.drhandyman.me'],
@@ -270,6 +271,11 @@ require('dotenv').config();
         io.to(socket.id).emit("callEnded", "Error when trying to find user");
       });
     })
+  });
+  socketHttp.listen(5000, function (err) {
+    if (err) console.log(err);
+    else console.log("HTTPS server on https://localhost:%s", "5000");
+    
   });
 // Socket io mid-point for video initialization
 
