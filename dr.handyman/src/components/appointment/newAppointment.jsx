@@ -142,6 +142,9 @@ const NewAppointment = ({ setDialog, appointment = {} }) => {
 					onBlur={handleBlur}
 					onChange={handleChange}
 					value={values.userEmail}
+					onKeyDown={(e)=>{
+						e.stopPropagation();
+					}}
 					error={!!touched.userEmail && !!errors.userEmail}
 					helperText={touched.userEmail && errors.userEmail}
 				/>
@@ -157,6 +160,9 @@ const NewAppointment = ({ setDialog, appointment = {} }) => {
 					value={values.description || ""}
 					error={!!touched.description && !!errors.description}
 					helperText={touched.description && errors.description}
+					onKeyDown={(e)=>{
+						e.stopPropagation();
+					}}
 				/>
 
 				<LocalizationProvider dateAdapter={AdapterDateFns}>
