@@ -86,12 +86,12 @@ const NewPost = ({ setDialog, post = {} }) => {
 							setDialog(false);
 						}
 					})
-					.catch(() => {
+					.catch((err) => {
 						dispatch({
 							type: TRIGGER_MESSAGE,
 							payload: {
 								globalMessage: {
-									message: "Add new post failed.",
+									message: err.message,
 									severity: "error",
 								},
 							},
