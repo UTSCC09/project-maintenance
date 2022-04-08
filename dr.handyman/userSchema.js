@@ -172,7 +172,7 @@ const userQuery = {
                         }
                     }
                 }, { type: "worker" }]}).skip(page * workerPerPage).limit(workerPerPage);
-            return addDistances(workers, coordinates);
+            return addCommentCount(addDistances(workers, coordinates));
         }
 
         if (queryText == ""){
