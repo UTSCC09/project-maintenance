@@ -5,6 +5,7 @@
  * Graphql Shield: https://www.graphql-shield.com/docs
  * 
  */
+ const { User } = require('../mongooseSchemas');
 const { rule } = require('graphql-shield');
 const { stripXss, textFieldLenCheck, unmodifiableValidate, phoneValidate, emailValidate,passwordValidate } = require('./sanitizationRules');
 
