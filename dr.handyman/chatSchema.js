@@ -126,7 +126,7 @@ const chatMut = {
         await messageObj.save();
         await Conversation.updateOne({_id}, {_id: _id});
         context.pubsub.publish(_id, {
-            getChat: await Message.find({ conversationId: _id }).sort({ 'createdAt': -1 })
+            getChat: await Message.find({ conversationId: _id }).sort({ 'createdAt': 1 })
         });
         return true;
     }
@@ -172,7 +172,7 @@ const chatQuery = {
         return latestMessage[0];
     },
     async getAllMessage(_, {_id}){
-        return await Message.find({ conversationId: _id }).sort({ 'createdAt': -1 })
+        return await Message.find({ conversationId: _id }).sort({ 'createdAt': 1 })
     }
 };
 
