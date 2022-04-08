@@ -26,7 +26,7 @@
       methods: [ "GET", "POST" ]
     },
     wsEngine: ws.Server,
-    transports: ["websocket"]
+    transports: ["websocket", 'polling']
   })
 
   io.on("connection", (socket) => {
