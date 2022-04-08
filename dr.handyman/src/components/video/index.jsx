@@ -41,14 +41,27 @@ export default () => {
     const connectionRef= useRef()
 
     const dispatch = useDispatch();
-    const closeVideo = (event, reason) => {
+
+    /**
+     * Resets all attributes in this.
+     * @param {String} reason cause of video termination. disables dropbacks
+     */
+    const closeVideo = (_, reason) => {
         if (reason && reason == "backdropClick") 
             return;
-        if (myVideo && myVideo.current && myVideo.current.srcObject && myVideo.current.srcObject.getVideoTracks().length == 1)
-        {
-            myVideo.current.srcObject.getVideoTracks()[0].enabled = false;
-            myVideo.current.srcObject.getAudioTracks()[0].enabled = false;
-        }
+
+        // Turns off tracks
+        if (myVideo && myVideo.current && myVideo.current.srcObject)
+            {
+                myVideo.current.srcObject.getTracks().forEach(function(track) {
+                    track.enabled = false;
+                });
+                myVideo.current.srcObject.getTracks().forEach(function(track) {
+                    track.stop();
+                });
+            }
+        
+        // Sends reason to end user
         if (otherId)
             {
                 if (!reason && !makingCall)
@@ -96,6 +109,8 @@ export default () => {
             setvideoShow (true);
            
         setRecievingEnd(false)
+
+        // Prevent multiple listeners of the same name when restarted.
         socket.removeAllListeners("incomingCall");
         socket.removeAllListeners("callEnded");
         socket.removeAllListeners("cancel");
@@ -117,10 +132,7 @@ export default () => {
                 })
             }
             else
-                {
-                    leaveCall();
-                }
-                
+                leaveCall();
                 
         })
         socket.on("cancel", () => {
