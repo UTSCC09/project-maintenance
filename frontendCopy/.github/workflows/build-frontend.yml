@@ -1,0 +1,67 @@
+name: Deploy handymanfrontend
+
+on:
+  push:
+    # Only run this workflow if it is a commit to master.
+    branches:
+      - frontend-Deploy
+    # Only run this workflow if the commit has modified files from frontend
+    paths:
+      - dr.handyman/**
+
+
+env:
+  IMAGE_NAME: handymanfrontend
+
+jobs:
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+
+      - name: Log into GitHub Container Registry
+        # TODO: Create a Personal Access Tokens (PAT) with `read:packages` and `write:packages` scopes and save it as an Actions secret `CR_PAT`
+        run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push image to GitHub Container Registry
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "frontend-Deploy" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+
+      - name: deploy new image
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+                host: ${{ secrets.HOST }}
+                username: ${{ secrets.USERNAME }}
+                key: ${{ secrets.KEY }}
+                port: ${{ secrets.PORT }}
+                passphrase: ${{ secrets.PASSPHRASE }}
+                script: |
+                        ACTOR=${{ github.actor }}
+                        ACTOR=$(echo $ACTOR | tr '[A-Z]' '[a-z]')
+                        echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u $ACTOR --password-stdin
+                        cd ~/nginx-docker
+                        docker-compose pull
+                        docker-compose up -d --build --force-recreate
+                        docker rmi -f $(docker images -aq)

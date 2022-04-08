@@ -1,0 +1,8 @@
+body {
+    padding-right: 0px !important;
+    overflow: auto !important
+  }
+footer {
+  display: flex;
+  justify-content: center 
+}
