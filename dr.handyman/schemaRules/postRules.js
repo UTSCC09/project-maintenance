@@ -25,27 +25,27 @@ const { textFieldLenCheck } = require('./sanitizationRules');
 const postRules = {
     addPostRules: rule()( async (_, {title, content, coordinates, type}) => {
         if (title.length <= 0 || !textFieldLenCheck(title, 20))
-            return new Error("Title should have at least one character and maximum 20 letters")
+            return new Error("Title should have at least one character and maximum 20 letters");
         if (content.length <= 0 || !textFieldLenCheck(title, 500))
-            return new Error("Content should have at least one character and maximum 500 letters")
+            return new Error("Content should have at least one character and maximum 500 letters");
         if (type > 1 || type < 0)
             return new Error("Type does not eixts");
 
         if (coordinates == null)
             return new Error("No coordinate");
-        else if (coordinates != undefined && coordinates.length == 2
-            && typeof coordinates[0] === "number" && typeof coordinates[1] === "number"
-            && coordinates[0] <= 180 && coordinates[0] >= -180
-            && coordinates[0] <= 90 && coordinates[0] >= -90)
+        else if (coordinates != undefined && coordinates.length == 2 && 
+            typeof coordinates[0] === "number" && typeof coordinates[1] === "number" && 
+            coordinates[0] <= 180 && coordinates[0] >= -180 && 
+            coordinates[0] <= 90 && coordinates[0] >= -90)
             return true;
         else
             return new Error("Coordinate invalid");
     }),
     setPostRules: rule()( async (_, { title, content }) => {
         if (title.length <= 0 || !textFieldLenCheck(title, 20))
-            return new Error("Title should have at least one character and maximum 20 letters")
+            return new Error("Title should have at least one character and maximum 20 letters");
         if (content.length <= 0 || !textFieldLenCheck(title, 500))
-            return new Error("Content should have at least one character and maximum 500 letters")
+            return new Error("Content should have at least one character and maximum 500 letters");
         return true;
 
     }),
@@ -67,7 +67,7 @@ const postRules = {
             throw new Error('Post no longer exist or not authorized');
         return true;
     }),
-}
+};
 
 module.exports = {
     postRules,

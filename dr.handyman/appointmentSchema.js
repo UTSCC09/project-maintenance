@@ -17,14 +17,14 @@ const { stripXss } = require('./schemaRules/sanitizationRules');
 async function addIsCommented (inputList){
     await Promise.all(inputList.map(async (appointment) => {
         try {
-            const count = await Comment.countDocuments({appointmentId: appointment._id})
+            const count = await Comment.countDocuments({appointmentId: appointment._id});
             appointment.isCommented = count != 0;
             return appointment;
         } catch (error) {
             throw new Error("Comment status request failed");
         }
-    }))
-    return inputList
+    }));
+    return inputList;
 }
 
 const appointmentDefs = `
@@ -129,8 +129,7 @@ const appointmentQuery = {
                                                     { workerEmail: email } ] },
                                             {endTime: { $gt: curDate.getTime() }}]});
     },
-
-}
+};
 
 /**
  * Note: Graphql operations handle thrown errors automatically. Graphql Shield has taken care
@@ -181,7 +180,7 @@ const appointmentMut = {
             return new Error("Update Failed");
         const updatedAppointment = await Appointment.findOne({ _id });
         if (!updatedAppointment)
-            return new Error("Appointment does not exist anymore")
+            return new Error("Appointment does not exist anymore");
         return updatedAppointment;
     }
 };

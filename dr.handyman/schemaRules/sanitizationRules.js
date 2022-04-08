@@ -18,8 +18,7 @@ function unmodifiableValidate(inputString){
     return validator.isAlphanumeric(inputString);
 }
 function passwordValidate(password){
-    return !validator.contains(password, ' ') 
-        && validator.isStrongPassword(password);
+    return !validator.contains(password, ' ') && validator.isStrongPassword(password);
 }
 
 function phoneValidate(phone){

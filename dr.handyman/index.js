@@ -119,7 +119,7 @@ require('dotenv').config();
     } catch (e) {
       res.status(500).end('failure in getting user');
     }
-  })
+  });
 
   // Sentry error handler before middleware and after express handlers
   app.use(Sentry.Handlers.errorHandler());

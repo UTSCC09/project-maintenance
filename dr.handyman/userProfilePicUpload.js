@@ -33,7 +33,7 @@ const fileUploadQueryDef = `
   # field be present within the 'Query' type.  This example does not
   # demonstrate how to fetch uploads back.
   otherFields: Boolean!
-`
+`;
 
 const fileUploadMutDef =`
   # Multiple uploads are supported. See graphql-upload docs for details.
@@ -41,7 +41,7 @@ const fileUploadMutDef =`
   Uploads a profile picture to the server. Returns boolean indicating success status
   """
   profilePicUpload(file: Upload!): Boolean!
-`
+`;
 
 const fileUploadScalar = {
     Upload: GraphQLUpload,

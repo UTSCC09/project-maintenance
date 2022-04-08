@@ -71,7 +71,7 @@ async function recalculateRating (workerEmail){
     else if (commentCount == null || commentCount < 0)
         throw new Error("Error updating rating");
     else{
-        const allComments = await commentQuery.getCommentOnWorkerPage(null, {email: workerEmail, commentPerPage: commentCount, page: 0})
+        const allComments = await commentQuery.getCommentOnWorkerPage(null, {email: workerEmail, commentPerPage: commentCount, page: 0});
         let ratingSum = 0;
         allComments.forEach((elem) => {
             ratingSum += elem.rating;
@@ -102,7 +102,7 @@ const commentMut = {
             rating,
             content
         });
-        const result = await commentObj.save()
+        const result = await commentObj.save();
                 
         await recalculateRating(workerEmail);
 
@@ -128,7 +128,7 @@ const commentMut = {
             throw new Error("Update Failed");
         const updatedComment = await Comment.findOne({ _id });
         if (!updatedComment)
-            throw new Error("Comment does not exist anymore")
+            throw new Error("Comment does not exist anymore");
         await recalculateRating(updatedComment.workerEmail);
         return updatedComment;
     }

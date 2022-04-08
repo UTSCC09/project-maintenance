@@ -42,7 +42,7 @@ const userRules = {
 
         return true;
     }),
-}
+};
 
 module.exports = {
     userRules,

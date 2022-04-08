@@ -24,7 +24,7 @@ const { textFieldLenCheck } = require('./sanitizationRules');
 const appointmentRules = {
     appointmentRule: rule()( async (_, {description, userEmail, startTime, endTime}, context) => {
         if (description.length <= 0 || !textFieldLenCheck(description, 500))
-            return new Error("Description should have at least one character and maximum 500 letters")
+            return new Error("Description should have at least one character and maximum 500 letters");
 
         const user = await User.findOne({email: userEmail});
         if (user == null)
@@ -42,12 +42,12 @@ const appointmentRules = {
         ]}]});
         if (conflictAppointment != null)
             return new Error("Time period conflict");
-        return true
+        return true;
     }),
 
     appointmentEditRule: rule()( async (_, {_id, description, userEmail, startTime, endTime}, context) => {
         if (description.length <= 0 || !textFieldLenCheck(description, 500))
-            return new Error("Description should have at least one character and maximum 500 letters")
+            return new Error("Description should have at least one character and maximum 500 letters");
         if (userEmail)
             {
                 const user = await User.findOne({email: userEmail});
@@ -57,7 +57,7 @@ const appointmentRules = {
         if (!startTime && !endTime)
             return true;
         if (!startTime || !endTime)
-            return new Error("Please enter startTime and endTime")
+            return new Error("Please enter startTime and endTime");
 
         if (endTime - 1000 * 60 * 5 < startTime)
             return new Error("Time period too short or invalid");
@@ -72,7 +72,7 @@ const appointmentRules = {
         ]}]});
         if (conflictAppointment != null)
             return new Error("Time period conflict");
-        return true
+        return true;
     }),
 
     appointmentDeleteRule: rule()( async (_, {_id}) => {
@@ -85,7 +85,7 @@ const appointmentRules = {
         
         if (appointment != null)
             return new Error("No deletion of history");
-        return true
+        return true;
 
     }),
     

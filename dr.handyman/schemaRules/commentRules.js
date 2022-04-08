@@ -24,7 +24,7 @@ const { textFieldLenCheck } = require('./sanitizationRules');
 const commentRules = {
     addCommmentRule: rule()( async (_, {appointmentId, workerEmail, rating, content}, context) => {
         if (content.length <= 0 || !textFieldLenCheck(content, 500))
-            return new Error("Content should have at least one character and maximum 500 letters")
+            return new Error("Content should have at least one character and maximum 500 letters");
 
         const curDate = new Date();
         const appointment = await Appointment.findOne({$and: [
@@ -42,7 +42,7 @@ const commentRules = {
         if (worker == null || appointment.workerEmail != workerEmail || appointment.userEmail != context.getUser().email)
             return new Error("No such worker or wrong appointment");
         else if (worker.email == context.getUser().email)
-            return new Error("Cannot comment yourself")
+            return new Error("Cannot comment yourself");
 
         const duplicate = await Comment.findOne({ $and : [
             {workerEmail},
@@ -60,7 +60,7 @@ const commentRules = {
 
     editCommmentRule: rule()( async (_, {rating, content}) => {
         if (content.length <= 0 || !textFieldLenCheck(content, 500))
-            return new Error("Content should have at least one character and maximum 500 letters")
+            return new Error("Content should have at least one character and maximum 500 letters");
         if (rating != null && (rating > 5 || rating < 0))
             return new Error("Rating out of bounds");
         return true;

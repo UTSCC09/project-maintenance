@@ -20,7 +20,7 @@ async function addCommentCount (inputList)
 {
     await Promise.all(inputList.map(async (worker) => {
         try {
-            const count = await Comment.countDocuments({workerEmail: worker.email})
+            const count = await Comment.countDocuments({workerEmail: worker.email});
             worker.commentCount = count;
             return worker;
         } catch (error) {
@@ -144,9 +144,9 @@ const userQuery = {
         if (worker == null)
             throw new Error('worker does not exist');
 
-        worker["distance"] = null;
+        worker.distance = null;
         if (coordinateCheck(coordinates))
-            worker["distance"] = getDistance(coordinates, worker.location.coordinates) / 1000;
+            worker.distance = getDistance(coordinates, worker.location.coordinates) / 1000;
 
         const newWorker = await addCommentCount([worker]);
         return newWorker[0];

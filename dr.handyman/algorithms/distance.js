@@ -27,22 +27,21 @@ var getDistance = function(p1, p2) {
 
 function coordinateCheck (coordinates)
 {
-    return coordinates != null && coordinates != undefined && coordinates.length == 2
-    && typeof coordinates[0] === "number" && typeof coordinates[1] === "number";
+    return coordinates != null && coordinates != undefined && coordinates.length == 2 && 
+           typeof coordinates[0] === "number" && typeof coordinates[1] === "number";
 }
 
 function addDistances (inputList, coordinates)
 {
     if (coordinateCheck(coordinates)){
             inputList.forEach((elem) => {
-                elem["distance"] = getDistance(coordinates, elem.location.coordinates) / 1000;
-            })
-            
-        }
+                elem.distance = getDistance(coordinates, elem.location.coordinates) / 1000;
+            });
+    }
     else{
         inputList.forEach((elem) => {
-            elem["distance"] = null;
-        })
+            elem.distance = null;
+        });
     }
     return inputList;
 }

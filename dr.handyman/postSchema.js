@@ -169,7 +169,7 @@ const postMut = {
             throw new Error("Update Failed");
         const updatedPost = await Post.findOne({_id});
         if (!updatedPost)
-            throw new Error("Post does not exist anymore")
+            throw new Error("Post does not exist anymore");
         return updatedPost;
     },
     async deletePost(_, {_id}){
@@ -210,9 +210,9 @@ const postQuery = {
         const post = await Post.findOne({_id});
         if (post == null)
             throw new Error('Post does not exist');
-        post["distance"] = null;
+        post.distance = null;
         if (coordinateCheck(coordinates)){
-                post["distance"] = getDistance(coordinates, post.location.coordinates) / 1000;
+                post.distance = getDistance(coordinates, post.location.coordinates) / 1000;
             }
         return post;
     },
@@ -297,7 +297,7 @@ const postQuery = {
         }
         else {
             if (queryText == ""){
-                    const posts = await Post.find({}).sort({ 'createdAt': -1 }).skip(page * postPerPage).limit(postPerPage)
+                    const posts = await Post.find({}).sort({ 'createdAt': -1 }).skip(page * postPerPage).limit(postPerPage);
                     return addDistances(posts, coordinates);
             }
             else {
@@ -315,7 +315,7 @@ const postQuery = {
         else
             return await Post.countDocuments({});
     }
-}
+};
 
 module.exports = {
     postDefs,

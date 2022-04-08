@@ -113,7 +113,7 @@ const chatMut = {
     },
     async createMessage(_, { _id, content }, context){
         if (content.length <= 0 || !textFieldLenCheck(content, 500))
-            throw new Error("Content should have at least one character and maximum 500 letters")
+            throw new Error("Content should have at least one character and maximum 500 letters");
 
         content = stripXss(content);
         const messageObj = new Message({
@@ -172,7 +172,7 @@ const chatQuery = {
         return latestMessage[0];
     },
     async getAllMessage(_, {_id}){
-        return await Message.find({ conversationId: _id }).sort({ 'createdAt': 1 })
+        return await Message.find({ conversationId: _id }).sort({ 'createdAt': 1 });
     }
 };
 
