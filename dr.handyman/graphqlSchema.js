@@ -125,7 +125,7 @@ const resolvers = {
     Upload: fileUploadScalar.Upload,
     Subscription: {
         getChat: {
-            subscribe: (_, {conversationId}, context) => {  
+            subscribe: async (_, {conversationId}, context) => {  
             if (context.email == null)
                 throw new Error("Unauthorized");
             else{
