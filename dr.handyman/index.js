@@ -4,7 +4,21 @@
   const PORT = process.env.PORT;
   const app = require('express')();
   const httpServer = http.createServer(app);
+  const Redis = require('ioredis');
+  
+  // Redis is only available in deployment. 
+  const option = {
+    host: "redis",
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASS,
+    retryStrategy: times => {
+      // reconnect after
+      return Math.min(times * 50, 2000);
+    }
+  };
 
+  // Redis instance for storing user online status and the socket id
+  const userStatus = new Redis(option);
   const io = require("socket.io")(httpServer, {
     cors: {
       credentials: true,
