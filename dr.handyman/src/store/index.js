@@ -13,7 +13,7 @@ const initialData = {
 	},
 	userLocation: {},
 	currentConvUserInfo: {},
-	socket:  io.connect(`https://api.drhandyman.me:5000`),
+	socket:  io.connect(`https://${SERVER_URL}`),
 	callingUser: ""
 };
 
