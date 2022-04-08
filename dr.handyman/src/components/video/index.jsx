@@ -15,10 +15,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Peer from "simple-peer"
 
+/**
+ * Reference and Inspiration by Darwin Tech: https://github.com/NikValdez/VideoChatTut
+ */
 export default () => {
     const [videoShow, setvideoShow] = useState(true);
     const [ receivingCall, setReceivingCall ] = useState(false)

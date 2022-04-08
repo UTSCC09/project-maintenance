@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { styled } from '@mui/material';
+import Link from 'next/link'
 
 const StyledLink = styled('a')(({
   theme
@@ -18,7 +19,9 @@ const StyledLink = styled('a')(({
 
 const Footer = () => {
   return <footer>
-      
+      <Link href="/credit" >
+          <a>Credits</a>
+      </Link>
     </footer>;
 };
 
