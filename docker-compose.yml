@@ -1,0 +1,94 @@
+version: '3.7'
+
+networks:
+  app-tier:
+    driver: bridge
+  nginx-proxy:
+    external: true
+
+services:
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+    networks:
+      - nginx-proxy
+
+  nginx-proxy-acme:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./acme:/etc/acme.sh
+    environment:
+      - DEFAULT_EMAIL=shaopeng.lin@mail.utoronto.ca
+    networks:
+      - nginx-proxy
+
+  backend:
+    image: ghcr.io/utscc09/handymanbackend
+    container_name: handymanbackend
+    restart: always
+    expose:
+      - 3000
+    environment:
+      - VIRTUAL_HOST=api.drhandyman.me
+      - LETSENCRYPT_HOST=api.drhandyman.me
+      - MONGO=mongodb+srv://Chris:chris@dr-handyman.7i3hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+      - REDIS_PASS=password123
+      - REDIS_PORT=6379
+      - SECRET=some secret
+      - PORT=3000
+      - PROD=false
+    volumes:
+      - ../hmBackend/dr.handyman/files:/usr/src/app/files
+    networks:
+      - nginx-proxy
+      - app-tier
+  socket:
+    image: ghcr.io/utscc09/socket
+    container_name: socket
+    restart: always
+    expose:
+      - 4000
+    environment:
+      - VIRTUAL_HOST=cache.drhandyman.me
+      - LETSENCRYPT_HOST=cache.drhandyman.me
+      - PORT=4000
+      - PROD=false
+      - REDIS_PASS=password123
+      - REDIS_PORT=6379
+    networks:
+      - nginx-proxy
+      - app-tier
+
+  frontend:
+    image: ghcr.io/utscc09/handymanfrontend
+    container_name: handymanfrontend
+    restart: always
+    expose:
+      - 80
+    environment:
+      - VIRTUAL_HOST=www.drhandyman.me
+      - LETSENCRYPT_HOST=www.drhandyman.me
+    networks:
+      - nginx-proxy
+
+  redis:
+    image: 'bitnami/redis:latest'
+
+    environment:
+      # - VIRTUAL_HOST=cache.drhandyman.me
+      - REDIS_PASSWORD=password123
+    networks:
+      - app-tier
