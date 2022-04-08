@@ -200,21 +200,7 @@ const NewAppointment = ({ setDialog, appointment = {} }) => {
 				>
 					Submit the Appointment
 				</Button>
-				<Button
-					variant="contained"
-					type="submit"
-					fullWidth
-					sx={{
-						mb: "1.65rem",
-						height: 44,
-						bgcolor: "#FFAB92",
-						"&:hover": {
-							bgcolor: "#F20E0E",
-						},
-					}}
-				>
-					Cancel
-				</Button>
+				
 			</form>
 		</StyledCard>
 	);
