@@ -217,12 +217,10 @@ require('dotenv').config();
           // const user = await User.find({email: data.email});
           io.to(result).emit("incomingCall", {signal: data.signalData, fromId: socket.id, username: data.username})
         }else{
-          console.log("not online")
-          io.to(socket.id).emit("callEnded", {});
+          io.to(socket.id).emit("callEnded", "User not online");
         }
       }).catch((err) => {
-        console.log("not online")
-        io.to(socket.id).emit("callEnded", {});
+        io.to(socket.id).emit("callEnded", "Error when trying to find user");
       });
       
     })
@@ -253,8 +251,8 @@ require('dotenv').config();
     })
     
     // Notify caller that end user ended the call
-    socket.on("callEnded", (id)=>{
-      io.to(id).emit("callEnded", {});
+    socket.on("callEnded", (data)=>{
+      io.to(data.id).emit("callEnded", data.reason);
     })
 
     // Notify end user that the caller is no longer calling. Emits signal if end user not active
@@ -265,11 +263,11 @@ require('dotenv').config();
           io.to(result).emit("cancel", {});
         }else{
           console.log("not online")
-          io.to(socket.id).emit("callEnded", {});
+          io.to(socket.id).emit("callEnded", "Error when trying to find user");
         }
       }).catch((err) => {
         console.log("not online")
-        io.to(socket.id).emit("callEnded", {});
+        io.to(socket.id).emit("callEnded", "Error when trying to find user");
       });
     })
   });
