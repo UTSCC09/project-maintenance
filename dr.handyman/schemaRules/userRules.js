@@ -6,7 +6,7 @@
  * 
  */
 const { rule } = require('graphql-shield');
-const { stripXss, textFieldLenCheck, unmodifiableValidate, phoneValidate } = require('./sanitizationRules');
+const { stripXss, textFieldLenCheck, unmodifiableValidate, phoneValidate, emailValidate } = require('./sanitizationRules');
 
 /**
  * Comment on object:
