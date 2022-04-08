@@ -4,8 +4,7 @@
  * Reference numbers:
  * 1. Johannes Kettmann: https://dev.to/jkettmann/password-based-authentication-with-graphql-and-passport-8nd
  * 2. Sentry Express: https://docs.sentry.io/platforms/node/guides/express/
- * 3. Darwin Tech: https://github.com/NikValdez/VideoChatTut
- * 4. Apollo Docs: https://www.apollographql.com/docs/apollo-server/
+ * 3. Apollo Docs: https://www.apollographql.com/docs/apollo-server/
  * 
  */
 
@@ -186,95 +185,8 @@ require('dotenv').config();
   app.use(graphqlUploadExpress());
 // Express X Passport X HTTPS setup
 
-// Socket io mid-point for video initialization
-// Reference Number: 3
-  const io = require("socket.io")(httpServer, {
-    cors: {
-      credentials: true,
-      origin: process.env.PROD == 'false' ? ['https://www.drhandyman.me', 'http://localhost:3001'] : ['https://www.drhandyman.me'],
-      methods: [ "GET", "POST" ]
-    },
-  })
-
-  io.on("connection", (socket) => {
-
-    /**
-     * caches the socket id of user
-     */
-    socket.on('login', function(email){
-      console.log(email);
-      if (email != null)
-        userStatus.set(email, socket.id, "EX", 600000);
-    })
-
-    /**
-     * If the user trying to call exists, send calling information. Otherwise, emit to signal 
-     * termination
-     */
-    socket.on('callEmail', async (data) => {
-      userStatus.get(data.email).then((result) => {
-        if (io.sockets.sockets.get(result) !== undefined){
-          // const user = await User.find({email: data.email});
-          io.to(result).emit("incomingCall", {signal: data.signalData, fromId: socket.id, username: data.username})
-        }else{
-          io.to(socket.id).emit("callEnded", "User not online");
-        }
-      }).catch((err) => {
-        io.to(socket.id).emit("callEnded", "Error when trying to find user");
-      });
-      
-    })
-
-    // Notify caller that the other end has answered
-    socket.on("answer", async (data) => {
-      io.to(data.toId).emit("answered", { signal: data.signal, id: socket.id , username: data.toUsername});
-    })
-
-    // Notify caller that end user turned off video
-    socket.on("stopVideo", async (id) => {
-      io.to(id).emit("stopVideo", {});
-    })
-
-    // Notify caller that end user turned on video
-    socket.on("startVideo", async (id) => {
-      io.to(id).emit("startVideo", {});
-    })
-
-    // Notify caller that end user turned on audio
-    socket.on("mute", async (id) => {
-      io.to(id).emit("mute", {});
-    })
-
-    // Notify caller that end user turned off audio
-    socket.on("unmute", async (id) => {
-      io.to(id).emit("unmute", {});
-    })
-    
-    // Notify caller that end user ended the call
-    socket.on("callEnded", (data)=>{
-      io.to(data.id).emit("callEnded", data.reason);
-    })
-
-    // Notify end user that the caller is no longer calling. Emits signal if end user not active
-    socket.on("cancel", (email) => {
-      userStatus.get(email).then((result) => {
-        if (io.sockets.sockets.get(result) !== undefined){
-          // const user = await User.find({email: data.email});
-          io.to(result).emit("cancel", {});
-        }else{
-          console.log("not online")
-          io.to(socket.id).emit("callEnded", "Error when trying to find user");
-        }
-      }).catch((err) => {
-        console.log("not online")
-        io.to(socket.id).emit("callEnded", "Error when trying to find user");
-      });
-    })
-  });
-// Socket io mid-point for video initialization
-
 // Initialize and start the HTTPS server
-// Reference Number: 4
+// Reference Number: 3
   async function startServer() {
     const server = new ApolloServer({
       schema,
