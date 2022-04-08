@@ -88,7 +88,7 @@ const resolvers = {
             else{
                 setTimeout(async () => context.pubsub.publish(args.conversationId, {
                     getChat: await Message.find({ conversationId: args.conversationId })
-                }), 0);
+                }), 1);
                 return context.pubsub.asyncIterator(args.conversationId);
             }
             }
