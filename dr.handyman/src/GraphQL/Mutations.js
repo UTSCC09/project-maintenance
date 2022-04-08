@@ -88,7 +88,24 @@ mutation SetUser($username: String!, $phone: String!) {
 
 export const SET_WORKER = gql `
 	mutation SetWorker($coordinates: [Float!]) {
-		setWorker(coordinates: $coordinates)
+		setWorker(coordinates: $coordinates){
+		username
+		email
+		password
+		type
+		phone
+		rating
+		location
+		distance
+		commentCount
+		profilePic {
+		  filepath
+		  fileGetPath
+		  mimetype
+		  encoding
+		}
+		createdAt
+	  }
 	}
 `;
 
