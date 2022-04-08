@@ -76,10 +76,10 @@ const MaintainerList = () => {
 				sortByDist = false,
 				page = 0,
 			} = queryParams;
-			if (sortByDist) {
-				authorizePosition().then((coords) => {
+			const handlerSearch = (coords) => {
+				setCacheQueryParams(queryParams);
 					if (!queryText) return getAllList();
-					setCacheQueryParams(queryParams);
+					
 					const userLocationNew = store.getState().userLocation;
 					searchWorkerCount({
 						variables: {
@@ -125,7 +125,14 @@ const MaintainerList = () => {
 								severity: "error",
 							});
 						});
-				});
+					}
+					if (sortByDist) {
+						authorizePosition().then((coords) => {
+							handlerSearch(coords)
+						});
+					} else {
+						const userLocationNew = store.getState().userLocation;
+						handlerSearch(userLocationNew)
 			}
 		};
 		Emitter.on("searchWorkers", handlerWorkersSearch);

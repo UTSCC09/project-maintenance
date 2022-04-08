@@ -77,12 +77,10 @@ const Posts = () => {
 				sortByDist = false,
 				page = 0,
 			} = queryParams;
-			if (sortByDist) {
-				authorizePosition().then((coords) => {
-					setCacheQueryParams(queryParams);
-					setHiddenTitle(false);
-					if (!queryText) return updatePostInfo();
-					const userLocationNew = store.getState().userLocation;
+			const handlerSearch = (coords) => {
+				setCacheQueryParams(queryParams);
+				setHiddenTitle(false);
+				if (!queryText) return updatePostInfo();
 					searchPostCount({
 						variables: {
 							page,
@@ -125,7 +123,14 @@ const Posts = () => {
 								severity: "error",
 							});
 						});
+					}
+					if (sortByDist) {
+						authorizePosition().then((coords) => {
+							handlerSearch(coords)
 				});
+			} else {
+				const userLocationNew = store.getState().userLocation;
+				handlerSearch(userLocationNew)
 			}
 		};
 
