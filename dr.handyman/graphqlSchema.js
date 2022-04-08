@@ -113,7 +113,6 @@ const typeDefs = gql(`
  * 
  * @param Upload check fileUploadSchema for more detail
  * @param Subscription.getChat subscribe user to chat channel conversationId and responds with publisher info.
- *                             publish the first set of messages on the first run.
  * @param Mutation.login Logs the user in with email and password. Goes through the passport strategy context
  *                       and returns the user payload.
  * @param Mutation.logout Logs the current user out from passport and express
@@ -129,10 +128,6 @@ const resolvers = {
             if (context.email == null)
                 throw new Error("Unauthorized");
             else{
-                const messages = await Message.find({ conversationId: conversationId })
-                setTimeout( () => context.pubsub.publish(conversationId, {
-                    getChat: messages
-                }), 0);
                 return context.pubsub.asyncIterator(conversationId);
             }
             }
