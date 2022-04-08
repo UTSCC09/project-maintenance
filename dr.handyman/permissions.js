@@ -32,6 +32,7 @@ const isNotWorker = rule()((parent, args, context) => {
 const permissions = shield({
     Query: {
         currentUser: isAuthenticated,
+        getAllMessage: isAuthenticated,
         getOneConvo: isAuthenticated,
         getCurrentConvos: isAuthenticated,
         getUserPostsPage: isAuthenticated,
@@ -46,6 +47,7 @@ const permissions = shield({
         profilePicUpload: isAuthenticated,
         createConvo: isAuthenticated,
         createMessage: isAuthenticated,
+        
 
         setPost: chain(isAuthenticated, postRules.isOwner, postRules.setPostRules),
         acquirePost: chain(isAuthenticated, postRules.notAcquired),

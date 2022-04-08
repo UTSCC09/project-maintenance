@@ -73,6 +73,11 @@ const chatQueryDef = `
     Gets the Latest messages of current user.
     """
     getLatestMessage(_id: String!): Message
+
+    """
+    Gets all messages for this id
+    """
+    getAllMessage(_id: String!): [Message]
 `;
 
 /**
@@ -121,7 +126,7 @@ const chatMut = {
         await messageObj.save();
         await Conversation.updateOne({_id}, {_id: _id});
         context.pubsub.publish(_id, {
-            getChat: await Message.find({ conversationId: _id })
+            getChat: await Message.find({ conversationId: _id }).sort({ 'createdAt': -1 })
         });
         return true;
     }
@@ -137,6 +142,7 @@ const chatMut = {
  *                         Results sorted by earliest update time.
  * @param getCurrentConvosWithDescription Same as getCurrentConvos but each object embeds username.
  * @param getLatestMessage Returns the latest message in a conversation channel. Sorted by earliest creation time.
+ * @param getAllMessage Returns all messages in this conversation.
  * 
  */
 const chatQuery = {
@@ -164,7 +170,10 @@ const chatQuery = {
         if (latestMessage.length != 1)
             return null;
         return latestMessage[0];
-    }   
+    },
+    async getAllMessage(_, {_id}){
+        return await Message.find({ conversationId: _id }).sort({ 'createdAt': -1 })
+    }
 };
 
 module.exports = {
