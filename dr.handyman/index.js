@@ -25,7 +25,8 @@
       origin: process.env.PROD == 'false' ? ['https://www.drhandyman.me', 'http://localhost:3001'] : ['https://www.drhandyman.me'],
       methods: [ "GET", "POST" ]
     },
-    wsEngine: ws.Server
+    wsEngine: ws.Server,
+    transports: ["websocket"]
   })
 
   io.on("connection", (socket) => {
