@@ -1,23 +1,36 @@
 /*jshint esversion: 9 */
-const { Appointment, User, Comment } = require('./mongooseSchemas');
-const { rule } = require('graphql-shield');
 
-async function addIsCommented (inputList)
-{
-    // let newComments = []
+/**
+ * 
+ * Reference in general
+ * Mongoose Docs: https://mongoosejs.com/docs/guide.html
+ * Apollo Docs: https://www.apollographql.com/docs/apollo-server/
+ *  
+ */
+const { Appointment, Comment } = require('./mongooseSchemas');
+const { stripXss } = require('./schemaRules/sanitizationRules');
+/**
+ * Adds the status code on whether or not an appointment is commented
+ * @param {Array} inputList appointment objects to be added
+ * @returns updated list
+ */
+async function addIsCommented (inputList){
     await Promise.all(inputList.map(async (appointment) => {
-    try {
-        const count = await Comment.countDocuments({appointmentId: appointment._id})
-        appointment.isCommented = count != 0;
-        return appointment;
-    } catch (error) {
-        console.log('error'+ error);
-    }
+        try {
+            const count = await Comment.countDocuments({appointmentId: appointment._id})
+            appointment.isCommented = count != 0;
+            return appointment;
+        } catch (error) {
+            throw new Error("Comment status request failed");
+        }
     }))
-    return inputList // return without waiting for process of 
+    return inputList
 }
 
 const appointmentDefs = `
+    """
+    Appointment Object
+    """
     type Appointment {
         _id: String
         description: String
@@ -30,21 +43,57 @@ const appointmentDefs = `
 `;
 
 const appointmentMutDef = `
+    """
+    Adds an appointment to the current worker's schedule.
+    """
     addAppointment(description: String!, userEmail: String!, startTime: Float!, endTime: Float!): Appointment
+
+    """
+    Deletes an appointment from the worker's schedule
+    """
     deleteAppointment(_id: String!): Boolean
+
+    """
+    Updates the appointment from worker's schedule
+    """
     editAppointment(_id: String!, description: String, userEmail: String, startTime: Float, endTime: Float): Appointment
 `;
 
 const appointmentQueryDef = `
+    """
+    Gets a page of the appointment history of the user specified by email
+    """
     getAppointmentHistoryPage(email: String!, appointmentPerPage: Int!, page: Int!): [Appointment]
+
+    """
+    Gets the count of the appointment history of user specified by email
+    """
     getAppointmentHistoryCount(email: String!): Int
 
+    """
+    Gets a page of upcoming appointments of the user specified by email
+    """
     getAppointmentUpComingPage(email: String!, appointmentPerPage: Int!, page: Int!): [Appointment]
+
+    """
+    Gets the count of upcoming appointments of the user specified by email
+    """
     getAppointmentUpComingCount(email: String!): Int
 `;
 
+/**
+ * Note: Graphql operations handle thrown errors automatically. Graphql Shield has taken care
+ *       of authorization and sanitization
+ * Comments on object:
+ * 
+ * @param getAppointmentHistoryPage Gets a page of appointment history for user specified by email. Sorted in start time
+ * @param getAppointmentUpComingPage Gets a page of upcoming history for user specified by email. Sorted in start time
+ * @param getAppointmentHistoryCount Gets count of appointment history for user specified by email.
+ * @param getAppointmentUpComingCount Gets count of up coming appointment for user specified by email 
+ * 
+ */
 const appointmentQuery = {
-    async getAppointmentHistoryPage(parent, {email, appointmentPerPage, page}, context, info){
+    async getAppointmentHistoryPage(_, {email, appointmentPerPage, page}){
         if (page < 0)
             throw new Error("page number undefined");
         if (appointmentPerPage == 0)
@@ -56,7 +105,7 @@ const appointmentQuery = {
         return addIsCommented (appointments);
     },
 
-    async getAppointmentUpComingPage(parent, {email, appointmentPerPage, page}, context, info){
+    async getAppointmentUpComingPage(_, {email, appointmentPerPage, page}){
         if (page < 0)
             throw new Error("page number undefined");
         if (appointmentPerPage == 0)
@@ -68,13 +117,13 @@ const appointmentQuery = {
         return appointments;
     },
 
-    async getAppointmentHistoryCount(parent, {email}, context, info){
+    async getAppointmentHistoryCount(_, {email}){
         const curDate = new Date();
         return await Appointment.countDocuments({ $and: [{ $or: [ { userEmail: email }, 
                                                     { workerEmail: email } ] },
                                             {endTime: { $lte: curDate.getTime() }}]});
     },
-    async getAppointmentUpComingCount(parent, {email}, context, info){
+    async getAppointmentUpComingCount(_, {email}){
         const curDate = new Date();
         return await Appointment.countDocuments({ $and: [{ $or: [ { userEmail: email }, 
                                                     { workerEmail: email } ] },
@@ -83,8 +132,20 @@ const appointmentQuery = {
 
 }
 
+/**
+ * Note: Graphql operations handle thrown errors automatically. Graphql Shield has taken care
+ *       of authorization and sanitization
+ * Comments on object:
+ * 
+ * @param addAppointment Adds an appointment with user specified by user email in time period startTime -> endTime
+ * @param deleteAppointment Deletes an appointment specified by _id. No comment deletion required as only history
+ *                          comment can be commented and history cannot be deleted
+ * @param editAppointment Updates the appointment with new information
+ * 
+ */
 const appointmentMut = {
-    async addAppointment(parent, {description, userEmail, startTime, endTime}, context, info){
+    async addAppointment(_, {description, userEmail, startTime, endTime}, context){
+        description = stripXss(description);
         const aptObj = new Appointment({
             description,
             userEmail,
@@ -100,7 +161,7 @@ const appointmentMut = {
                 throw new Error("Add appointment failed");
             });
     },
-    async deleteAppointment(parent, {_id}, context, info){
+    async deleteAppointment(_, {_id}){
         return  Appointment.deleteOne({ _id }).then(result => {
             return result.deletedCount;
         })
@@ -108,7 +169,8 @@ const appointmentMut = {
             throw new Error("Appointment deletion failed");
         });
     },
-    async editAppointment(parent, {_id, description, userEmail, startTime, endTime}, context, info){
+    async editAppointment(_, {_id, description, userEmail, startTime, endTime}){
+        description = stripXss(description);
         const appointment = await Appointment.findOne({ _id });
         const res = await Appointment.updateOne({ _id },
                                          { description: description == null ? appointment.description : description,
@@ -124,84 +186,6 @@ const appointmentMut = {
     }
 };
 
-const appointmentRules = {
-    AppointmentRule: rule()( async (parent, {description, userEmail, startTime, endTime}, context) => {
-        const user = await User.findOne({email: userEmail});
-        if (user == null)
-            return new Error("Cannot find user");
-        
-        if (endTime - 1000 * 60 * 5 < startTime)
-            return new Error("Time period too short or invalid");
-        
-        const conflictAppointment = await Appointment.findOne({$and: [
-            {workerEmail: context.getUser().email},
-            {$or: [
-            {$and: [{startTime: {$gte: startTime}}, {startTime: {$lt: endTime}}]},
-            {$and: [{endTime: {$gt: startTime}}, {endTime: {$lte: endTime}}]},
-            {$and: [{startTime: {$lte: startTime}}, {endTime: {$gte: endTime}}]}
-        ]}]});
-        if (conflictAppointment != null)
-            return new Error("Time period conflict");
-        return true
-    }),
-
-    AppointmentEditRule: rule()( async (parent, {_id, description, userEmail, startTime, endTime}, context) => {
-        if (userEmail)
-            {
-                const user = await User.findOne({email: userEmail});
-                if (user == null)
-                    return new Error("Cannot find user");
-            }
-        if (!startTime && !endTime)
-            return true;
-        if (!startTime || !endTime)
-            return new Error("Please enter startTime and endTime")
-
-        if (endTime - 1000 * 60 * 5 < startTime)
-            return new Error("Time period too short or invalid");
-        
-        const conflictAppointment = await Appointment.findOne({$and: [
-            {workerEmail: context.getUser().email},
-            {_id: {$ne: _id}},
-            {$or: [
-            {$and: [{startTime: {$gte: startTime}}, {startTime: {$lt: endTime}}]},
-            {$and: [{endTime: {$gt: startTime}}, {endTime: {$lte: endTime}}]},
-            {$and: [{startTime: {$lte: startTime}}, {endTime: {$gte: endTime}}]}
-        ]}]});
-        if (conflictAppointment != null)
-            return new Error("Time period conflict");
-        return true
-    }),
-
-    AppointmentDeleteRule: rule()( async (parent, {_id}, context) => {
-        const curDate = new Date();
-
-        const appointment = await Appointment.findOne({$and :[
-            { _id },
-            { endTime: { $lte: curDate.getTime() }}
-        ]});
-        
-        if (appointment != null)
-            return new Error("No deletion of history");
-        return true
-
-    }),
-    
-    isAppointed: rule()( async (parent, {_id}, context) => {
-        const appointment = await Appointment.findOne({ _id });
-        if (appointment == null || (appointment.workerEmail != context.getUser().email && appointment.userEmail != context.getUser().email))
-            return new Error('Appointment no longer exist or not authorized');
-        return true;
-    }),
-
-    isAppointedWorker: rule()( async (parent, {_id}, context) => {
-        const appointment = await Appointment.findOne({ _id });
-        if (appointment == null || appointment.workerEmail != context.getUser().email)
-            return new Error('Appointment no longer exist or not authorized');
-        return true;
-    }),
-};
-
 module.exports = {
     Appointment,
     appointmentDefs,
@@ -209,5 +193,4 @@ module.exports = {
     appointmentQueryDef,
     appointmentQuery,
     appointmentMut,
-    appointmentRules,
 };

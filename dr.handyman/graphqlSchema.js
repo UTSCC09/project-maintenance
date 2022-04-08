@@ -1,18 +1,32 @@
 /*jshint esversion: 9 */
 
+/**
+ * 
+ * References in general:
+ * Mongoose Docs: https://mongoosejs.com/docs/guide.html
+ * Apollo Docs: https://www.apollographql.com/docs/apollo-server/
+ * 
+ */
 const bcrypt = require('bcrypt');
+const { permissions } = require('./permissions');
 const { gql } = require('apollo-server-express');
 const { applyMiddleware } = require('graphql-middleware');
 const { makeExecutableSchema }  = require('@graphql-tools/schema');
-const { permissions } = require('./permissions');
 const { userMutDef, userQueryDef, userDefs, User, userMut, userQuery } = require('./userSchema');
 const { postMutDef, postDefs, Post, postMut, postQuery, postQueryDef } = require('./postSchema');
 const { chatMutDef, chatQueryDef, chatDefs, Conversation, Message, chatMut, chatQuery } = require('./chatSchema');
 const { fileUploadDef, fileUploadMut, fileUploadMutDef, fileUploadQueryDef, fileUploadScalar } = require('./userProfilePicUpload');
 const { Appointment, appointmentDefs, appointmentMutDef, appointmentQueryDef, appointmentQuery, appointmentMut} = require('./appointmentSchema');
 const { Comment, commentDefs, commentMutDef, commentQueryDef, commentMut, commentQuery} = require('./commentSchema');
-async function addUser (parent, args, context, info) {
-    const { email, password, username, phone } = args;
+
+/**
+ * Create a user from the sign up information.
+ * @param {Object} object containing email, password, username, and phone to create
+ * a valid user.
+ * @returns newly created user
+ * @throws errors if mongo user creation failed.
+ */
+async function addUser ({ email, password, username, phone }) {
     const userObj = new User({
         email, password, username,
         type: "user",
@@ -26,7 +40,7 @@ async function addUser (parent, args, context, info) {
             return { ...result._doc };
         })
         .catch (err => {
-            console.error(err);
+            throw new Error('User Creation failed');
         });
 }
 
@@ -46,7 +60,9 @@ const typeDefs = gql(`
 
     # Query types
     type Query {
-        User: [User]
+        """
+        Get current user information
+        """
         currentUser: User` + 
         chatQueryDef +
         postQueryDef +
@@ -59,8 +75,17 @@ const typeDefs = gql(`
 
     # Mutation Types
     type Mutation {
+        """
+        Logs in user with passport context.
+        """
         login(email: String!, password: String!): AuthPayload
+        """
+        Signup user with passport context. Does not auto signin.
+        """
         signup(username: String!, email: String!, password: String!, phone: String!): AuthPayload
+        """
+        Logout user.
+        """
         logout: Boolean`+ 
         userMutDef + 
         postMutDef + 
@@ -72,46 +97,67 @@ const typeDefs = gql(`
     }
 
     type Subscription {
-        newUser: User
+        """
+        Subscription service that getChat through the conversation channel on publish.
+        Automatically publish messages on the first call.
+        """
         getChat(conversationId: String!, count: Int!): [Message]
     }
 `
 );
 
+/**
+ * Note: Graphql operations handle thrown errors automatically. Graphql Shield has taken care
+ *       of authorization and sanitization
+ * Comments on object:
+ * 
+ * @param Upload check fileUploadSchema for more detail
+ * @param Subscription.getChat subscribe user to chat channel conversationId and responds with publisher info.
+ *                             publish the first set of messages on the first run.
+ * @param Mutation.login Logs the user in with email and password. Goes through the passport strategy context
+ *                       and returns the user payload.
+ * @param Mutation.logout Logs the current user out from passport and express
+ * @param signup Signs the user up with the basic informations. Any invalid entries will be met with an error
+ *               Passwords are slat-hashed before user creation.
+ * @param Query.currentUser returns the current user.
+ */
 const resolvers = {
     Upload: fileUploadScalar.Upload,
     Subscription: {
         getChat: {
-            subscribe: (parent, args, context) => {  
+            subscribe: (_, {conversationId}, context) => {  
             if (context.email == null)
                 throw new Error("Unauthorized");
             else{
+<<<<<<< HEAD
                 setTimeout(async () => context.pubsub.publish(args.conversationId, {
                     getChat: await Message.find({ conversationId: args.conversationId })
                 }), 1);
                 return context.pubsub.asyncIterator(args.conversationId);
+=======
+                setTimeout(async () => context.pubsub.publish(conversationId, {
+                    getChat: await Message.find({ conversationId })
+                }), 0);
+                return context.pubsub.asyncIterator(conversationId);
+>>>>>>> 9c6b402527671a7c072133b820a8731aec3c52c3
             }
             }
         }
     },
     Mutation: {
-        login: async (parent, { email, password }, context) => {
+        login: async (_, { email, password }, context) => {
             const { user } = await context.authenticate('graphql-local', { email, password });
             await context.login(user);
             return { user };
         },
-        logout: (parent, args, context) => context.logout(),
-        signup: async (parent, { username, email, password, phone}, context) => {
-            const existUser = await User.findOne({ email: email});
-            if (existUser) {
-                throw new Error('User with email already exists');
-            }
+        logout: (_, __, context) => context.logout(),
+        signup: async (_, { username, email, password, phone}) => {
             const doSignup = () => new Promise((resolve, reject) => {
                 bcrypt.genSalt(10, function(err, salt) {
                     if (err) reject(Error('salt gen failed'));
                     bcrypt.hash(password, salt, async (err, hash) => {
                         if (err) reject(Error('hash failed'));
-                        const newUser = await addUser(null, {email, username, password: hash, phone}, null, null);
+                        const newUser = await addUser({email, username, password: hash, phone});
                         // await context.login(newUser);
                         resolve({ user: newUser });
                     });
@@ -122,10 +168,11 @@ const resolvers = {
     },
 
     Query: {
-        currentUser: (parent, args, context) => context.getUser(),
+        currentUser: (_, __, context) => context.getUser(),
     },
 };
 
+// Appends query and mutation schemas from other schemas.
 resolvers.Mutation = Object.assign({}, resolvers.Mutation, userMut, postMut, chatMut, fileUploadMut, appointmentMut, commentMut);
 resolvers.Query = Object.assign({}, resolvers.Query, chatQuery, postQuery, userQuery, appointmentQuery, commentQuery);
 
