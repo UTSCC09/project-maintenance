@@ -359,3 +359,17 @@ query Query($email: String!) {
   getCommentOnWorkerCount(email: $email)
 }
 `
+
+export const GET_ALL_MESSAGES = gql`
+query Query($_id: String!) {
+  getAllMessage(_id: $_id) {
+    _id
+    conversationId
+    content
+    username
+    email
+    createdAt
+    updatedAt
+  }
+}
+`

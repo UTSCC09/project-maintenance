@@ -3,7 +3,7 @@ import { Box, Container, TextField, Chip,Dialog } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { UPDATE_CALLING_USER } from "../../store/constants";
 import { CREATE_MESSAGE } from "@/GraphQL/Mutations";
-import { GET_LATEST_MESSAGE } from "@/GraphQL/Queries";
+import { GET_LATEST_MESSAGE, GET_ALL_MESSAGES } from "@/GraphQL/Queries";
 import { useMutation, useLazyQuery, useSubscription } from "@apollo/client";
 import Emitter from "@/utils/eventEmitter";
 import { GET_CHAT_SUBSCRIBE } from "@/GraphQL/Subscribes";
@@ -20,6 +20,9 @@ const ChatMessage = () => {
 	const [messageContent, setMessageContent] = useState("");
 	const [messageList, setMessageList] = useState([]);
 	const [createNewMessage] = useMutation(CREATE_MESSAGE);
+	const [getAllMessages, { loading }] = useLazyQuery(
+		GET_ALL_MESSAGES
+	);
 	const emojiRef = useRef(null);
 	const messageAreaRef = useRef(null);
 	const [emojiShow, setEmojiShow] = useState(false);
@@ -29,15 +32,55 @@ const ChatMessage = () => {
 		(state) => state.currentConvUserInfo
 	);
 	const { conversation = {} } = currentConvUserInfo;
-
+	const userData = useSelector((state) => state.userData);
+	useSubscription(GET_CHAT_SUBSCRIBE, {
+		variables: {
+			conversationId: conversation._id,
+			count: 10,
+		},
+		onSubscriptionData: ({ client, subscriptionData }) => {
+			const chatList =
+				subscriptionData &&
+				subscriptionData.data &&
+				subscriptionData.data.getChat;
+			convId2MsgList[conversation._id] = chatList || [];
+			setMessageList(chatList);
+			messageAreaRef.current.scrollTop =
+				messageAreaRef.current.scrollHeight;
+		},
+	});
 	useEffect(() => {
-		setMessageList(convId2MsgList[conversation._id] || []);
-		if (messageAreaRef.current) {
-			setTimeout(() => {
-				messageAreaRef.current.scrollTop =
-					messageAreaRef.current.scrollHeight;
-			});
-		}
+		if (!loading && conversation._id !== undefined)
+			getAllMessages({
+				variables: {
+					_id: conversation._id
+				},
+			})
+				.then((res) => {
+					convId2MsgList[conversation._id] = res.data.getAllMessage;
+					setMessageList(convId2MsgList[conversation._id] || []);
+					if (messageAreaRef.current) {
+						setTimeout(() => {
+							messageAreaRef.current.scrollTop =
+								messageAreaRef.current.scrollHeight;
+						});
+					}
+				})
+				.catch((err) => {
+					Emitter.emit("showMessage", {
+						message: err.message,
+						severity: "error",
+					});
+				});
+		else
+			setMessageList([]);
+			if (messageAreaRef.current) {
+				setTimeout(() => {
+					messageAreaRef.current.scrollTop =
+						messageAreaRef.current.scrollHeight;
+				});
+			}	
+		
 	}, [currentConvUserInfo]);
 
 	useEffect(() => {
@@ -53,24 +96,7 @@ const ChatMessage = () => {
 	}, []);
 
 
-	const userData = useSelector((state) => state.userData);
-	useSubscription(GET_CHAT_SUBSCRIBE, {
-		variables: {
-			conversationId: conversation._id,
-			count: 10,
-		},
-		onSubscriptionData: ({ client, subscriptionData }) => {
-			const chatList =
-				subscriptionData &&
-				subscriptionData.data &&
-				subscriptionData.data.getChat;
-			
-			convId2MsgList[conversation._id] = chatList || [];
-			setMessageList(chatList);
-			messageAreaRef.current.scrollTop =
-				messageAreaRef.current.scrollHeight;
-		},
-	});
+	
 	const toggleShowEmoji = (e) => {
 		e.stopPropagation();
 		setEmojiShow(!emojiShow);
