@@ -36,18 +36,21 @@ For project maintenance and monitoring, we plan to use Sentry for backend monito
 
 **Task:** What is the top 3 most challenging things that you have learned/developed for you app? Please restrict your answer to only three items. 
 
-1.
-2.
+1. Deploying a secure application with multiple microservices and managing domains.
+2. Using caching (Redis) to manage Websocket communication between users
 3. 
 
 ## Contributions
 
 **Task:** Describe the contribution of each team member to the project. Please provide the full name of each team member (but no student number). 
-Shaopeng Lin: 
-Siying Xu:
-Yuming Liu:
+Shaopeng Lin: Backend design and development and Deployment.
+Siying Xu: Frontend design and development
+Yuming Liu: API development and Innovation.
 
 # One more thing? 
 
 **Task:** Any additional comment you want to share with the course staff? 
-Yuming does not appear as a contributer on Github for this project however he does contribute as part of the team. The issue has been made known to Thierry.
+1. Yuming does not appear as a contributer on Github for this project however he does contribute as part of the team. The issue has been made known to Thierry.
+2. Chrome browser seem to use polling instead of websockets and can cause the user video feature to become very slow to respond to socket emits. Firefox does everything in an instant. 
+3. Due to time constraints, some displays might disappear when screen zoom or size is not large enough. Tunning the sizes can often help.
+4. 
