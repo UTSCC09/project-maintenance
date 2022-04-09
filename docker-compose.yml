@@ -45,7 +45,7 @@ services:
       - VIRTUAL_HOST=api.drhandyman.me
       - LETSENCRYPT_HOST=api.drhandyman.me
       - MONGO=mongodb+srv://Chris:chris@dr-handyman.7i3hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
-      - REDIS_PASS=password123
+      - REDIS_PASS=VeryHardPassword
       - REDIS_PORT=6379
       - SECRET=some secret
       - PORT=3000
@@ -66,7 +66,7 @@ services:
       - LETSENCRYPT_HOST=cache.drhandyman.me
       - PORT=4000
       - PROD=false
-      - REDIS_PASS=password123
+      - REDIS_PASS=VeryHardPassword
       - REDIS_PORT=6379
     networks:
       - nginx-proxy
@@ -89,6 +89,6 @@ services:
 
     environment:
       # - VIRTUAL_HOST=cache.drhandyman.me
-      - REDIS_PASSWORD=password123
+      - REDIS_PASSWORD=VeryHardPassword
     networks:
       - app-tier
