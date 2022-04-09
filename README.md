@@ -54,7 +54,7 @@ As for domain names, we used Namecheap to get a free domain name "drhandyman.me"
 **Task:** Explain how you monitor your deployed app to make sure that everything is working as expected.
 
 For project maintenance and monitoring, we are using Sentry for backend Express, Graphql, and MongoDB monitoring.
-Locust.io is used for load testing.
+
 
 ## Challenges
 
